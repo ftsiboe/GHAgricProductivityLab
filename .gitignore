@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+job_*.sbatch
+slurm-*.out
+data-raw/*
+replications/*
+!data-raw/scripts/
+data/*.rds
+data/*/*.rds
+data/*/*/*.rds
+
+
+

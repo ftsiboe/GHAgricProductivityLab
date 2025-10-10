@@ -1,0 +1,33 @@
+Package: GHAgricProductivityLab
+Type: Package
+Title: Agricultural Productivity in Ghana
+Version: 0.0.0.9000
+Author: Francis Tsiboe [aut, cre] (<https://orcid.org/0000-0001-5984-1072>)
+Maintainer: Francis Tsiboe <ftsiboe@hotmail.com>
+Contributor: -
+Reviewer: -
+Creator: Francis Tsiboe
+Description: Provides tools and datasets for investigating the drivers of agricultural production shortfalls in Ghana. 
+ It compiles research studies that examine farmer-specific and institutional factors to assess whether inefficiencies 
+ arise from technical inefficiency, technology gaps, or both. The package offers empirical evidence to inform policy 
+ discussions and interventions aimed at improving agricultural productivity, 
+ particularly in contexts with limited access to modern technologies.
+License: GPL-3 + file LICENSE
+URL: https://github.com/you/GHAgricProductivityLab
+BugReports: https://github.com/you/GHAgricProductivityLab/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+VignetteBuilder: knitr
+Depends: R (>= 4.1.0)
+Imports: haven, data.table, MatchIt
+Remotes: github::dylan-turner25/rfcip
+Suggests: dplyr, knitr, crayon, tidyr, rmarkdown, testthat (>= 3.0.0)
+LazyData: true
+Cite-us: If you find it useful, please consider staring the repository and citing the following studies
+  - Tsiboe, F. and Turner, D. (2025). "Incorporating buy‐up price loss coverage into the United States
+    farm safety net." Applied Economic Perspectives and Policy.
+  - Tsiboe, F., et al. (2025). "Risk reduction impacts of crop insurance in the United States."
+    Applied Economic Perspectives and Policy.
+  - Gaku, S. and Tsiboe, F. (2024). Evaluation of alternative farm safety net program combination
+    strategies. Agricultural Finance Review.
