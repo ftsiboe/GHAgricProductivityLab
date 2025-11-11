@@ -11,7 +11,7 @@
   if (getRversion() >= "2.15.1") {
     utils::globalVariables(
       strsplit(
-        ". TechVar d disasg f level EaId glss .data",
+        " .data EaId glss stat value",
         "\\s+"
       )[[1]]
     )

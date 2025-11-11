@@ -8,8 +8,7 @@ data-raw/*
 replications/*
 !data-raw/scripts/
 data/*.rds
-data/*/*.rds
-data/*/*/*.rds
-
-
+data/*.dta
+data/*.md
+.DS_Store
 

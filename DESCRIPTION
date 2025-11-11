@@ -13,16 +13,16 @@ Description: Provides tools and datasets for investigating the drivers of agricu
  discussions and interventions aimed at improving agricultural productivity, 
  particularly in contexts with limited access to modern technologies.
 License: GPL-3 + file LICENSE
-URL: https://github.com/you/GHAgricProductivityLab
-BugReports: https://github.com/you/GHAgricProductivityLab/issues
+URL: https://github.com/ftsiboe/GHAgricProductivityLab
+BugReports: https://github.com/ftsiboe/GHAgricProductivityLab/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Depends: R (>= 4.1.0)
-Imports: haven, data.table, MatchIt
+Imports: MatchIt, data.table, haven
 Remotes: github::dylan-turner25/rfcip
-Suggests: dplyr, knitr, crayon, tidyr, rmarkdown, testthat (>= 3.0.0)
+Suggests: dplyr, knitr, crayon, tidyr, withr, rmarkdown, cobalt, dplyr,doBy, stringr, testthat (>= 3.0.0)
 LazyData: true
 Cite-us: If you find it useful, please consider staring the repository and citing the following studies
   - Tsiboe, F. and Turner, D. (2025). "Incorporating buy‐up price loss coverage into the United States

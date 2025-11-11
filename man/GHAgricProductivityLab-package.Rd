@@ -11,8 +11,8 @@ Provides tools and datasets for investigating the drivers of agricultural produc
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/you/GHAgricProductivityLab}
-  \item Report bugs at \url{https://github.com/you/GHAgricProductivityLab/issues}
+  \item \url{https://github.com/ftsiboe/GHAgricProductivityLab}
+  \item Report bugs at \url{https://github.com/ftsiboe/GHAgricProductivityLab/issues}
 }
 
 }

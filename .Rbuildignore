@@ -31,14 +31,9 @@ data/README.md
 ^SECURITY\.md$
 code_of_conduct.md
 CONTRIBUTING
-run_workflow_01_simulation.sbatch
-run_workflow_02a_aggregate_outcome_small.sbatch
-run_workflow_02b_aggregate_outcome_big.sbatch
-run_workflow_03_demand_shifts.sbatch
 \\.out$
 ^.*\\.pdf$
 ^GHAgricProductivityLab_.*\.pdf$
 ^data/[^/]+\.rds$
 ^data/[^/]+/[^/]+\.rds$
 ^data/[^/]+/[^/]+/[^/]+\.rds$
-

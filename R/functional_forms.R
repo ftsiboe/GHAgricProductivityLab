@@ -1,7 +1,7 @@
 #' Generate Functional and Distribution Forms
 #'
 #' Creates symbolic production function strings for stochastic frontier analysis (SFA),
-#' including Cobb–Douglas (CD) and Translog (TL) specifications, plus a set of
+#' including Cobb-Douglas (CD) and Translog (TL) specifications, plus a set of
 #' candidate distributions for the inefficiency term.
 #'
 #' @param nX Integer. Number of input variables. Default is 5.

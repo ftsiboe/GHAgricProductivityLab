@@ -21,7 +21,7 @@ A list with:
 }
 \description{
 Creates symbolic production function strings for stochastic frontier analysis (SFA),
-including Cobb–Douglas (CD) and Translog (TL) specifications, plus a set of
+including Cobb-Douglas (CD) and Translog (TL) specifications, plus a set of
 candidate distributions for the inefficiency term.
 }
 \details{
