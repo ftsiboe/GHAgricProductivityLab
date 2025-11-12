@@ -444,3 +444,280 @@ covariate_balance <- function(
 }
 
 
+#' Compute log-linear treatment effects (ATE/ATET/ATEU) for multiple outcomes
+#'
+#' @description
+#' For a given matching specification index `i`, this function:
+#' 1) loads the corresponding matched sample weights from disk,
+#' 2) merges them into the analysis `data` via `UID`,
+#' 3) normalizes selected inputs/outputs by plot `Area`,
+#' 4) fits a weighted log-linear model for each outcome with interactions between `Treat`
+#'    and the provided matching covariate formulas,
+#' 5) transforms fitted differences to percentage effects, trims extreme values, and
+#'    computes weighted ATE, ATET, and ATEU alongside model fit statistics.
+#'
+#' **Note:** The function returns a long table of results (`atet_scalar`), not the index `i`.
+#'
+#' @param data A `data.frame` containing at least:
+#'   - identifiers: `UID`
+#'   - treatment flag: `Treat` (logical or 0/1)
+#'   - plot size: `Area` (positive; used to area-normalize variables)
+#'   - outcomes: `HrvstKg`, `Area`, `SeedKg`, `HHLaborAE`, `HirdHr`, `FertKg`, `PestLt`
+#'   - any covariates referenced in `match_formulas$general_match` and `match_formulas$exact_match`
+#' @param i Integer index selecting the row of `match_specifications` and the matching result
+#'   file to load (zero-padded via `ARRAY` to `"NNNN.rds"`).
+#' @param match_specifications A `data.frame` with at least column `ARRAY`; the `i`-th
+#'   row is used to locate the matching output file and is also cbind-ed to the results.
+#' @param matching_output_directory Directory containing per-specification matching results
+#'   named as `"0001.rds"`, `"0002.rds"`, etc. Each RDS should contain `$md` with `UID` and `weights`.
+#' @param match_formulas A list with:
+#'   - `general_match`: a **formula** (RHS accessed via `as.character(...)[3]`)
+#'   - `exact_match`: a **formula** (RHS accessed via `as.character(...)[2]`)
+#'
+#' @details
+#' For each outcome in \code{c("HrvstKg","Area","SeedKg","HHLaborAE","HirdHr","FertKg","PestLt")}, fits:
+#' \preformatted{
+#' log(outcome + eps) ~ Treat * (general_match_rhs + exact_match_rhs)
+#' }
+#' where \code{eps = min(outcome[outcome>0]) * 1/100}. Treatment effect is
+#' \deqn{TE_OLS = (e^{\hat{y}_1 - \hat{y}_0} - 1) \times 100} trimmed to \eqn{[-100,100]}.
+#'
+#' @return A `data.frame` (`atet_scalar`) with columns from `match_specifications[i, ]`
+#'   joined to rows:
+#'   \itemize{
+#'     \item `outcome`, `treatment`
+#'     \item `level` in \{`ATE`,`ATET`,`ATEU`,`aic`,`ll`,`R2`,`N`,`Ft`,`R2a`\}
+#'     \item `est` (numeric estimate)
+#'   }
+#'
+#' @import stats 
+#' @export
+treatment_effect_calculation <- function(
+    data,
+    i,
+    match_specifications,
+    matching_output_directory,
+    match_formulas){
+
+    # 1. Validate inputs
+    # Ensure formulas are actually formulas (not character strings)
+    if (!inherits(match_formulas$general_match, "formula") ||
+        !inherits(match_formulas$exact_match, "formula")) {
+      stop("`match_formulas$general_match` and `$exact_match` must be formulas.")
+    }
+    
+    # Convert Treat to numeric (1/0) for consistent filtering
+    if (is.logical(data$Treat)) data$Treat <- as.integer(data$Treat)
+    
+    # Check Area for non-positive or missing values to prevent division by zero
+    if (any(!is.finite(data$Area) | data$Area <= 0, na.rm = TRUE)) {
+      stop("Non-positive or missing `Area` values found. Clean before running.")
+    }
+    
+    # Verify that each outcome has at least some positive observations
+    outcomes <- c("HrvstKg", "Area", "SeedKg", "HHLaborAE", "HirdHr", "FertKg", "PestLt")
+    for (oc in outcomes) {
+      if (!any(data[[oc]] > 0, na.rm = TRUE)) {
+        stop(sprintf("Outcome '%s' has no positive values.", oc))
+      }
+    }
+    
+    # 2. Load matched dataset for the current specification
+    # Expected file: matching_output_directory/0001.rds, 0002.rds, etc.
+    file_path <- file.path(
+      matching_output_directory,
+      paste0(stringr::str_pad(match_specifications$ARRAY[i], 4, pad = "0"), ".rds")
+    )
+    
+    # Read in matched data; expect object with `$md` containing UID and weights
+    matched_file <- readRDS(file_path)
+    if (!("md" %in% names(matched_file)) ||
+        !all(c("UID", "weights") %in% names(matched_file$md))) {
+      stop("Matching file is missing `$md` or required columns (UID, weights).")
+    }
+    
+    # Extract matched weights and merge into analysis data
+    md <- matched_file$md[c("UID", "weights")]
+    md <- dplyr::inner_join(data, md, by = "UID")
+    
+    # 3. Normalize key variables by area (per-hectare metrics)
+    md$HrvstKg   <- md$HrvstKg / md$Area
+    md$SeedKg    <- md$SeedKg / md$Area
+    md$HHLaborAE <- md$HHLaborAE / md$Area
+    md$HirdHr    <- md$HirdHr / md$Area
+    md$FertKg    <- md$FertKg / md$Area
+    md$PestLt    <- md$PestLt / md$Area
+    
+    treatment <- "Treat"
+    
+    # 4. Fit outcome-specific models and compute ATE/ATET/ATEU
+    atet_scalar <- as.data.frame(
+      data.table::rbindlist(
+        lapply(outcomes, function(outcome) {
+          tryCatch({
+            
+            # Filter to complete observations for this outcome
+            data <- md[!(is.na(md[, treatment]) |
+                           is.na(md[, outcome])   |
+                           is.na(md[, "weights"])), ]
+            
+            # Build log-linear model formula dynamically
+            Fit.formula <- as.formula(
+              paste0(
+                "log(", outcome, "+",
+                min(data[, outcome][data[, outcome] > 0], na.rm = TRUE) * (1/100),
+                ") ~ ", treatment, "*(",
+                as.character(match_formulas$general_match)[3], "+",
+                as.character(match_formulas$exact_match)[2], ")"
+              )
+            )
+            
+            # Weighted linear model
+            fit_lm <- lm(Fit.formula, weights = weights, data = data)
+            
+            # Predict counterfactuals for treated and untreated cases
+            TREATED <- data[names(data)[!names(data) %in% treatment]]
+            TREATED[, treatment] <- 1
+            TREATED <- predict(fit_lm, TREATED)
+            
+            UNTREATED <- data[names(data)[!names(data) %in% treatment]]
+            UNTREATED[, treatment] <- 0
+            UNTREATED <- predict(fit_lm, UNTREATED)
+            
+            # Treatment effect in percent change
+            data$TE_OLS  <- (exp(TREATED - UNTREATED) - 1) * 100
+            data$outcome <- outcome
+            
+            # Trim implausible effects outside [-100, 100]
+            TE <- data[!(data$TE_OLS <= -100 | data$TE_OLS >= 100), ]
+            
+            # Compute weighted means for ATE, ATET, and ATEU
+            data.table::setDT(TE)
+            ATE  <- data.frame(TE[, .(est = weighted.mean(TE_OLS, w = weights, na.rm = TRUE)), by = .(outcome)])$est
+            ATET <- data.frame(TE[Treat == 1][, .(est = weighted.mean(TE_OLS, w = weights, na.rm = TRUE)), by = .(outcome)])$est
+            ATEU <- data.frame(TE[Treat == 0][, .(est = weighted.mean(TE_OLS, w = weights, na.rm = TRUE)), by = .(outcome)])$est
+            
+            # Model diagnostics
+            aic <- as.numeric(AIC(fit_lm))
+            ll  <- as.numeric(logLik(fit_lm))
+            R2  <- summary(fit_lm)$r.squared
+            R2a <- summary(fit_lm)$adj.r.squared
+            Ft  <- summary(fit_lm)$fstatistic[1]
+            N   <- nrow(fit_lm$model)
+            
+            # Store all results in a tidy frame
+            fit_lm_res <- data.frame(
+              outcome = outcome,
+              treatment = treatment,
+              level = c("ATE", "ATET", "ATEU", "aic", "ll", "R2", "N", "Ft", "R2a"),
+              est   = c(ATE, ATET, ATEU, aic, ll, R2, N, Ft, R2a)
+            )
+            
+            return(fit_lm_res)
+          }, error = function(e) {
+            # Return NULL for this outcome if any model fails
+            return(NULL)
+          })
+        }), fill = TRUE)
+    )
+    
+    # Attach specification metadata to results (not returned)
+    atet_scalar <- data.frame(match_specifications[i, ], atet_scalar)
+    
+    # 5. Return specification index to indicate completion
+    return(atet_scalar)
+    
+}
+
+
+
+#' Summarize Treatment Effect Estimates Across Matching Specifications
+#'
+#' @description
+#' Aggregates and summarizes treatment effect results stored as `.rds` files
+#' in a specified output directory. The function reads each RDS file, combines
+#' all results into a single data frame, filters out invalid estimates, and
+#' computes jackknife-style summary statistics (mean, standard error, sample size,
+#' t-value, and p-value) by matching specification and outcome.
+#'
+#' @param treatment_effects_output_directory
+#' Character string giving the path to the directory containing
+#' `.rds` files with treatment effect results (e.g., outputs of
+#' \code{treatment_effect_calculation()} saved across specifications).
+#'
+#' @details
+#' The function proceeds through the following steps:
+#' \enumerate{
+#'   \item Lists and reads all `.rds` files in \code{treatment_effects_output_directory}.
+#'   \item Combines them into a single long-format data frame using
+#'         \code{data.table::rbindlist()}.
+#'   \item Removes rows with invalid estimates (\code{NA}, \code{NaN}, \code{Inf}, or \code{-Inf}).
+#'   \item Separates base (non-bootstrap) results where \code{boot == 0} and joins these
+#'         with jackknife summary statistics computed via
+#'         \code{doBy::summaryBy()} across method, distance, link, outcome, and level.
+#'   \item Renames summary columns to:
+#'         \itemize{
+#'           \item \code{jack_mean}: mean estimate
+#'           \item \code{jack_se}: standard error
+#'           \item \code{jack_n}: sample size (number of replicates)
+#'           \item \code{jack_tvl}: t-value (\code{jack_mean / jack_se})
+#'           \item \code{jack_pvl}: two-sided p-value
+#'         }
+#' }
+#'
+#' @return
+#' A \code{data.frame} containing summarized treatment effect estimates with
+#' columns:
+#' \itemize{
+#'   \item \code{method, distance, link, outcome, level}
+#'   \item \code{est} (original estimate for non-bootstrap sample)
+#'   \item \code{jack_mean, jack_se, jack_n, jack_tvl, jack_pvl}
+#' }
+#' @export
+treatment_effect_summary <- function(
+    treatment_effects_output_directory){
+  
+  files <- list.files(treatment_effects_output_directory, pattern = "\\.rds$", full.names = TRUE)
+  if (length(files) == 0L) return(data.frame())
+  
+  estim <- as.data.frame(
+    data.table::rbindlist(
+      lapply(files, function(file) {
+        out <- NULL
+        tryCatch({ out <- readRDS(file) }, error = function(e) {})
+        out
+      }),
+      fill = TRUE
+    )
+  )
+  
+  # Required columns present?
+  req <- c("method","distance","link","outcome","level","est","boot")
+  miss <- setdiff(req, names(estim))
+  if (length(miss)) stop("Missing required columns: ", paste(miss, collapse = ", "))
+  
+  # Keep finite estimates only
+  estim <- estim[is.finite(estim$est), , drop = FALSE]
+  
+  # Base (boot==0), deduplicated
+  base0 <- unique(estim[estim$boot %in% 0, c("method","distance","link","outcome","level","est")])
+  
+  # Jackknife summaries across specs (or boots)
+  jk <- doBy::summaryBy(est ~ method + distance + link + outcome + level,
+                        data = estim, FUN = c(length, mean, sd))
+  
+  # Merge
+  estim <- dplyr::full_join(base0, jk, by = c("method","distance","link","outcome","level"))
+  
+  # Rename & inferential stats
+  names(estim)[names(estim) == "est.mean"]   <- "jack_mean"
+  names(estim)[names(estim) == "est.sd"]     <- "jack_se"
+  names(estim)[names(estim) == "est.length"] <- "jack_n"
+  
+  estim$jack_tvl <- ifelse(estim$jack_se > 0, estim$jack_mean / estim$jack_se, NA_real_)
+  df <- pmax(estim$jack_n - 2L, 1L)
+  estim$jack_pvl <- 2 * (1 - stats::pt(abs(estim$jack_tvl), df))
+  
+  
+  return(estim)
+}

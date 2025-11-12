@@ -11,7 +11,7 @@
   if (getRversion() >= "2.15.1") {
     utils::globalVariables(
       strsplit(
-        " .data EaId glss stat value",
+        " .data EaId glss stat value . TE_OLS Treat DATA",
         "\\s+"
       )[[1]]
     )
