@@ -20,7 +20,7 @@ Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](c
 *Collaborations with enthusiastic and committed graduate students are
 welcomed. For more details see the wiki on [Graduate Student Opportunity
 to Lead Research on Agricultural Productivity in
-Ghana](https://github.com/ftsiboeGHAgricProductivityLabb/wiki/Graduate-Student-Opportunity-to-Lead-Research-on-Agricultural-Productivity-in-Ghana)*
+Ghana](https://github.com/ftsiboe/GHAgricProductivityLab/wiki/Graduate-Student-Opportunity-to-Lead-Research-on-Agricultural-Productivity-in-Ghana)*
 
 ## 📘 Overview
 
@@ -65,68 +65,76 @@ periodically, approximately every five years, in Ghana:
 
 - [Technology and managerial performance of farm operators by age in
   Ghana](https://doi.org/10.1007/s11123-023-00679-y) \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/legacy_studies/2023%20Technology%20and%20managerial%20performance%20of%20farm%20operators%20by%20age%20in%20Ghana.zip)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+
 - [Taking stock of gender gaps in crop production technology adoption
   and technical efficiency in
   Ghana](https://doi.org/10.1080/03031853.2022.2150664) \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/legacy_studies/2023%20Taking%20stock%20of%20gender%20gaps%20in%20crop%20production%20in%20Ghana.zip)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+
 - [Starchy Staples Production Shortfall in Ghana is influenced by
   Technical Inefficiency than by Ecological Technology
   Gaps](https://doi.org/10.1371/journal.pone.0284780) \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/legacy_studies/2023%20Starchy%20staples%20production%20shortfalls%20in%20Ghana.zip)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+
 - [Production Technology, Efficiency, and Productivity of Cereal
   Farms](https://doi.org/10.1017/age.2022.16) \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/legacy_studies/2022%20Production%20technology%20efficiency%20and%20productivity%20of%20cereal%20farms%20in%20Ghana.zip)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+
 - [Chronic Sources of Low Cocoa Production in
   Ghana](https://doi.org/10.1017/age.2021.3) \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/legacy_studies/2021%20Chronic%20Sources%20of%20Low%20Cocoa%20Production%20in%20Ghana.zip)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+
 - [Effect of Fertilizer Subsidy on Household Level Cereal Production in
   Ghana](https://doi.org/10.1016/j.sciaf.2021.e00916) \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/legacy_studies/2021%20Effect%20of%20fertilizer%20subsidy%20on%20household%20level%20cereal%20production%20in%20Ghana.zip)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+
 - [Spatiotemporal Evaluation of Dry Beans and Groundnut Production
   Technology and Inefficiency in
   Ghana](https://ageconsearch.umn.edu/record/310316/?ln=en&v=pdf) \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/legacy_studies/2021%20Dry%20Beans%20and%20Groundnut%20Production%20Technology%20and%20Inefficiency%20in%20Ghana.zip)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+
 - [Vegetable Production Technical Efficiency and Technology Gaps in
   Ghana](https://ageconsearch.umn.edu/record/301046/?ln=en&v=pdf) \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/legacy_studies/2019%20Vegetable%20Production%20Technical%20Efficiency%20and%20Technology%20Gaps%20in%20Ghana.zip)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+
 - [Nationally Representative Farm/Household Level Dataset on Crop
   Production in Ghana from
   1987-2017](http://dx.doi.org/10.2139/ssrn.4134518) \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/legacy_studies/30%20Years%20of%20Crop%20Production%20in%20Ghana.zip)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
 
 ## 🛠 Work in Progress
 
 - [Technology Gaps Drive Inequality in Production for Farmers with
   Disabilities](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/tech_inefficiency_disability/DisabilityAgricProdGapGhana_public_version.pdf)
   \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_disability)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/disability)
 - [Heterogeneous Impacts of Farmer Education on Technology Access and
   Technical Efficiency in
   Ghana](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_education#heterogeneous-impacts-of-farmer-education-on-technology-access-and-technical-efficiency-in-ghana)
   \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_education)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/education)
 - [Digging into the Linkages Between Resource Extraction and Farm
   Performance](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_resource_extract#digging-into-the-linkages-between-resource-extraction-and-farm-performance)
   \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_resource_extract)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/resource_extract)
 - Societal Peace and Cohesion Improve Farm Technology and Technical
   Efficiency in Ghana \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_conflict)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/conflict)
 - Financial Inclusion and Credit Impacts on Crop Production in Ghana \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_financial_inclusion)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/financial_inclusion)
 - Land Ownership Appears Neither Necessary nor Sufficient for Superior
   Agricultural Performance in Ghana \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_land_tenure)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/land_tenure)
 - The Association Between Income Transfers and Crop Production in Ghana
   \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_income_transfer)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/income_transfer)
 
 ## 📅 Scheduled Studies
 
 - The link between extension services and Farm Technology Endowment and
   its Efficient Use \|
-  [🗂️⚙️](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_extension)
+  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/extension)
 
 ## 🔓 Data and Code Availability
 
