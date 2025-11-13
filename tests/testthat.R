@@ -6,8 +6,8 @@
 # * https://r-pkgs.org/testing-design.html#sec-tests-files-overview
 # * https://testthat.r-lib.org/articles/special-files.html
 
-# library(testthat)
-# library(data.table)
-# library(GHAgricProductivityLab)
-# test_check("GHAgricProductivityLab")
+library(testthat)
+library(data.table)
+library(GHAgricProductivityLab)
+test_check("GHAgricProductivityLab")
 
