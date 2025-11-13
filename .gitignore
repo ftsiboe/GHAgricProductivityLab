@@ -4,16 +4,12 @@
 .Ruserdata
 job_*.sbatch
 slurm-*.out
-data-raw/*
-replications/*
-!data-raw/scripts/
+.DS_Store
+replications/**/*.dta
+replications/**/*.rds
+replications/**/*.zip
 data/*.rds
 data/*.dta
-data/*.md
-.DS_Store
-job_**.sbatch
-slurm-*.out
-**/output/estimations/**
-**/output/matching/**
-**/output/treatment_effects/**
+data-raw/*
+!data-raw/scripts/
 
