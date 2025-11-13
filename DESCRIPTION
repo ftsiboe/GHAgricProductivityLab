@@ -20,7 +20,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 Depends: R (>= 4.1.0)
-Imports: MatchIt, data.table, haven, stats, sfaR
+Imports: MatchIt, data.table, haven, stats, sfaR, piggyback
 Remotes: github::dylan-turner25/rfcip
 Suggests: dplyr, knitr, crayon, tidyr, withr, rmarkdown, lavaan, emdbook, cobalt, quadprog, 
  dplyr,doBy, stringr, MASS, Matrix, corpcor, testthat (>= 3.0.0)

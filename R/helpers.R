@@ -44,13 +44,6 @@ harmonized_data_prep <- function(data){
     data[,paste0("ln",vv)] <- log(data[,vv] + 0.00001)
   }
   
-  # Convert specified columns to factors using the haven::as_factor function
-  for( vv in c("EduLevel", "Survey", "Region", "Ecozon", "Locality", "Ethnic", "Season", "EduCat", "Head", "Religion", "Marital", "CropID")) {
-    tryCatch({
-      data[,vv] <- haven::as_factor(data[,vv])
-    }, error=function(e){})
-  }
-  
   # Convert EduLevel to numeric levels for analysis
   tryCatch({
     data$EduLevel <- ifelse(as.character((data$EduLevel)) %in% "None","0",as.character((data$EduLevel)))

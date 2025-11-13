@@ -9,6 +9,7 @@ study_setup <- function(
     myseed = 1980632,
     project_name,
     local_directories = list(
+      home             = file.path("replications", project_name),
       output           = file.path("replications", project_name, "output"),
       matching         = file.path("replications", project_name, "output", "matching"),
       treatment_effects= file.path("replications", project_name, "output", "treatment_effects"),

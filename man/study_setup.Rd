@@ -7,12 +7,13 @@
 study_setup(
   myseed = 1980632,
   project_name,
-  local_directories = list(output = file.path("replications", project_name, "output"),
-    matching = file.path("replications", project_name, "output", "matching"),
-    treatment_effects = file.path("replications", project_name, "output",
-    "treatment_effects"), estimations = file.path("replications", project_name, "output",
-    "estimations"), figure_data = file.path("replications", project_name, "output",
-    "figure_data"), figure = file.path("replications", project_name, "output", "figure"))
+  local_directories = list(home = file.path("replications", project_name), output =
+    file.path("replications", project_name, "output"), matching =
+    file.path("replications", project_name, "output", "matching"), treatment_effects =
+    file.path("replications", project_name, "output", "treatment_effects"), estimations =
+    file.path("replications", project_name, "output", "estimations"), figure_data =
+    file.path("replications", project_name, "output", "figure_data"), figure =
+    file.path("replications", project_name, "output", "figure"))
 )
 }
 \arguments{

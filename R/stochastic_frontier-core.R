@@ -569,7 +569,7 @@ msf_workhorse <- function(
       
       mspecs_path    <- study_environment$wd$matching
       mspecs         <- study_environment$match_specifications
-      mspecs_optimal <- readRDS(file.path(study_environment$wd$output, "match_specification_optimal.rds"))[c("ARRAY","method","distance","link")]
+      mspecs_optimal <- study_environment$match_specification_optimal[c("ARRAY","method","distance","link")]
       mspecs_fullset <- mspecs[!grepl("linear",mspecs$link),]
       mspecs_fullset <- mspecs_fullset[mspecs_fullset$boot %in% 0,c("ARRAY","method","distance","link")] #!!!
       
@@ -1947,7 +1947,7 @@ fit_organizer <- function(fit, number_of_inputs, FXN) {
 #' }
 #' @family frontier analysis
 #' @export
-sfaR_summary <- function(fit) {
+sfaR_summary <- function(fit){
   
   # Extract the maximum likelihood results from the fit summary and convert to a dataframe
   mlRes <- as.data.frame(summary(fit)$mlRes)
