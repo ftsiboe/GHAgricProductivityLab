@@ -106,16 +106,16 @@ periodically, approximately every five years, in Ghana:
 ## 🛠 Work in Progress
 
 - [Technology Gaps Drive Inequality in Production for Farmers with
-  Disabilities](https://github.com/ftsiboeGHAgricProductivityLabb/blob/master/replications/tech_inefficiency_disability/DisabilityAgricProdGapGhana_public_version.pdf)
+  Disabilities](https://github.com/ftsiboe/GHAgricProductivityLab/blob/main/replications/disability/DisabilityAgricProdGapGhana_public_version.pdf)
   \|
   [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/disability)
-- [Heterogeneous Impacts of Farmer Education on Technology Access and
+- \[Heterogeneous Impacts of Farmer Education on Technology Access and
   Technical Efficiency in
-  Ghana](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_education#heterogeneous-impacts-of-farmer-education-on-technology-access-and-technical-efficiency-in-ghana)
+  Ghana\]<https://github.com/ftsiboe/GHAgricProductivityLab/blob/main/replications/tech_inefficiency_education#heterogeneous-impacts-of-farmer-education-on-technology-access-and-technical-efficiency-in-ghana>)
   \|
   [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/education)
-- [Digging into the Linkages Between Resource Extraction and Farm
-  Performance](https://github.com/ftsiboeGHAgricProductivityLabb/tree/master/replications/tech_inefficiency_resource_extract#digging-into-the-linkages-between-resource-extraction-and-farm-performance)
+- \[Digging into the Linkages Between Resource Extraction and Farm
+  Performance\]<https://github.com/ftsiboe/GHAgricProductivityLab/blob/main/replications/tech_inefficiency_resource_extract#digging-into-the-linkages-between-resource-extraction-and-farm-performance>)
   \|
   [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/resource_extract)
 - Societal Peace and Cohesion Improve Farm Technology and Technical
