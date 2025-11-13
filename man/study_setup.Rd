@@ -5,7 +5,7 @@
 \title{Initialize Study Environment and Directory Structure}
 \usage{
 study_setup(
-  seed = 1980632,
+  myseed = 1980632,
   project_name,
   local_directories = list(output = file.path("replications", project_name, "output"),
     matching = file.path("replications", project_name, "output", "matching"),
@@ -16,7 +16,7 @@ study_setup(
 )
 }
 \arguments{
-\item{seed}{Numeric/integer scalar seed. Will be coerced to integer. Default: 1980632.}
+\item{myseed}{Numeric/integer scalar seed. Will be coerced to integer. Default: 1980632.}
 
 \item{project_name}{Length-1, non-NA character project name (required).}
 

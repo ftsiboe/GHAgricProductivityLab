@@ -420,7 +420,7 @@ Fxn_SF_forms <- function(nX=5, TREND=FALSE) {
 # - ulist: A list containing variables for the inefficiency function.
 # - vlist: A list containing variables for the production risk function.
 
-Fxn.equation_editor <- function(
+equation_editor <- function(
     data,
     FXN,
     outcome,
@@ -1652,7 +1652,7 @@ Fxn.MSF_WorkHorse_FT <- function(
 # - intercept_shiftersM: Variables for intercept shifters in the matched sample.
 # - disagscors_list: List of variables for disaggregated score summary.
 
-Fxn_draw_estimations <- function(
+draw_msf_estimations <- function(
     draw, drawlist, surveyy=FALSE, data, yvar, xlist, ulist=NULL, vlist=NULL, wvar=NULL,
     slope_shifter="NONE", intercept_shifters=NULL, f, d, UID, TREND=FALSE, tvar=NULL,
     nnm=NULL, ulistM=NULL, intercept_shiftersM=NULL, disagscors_list=NULL) {
@@ -1805,6 +1805,8 @@ Fxn_draw_estimations <- function(
     #---------------------------------------------
   }, error = function(e) {return(NULL)})
 }
+
+
 #---------------------------------------------
 # draw summary                             ####
 # This function computes summary statistics from multiple draws of stochastic frontier analysis results.
@@ -1812,7 +1814,7 @@ Fxn_draw_estimations <- function(
 # - res: List of results from multiple draws.
 # - TechKey: Data frame containing technology keys.
 
-Fxn.draw_summary <- function(res, TechKey) {
+draw_draw_summary <- function(res, TechKey) {
   #---------------------------------------------------
   # Summary Estimates                              ####
   # Combine results from all draws for summary estimates

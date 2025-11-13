@@ -11,4 +11,9 @@ data/*.rds
 data/*.dta
 data/*.md
 .DS_Store
+job_**.sbatch
+slurm-*.out
+**/output/estimations/**
+**/output/matching/**
+**/output/treatment_effects/**
 

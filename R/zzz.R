@@ -11,7 +11,10 @@
   if (getRversion() >= "2.15.1") {
     utils::globalVariables(
       strsplit(
-        " .data EaId glss stat value . TE_OLS Treat DATA",
+        " .data EaId glss stat value . TE_OLS Treat DATA CoefName DONE Estimate Survey TGR Tech crop_area_list estType
+    group_by input restrict risk seed solve.QP summarise
+    technology_variable translogCalc translogCheckCurvature
+    translogCheckMono translogEla translogMonoRestr type study_environment",
         "\\s+"
       )[[1]]
     )

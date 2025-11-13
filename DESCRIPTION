@@ -17,12 +17,13 @@ URL: https://github.com/ftsiboe/GHAgricProductivityLab
 BugReports: https://github.com/ftsiboe/GHAgricProductivityLab/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 Depends: R (>= 4.1.0)
-Imports: MatchIt, data.table, haven, stats
+Imports: MatchIt, data.table, haven, stats, sfaR
 Remotes: github::dylan-turner25/rfcip
-Suggests: dplyr, knitr, crayon, tidyr, withr, rmarkdown, cobalt, dplyr,doBy, stringr, testthat (>= 3.0.0)
+Suggests: dplyr, knitr, crayon, tidyr, withr, rmarkdown, lavaan, emdbook, cobalt, quadprog, 
+ dplyr,doBy, stringr, MASS, Matrix, corpcor, testthat (>= 3.0.0)
 LazyData: true
 Cite-us: If you find it useful, please consider staring the repository and citing the following studies
   - Tsiboe, F. and Turner, D. (2025). "Incorporating buy‐up price loss coverage into the United States

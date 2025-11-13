@@ -1,3 +1,18 @@
+#' Mode of a Vector (Internal)
+#'
+#' Computes the most frequent value in a vector. Used internally.
+#'
+#' @param x Vector.
+#' @param na.rm Logical; remove NA values. Default TRUE.
+#'
+#' @return The modal value.
+#'
+#' @keywords internal
+mode <- function(x, na.rm = TRUE) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
 #' Prepare Data for Agricultural Productivity Analysis
 #'
 #' Cleans and transforms a dataset by creating new variables, applying 
@@ -51,7 +66,7 @@ harmonized_data_prep <- function(data){
   data$Ecozon <- as.character(data$Ecozon)
   data$Survey <- as.character(data$Survey)
   data$Region <- as.character(data$Region)
-  
+  data$unique_identifier <- 1:nrow(data)
   # Return the cleaned and transformed data
   return(data)
 }

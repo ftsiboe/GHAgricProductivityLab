@@ -1,12 +1,12 @@
 #' Initialize Study Environment and Directory Structure
 #'
-#' @param seed Numeric/integer scalar seed. Will be coerced to integer. Default: 1980632.
+#' @param myseed Numeric/integer scalar seed. Will be coerced to integer. Default: 1980632.
 #' @param project_name Length-1, non-NA character project name (required).
 #' @param local_directories Named list of character paths to create. Defaults use `project_name`.
 #' @return List with `wd` (directories) and `seed`.
 #' @export
 study_setup <- function(
-    seed = 1980632,
+    myseed = 1980632,
     project_name,
     local_directories = list(
       output           = file.path("replications", project_name, "output"),
@@ -24,10 +24,9 @@ study_setup <- function(
   }
   
   # seed validation -> coerce to safe integer
-  if (!is.numeric(seed) || length(seed) != 1 || !is.finite(seed) || is.na(seed)) {
-    stop("`seed` must be a finite numeric(1).", call. = FALSE)
+  if(is.null(myseed)){
+    myseed <- GHAgricProductivityLab_control()$myseed
   }
-  seed_int <- as.integer(seed)
 
   # local_directories validation
   if (!is.list(local_directories) || length(local_directories) == 0L) {
@@ -45,12 +44,12 @@ study_setup <- function(
   invisible(lapply(local_directories, dir.create, recursive = TRUE, showWarnings = FALSE))
   
   # set seed
-  set.seed(seed_int)
+  set.seed(myseed)
   
   # return
   list(
     wd   = local_directories,
-    seed = seed_int
+    myseed = myseed
   )
 }
 
