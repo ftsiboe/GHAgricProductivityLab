@@ -40,7 +40,7 @@
 #' \code{tidyr::spread()} is used for wide reshaping (consider
 #' \code{tidyr::pivot_wider()} in new code).
 #' @family matching
-#' @importFrom data.table rbindlist
+#' @import data.table
 #' @export
 match_sample_specifications <- function(
     number_of_draws = NULL, data, myseed = NULL) {
@@ -278,8 +278,8 @@ draw_matched_samples <- function(
   if (!nrow(m.data)) stop("All rows were excluded by `sample_draw_list` for the selected bootstrap ID.")
   
   # ---- Summarize the weight by Surveyx and EaId again and merge with the sampled data.
-  allocj_tbl <- dplyr::group_by(m.data, .data$Surveyx, .data$EaId) |>
-    dplyr::summarise(allocj = sum(.data$Weight, na.rm = TRUE), .groups = "drop")
+  allocj_tbl <- m.data |> dplyr::group_by(Surveyx, EaId) |>
+    dplyr::summarise(allocj = sum(Weight, na.rm = TRUE), .groups = "drop")
   m.data <- dplyr::inner_join(allocj_tbl, m.data, by = c("Surveyx", "EaId"))
   
   # ---- Calculate the adjusted weights for matching.

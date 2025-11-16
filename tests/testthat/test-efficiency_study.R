@@ -335,6 +335,7 @@ test_that("efficiency study has no issues", {
   
   expect_true(nrow(obj$match_specification_ranking) >= 8)
   expect_true(nrow(obj$balance_table) >= 8)
+  
   # # =============================================================================
   # #  MULTI-STAGE FRONTIER ESTIMATION WORKFLOW – DISABILITY STUDY
   # # =============================================================================
