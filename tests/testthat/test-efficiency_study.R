@@ -482,9 +482,9 @@ test_that("efficiency study has no issues", {
             matching_type           = matching_type)
 
           # Summarize results across draws (means, stats, etc.)
-          # res <- list(res[[1]],res[[2]],res[[2]],res[[2]],res[[2]])
-          # res <- draw_msf_summary(res=res,technology_legend=technology_legend)
-          res <- res[[1]]
+          res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
+          res <- draw_msf_summary(res=res,technology_legend=technology_legend)
+          # res <- res[[1]]
           
           # Attach metadata (functional form, distribution, tech labels)
           for(i in 1:length(res)){
