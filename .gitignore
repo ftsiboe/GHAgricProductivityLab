@@ -12,4 +12,6 @@ data/*.rds
 data/*.dta
 data-raw/*
 !data-raw/scripts/
-
+tests/**/*.dta
+tests/**/*.rds
+tests/**/*.zip

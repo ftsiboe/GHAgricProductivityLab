@@ -104,7 +104,7 @@ when monotonicity is sufficiently violated, re-estimates a
 shape-constrained (restricted) frontier using minimum-distance methods.
 The function wraps the underlying \code{sfaR} estimation routines and a set
 helper utilities (e.g., \code{sf_functional_forms()}, \code{equation_editor()},
-\code{Fxn.fit_organizer()}, \code{translogEla()}, curvature/monotonicity
+\code{fit_organizer()}, \code{translogEla()}, curvature/monotonicity
 checks) to produce:
 \enumerate{
 \item Unrestricted stochastic frontier estimates and diagnostics.
@@ -141,7 +141,7 @@ observation-level risk metric based on squared deviations from mean
 output.
 
 \item \strong{Elasticities and regularity checks:}
-Using \code{Fxn.fit_organizer()} and \code{translogEla()}, the function
+Using \code{fit_organizer()} and \code{translogEla()}, the function
 computes elasticities and returns-to-scale-type measures, and evaluates
 monotonicity and curvature via \code{translogCheckMono()} and
 \code{translogCheckCurvature()} (or a coefficient-sign check for CD/LN

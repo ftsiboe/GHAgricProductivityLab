@@ -151,19 +151,19 @@ draw_msf_estimations <- function(
   
   tryCatch({ 
     function(){
-      production_slope_shifters       =NULL
-      include_trend       =FALSE
-      technology_variable                = technology_variable
-      draw                = 0
-      surveyy             = FALSE
-      intercept_shifters  = list(Svarlist=crop_area_list,Fvarlist=c("Survey","Ecozon"))
-      intercept_shifters_meta = list(Svarlist=crop_area_list,Fvarlist=c("Survey","Ecozon"))
-      weight_variable                = "Weight"
-      output_variable                = "HrvstKg"
-      risk_covariates               = NULL
-      input_variables               = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt")
-      inefficiency_covariates               = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
-      adoption_covariates              = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
+      production_slope_shifters   = NULL
+      include_trend               = FALSE
+      technology_variable         = technology_variable
+      draw                        = 0
+      surveyy                     = FALSE
+      intercept_shifters          = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon"))
+      intercept_shifters_meta     = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon"))
+      weight_variable             = "Weight"
+      output_variable             = "HrvstKg"
+      risk_covariates             = NULL
+      input_variables             = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt")
+      inefficiency_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
+      adoption_covariates         = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
       identifiers                 = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid")
     }
     #---------------------------------------------
@@ -418,6 +418,9 @@ draw_msf_estimations <- function(
 #'
 #' @export
 draw_msf_summary <- function(res, technology_legend) {
+  
+  res_list <- list(el_samp=res[[1]]$el_samp, ef_samp=res[[1]]$ef_samp, rk_samp=res[[1]]$rk_samp)
+  
   #---------------------------------------------------
   # Summary Estimates                              ####
   # Combine results from all draws for summary estimates
@@ -434,21 +437,23 @@ draw_msf_summary <- function(res, technology_legend) {
   }
   
   # Filter specific conditions for summary estimates
-  sf_estmX <- sf_estm[sf_estm$CoefName %in% "Nobs",]
-  sf_estmX <- sf_estmX[sf_estmX$draw %in% 0,]
-  sf_estmX <- sf_estmX[sf_estmX$restrict %in% "Unrestricted",]
-  sf_estmX <- sf_estmX[sf_estmX$Tech %in% 999,]
-  sf_estmX <- sf_estmX[sf_estmX$sample %in% "unmatched",]
+  # sf_estmX <- sf_estm[sf_estm$CoefName %in% "Nobs",]
+  # sf_estmX <- sf_estmX[sf_estmX$draw %in% 0,]
+  # sf_estmX <- sf_estmX[sf_estmX$restrict %in% "Unrestricted",]
+  # sf_estmX <- sf_estmX[sf_estmX$Tech %in% 999,]
+  # sf_estmX <- sf_estmX[sf_estmX$sample %in% "unmatched",]
   
   # Calculate summary statistics for the estimates
   sf_estm <- dplyr::inner_join(
-    sf_estm[sf_estm$draw %in% 0, c("Survey", "CoefName", "Tech", "sample", "restrict", "Estimate", "StdError", "Zvalue", "Pvalue")],
+    doBy::summaryBy(list(c("Estimate", "StdError", "Zvalue", "Pvalue"), 
+                         c("Survey", "CoefName", "Tech", "sample", "restrict")),
+                    data=sf_estm[sf_estm$draw %in% 0,], FUN=mean, keep.names = T),
     doBy::summaryBy(list(c("Estimate"), c("Survey", "CoefName", "Tech", "sample", "restrict")),
-                    data=sf_estm[!sf_estm$draw %in% 0,], FUN=c(mean, sd, length)),
+                    data=sf_estm, FUN=c(mean, sd, length)),
     by=c("Survey", "CoefName", "Tech", "sample", "restrict"))
   sf_estm$jack_zv <- sf_estm$Estimate / sf_estm$Estimate.sd
   sf_estm$jack_pv <- round(2 * (1 - pt(abs(sf_estm$jack_zv), df=sf_estm$Estimate.length)), 5)
-  
+  res_list[["sf_estm"]] <- sf_estm
   #---------------------------------------------------
   # Summary Scores                                 ####
   # Combine results from all draws for summary scores
@@ -457,16 +462,18 @@ draw_msf_summary <- function(res, technology_legend) {
   
   ef_mean <- doBy::summaryBy(list(c("Estimate"), c("sample", "Tech", "type", "estType", "Survey", "stat", "CoefName", "restrict", "draw")),
                              data=ef_mean, FUN=mean, keep.names = T)
-  
+
   ef_mean <- dplyr::inner_join(
-    ef_mean[ef_mean$draw %in% 0, c("sample", "Tech", "type", "estType", "Survey", "stat", "CoefName", "restrict", "Estimate")],
+    doBy::summaryBy(list(c("Estimate"), 
+                         c("sample", "Tech", "type", "estType", "Survey", "stat", "CoefName", "restrict")),
+                    data=ef_mean[ef_mean$draw %in% 0,], FUN=mean, keep.names = T),
     doBy::summaryBy(list(c("Estimate"), c("sample", "Tech", "type", "estType", "Survey", "stat", "CoefName", "restrict")),
-                    data=ef_mean[!ef_mean$draw %in% 0,], FUN=c(mean, sd, length)),
+                    data=ef_mean, FUN=c(mean, sd, length)),
     by=c("sample", "Tech", "type", "estType", "Survey", "stat", "CoefName", "restrict"))
   
   ef_mean$jack_zv <- ef_mean$Estimate / ef_mean$Estimate.sd
   ef_mean$jack_pv <- round(2 * (1 - pt(abs(ef_mean$jack_zv), df=ef_mean$Estimate.length)), 5)
-  
+  res_list[["ef_mean"]] <- ef_mean
   #---------------------------------------------------
   # Summary Elasticity                             ####
   # Combine results from all draws for summary elasticity
@@ -475,16 +482,18 @@ draw_msf_summary <- function(res, technology_legend) {
   
   el_mean <- doBy::summaryBy(list(c("Estimate"), c("Survey", "sample", "Tech", "input", "Survey", "stat", "CoefName", "restrict", "draw")),
                              data=el_mean, FUN=mean, keep.names = T)
-  
+
   el_mean <- dplyr::inner_join(
-    el_mean[el_mean$draw %in% 0, c("sample", "Tech", "input", "Survey", "stat", "CoefName", "restrict", "Estimate")],
+    doBy::summaryBy(list(c("Estimate"), 
+                         c("sample", "Tech", "input", "Survey", "stat", "CoefName", "restrict")),
+                    data=el_mean[el_mean$draw %in% 0,], FUN=mean, keep.names = T),
     doBy::summaryBy(list(c("Estimate"), c("sample", "Tech", "input", "Survey", "stat", "CoefName", "restrict")),
-                    data=el_mean[!el_mean$draw %in% 0,], FUN=c(mean, sd, length)),
+                    data=el_mean, FUN=c(mean, sd, length)),
     by=c("sample", "Tech", "input", "Survey", "stat", "CoefName", "restrict"))
   
   el_mean$jack_zv <- el_mean$Estimate / el_mean$Estimate.sd
   el_mean$jack_pv <- round(2 * (1 - pt(abs(el_mean$jack_zv), df=el_mean$Estimate.length)), 5)
-  
+  res_list[["el_mean"]] <- el_mean
   #---------------------------------------------------
   # Distribution bars- Scores                      ####
   # Combine results from all draws for distribution bars of scores
@@ -497,18 +506,19 @@ draw_msf_summary <- function(res, technology_legend) {
                              data=ef_dist, FUN=mean, keep.names = T)
   
   ef_dist <- dplyr::inner_join(
-    ef_dist[ef_dist$draw %in% 0, c("Survey", "sample", "Tech", "type", "estType", "range", "Frqlevel", "stat", "restrict", "Estimate")],
+    doBy::summaryBy(list(c("Estimate"), 
+                         c("Survey", "sample", "Tech", "type", "estType", "range", "Frqlevel", "stat", "restrict")),
+                    data=ef_dist[ef_dist$draw %in% 0,], FUN=mean, keep.names = T),
     doBy::summaryBy(list(c("Estimate"), c("Surveyy", "Survey", "sample", "Tech", "type", "estType", "range", "Frqlevel", "stat", "restrict")),
-                    data=ef_dist[!ef_dist$draw %in% 0,], FUN=c(mean, sd, length)),
+                    data=ef_dist, FUN=c(mean, sd, length)),
     by=c("Survey", "sample", "Tech", "type", "estType", "range", "Frqlevel", "stat", "restrict"))
   
   ef_dist$jack_zv <- ef_dist$Estimate / ef_dist$Estimate.sd
   ef_dist$jack_pv <- round(2 * (1 - pt(abs(ef_dist$jack_zv), df=ef_dist$Estimate.length)), 5)
   ef_dist$stat <- gsub("est_", "", ef_dist$stat)
-  
+  res_list[["ef_dist"]] <- ef_dist
   #---------------------------------------------------
   # Disaggregated score summary                    ####
-  disagscors <- NULL
   if(!is.null(res[[1]]$disagscors)) {
     disagscors <- as.data.frame(data.table::rbindlist(lapply(1:length(res), function(draw) { return(res[[draw]]$disagscors) }), fill = TRUE)) |> 
       tidyr::gather(stat, Estimate, c("wmean", "mean", "median", "mode")) 
@@ -533,15 +543,18 @@ draw_msf_summary <- function(res, technology_legend) {
     disagscors <- as.data.frame(data.table::rbindlist(list(disagscors, disagscorsGAP), fill = TRUE))
     
     disagscors <- dplyr::inner_join(
-      disagscors[disagscors$draw %in% 0, c("sample", "estType", "Tech", "input", "Survey", "disagscors_level", "disagscors_var", "CoefName", "stat", "restrict", "Estimate")],
+      doBy::summaryBy(list(c("Estimate"), 
+                           c("sample", "estType", "Tech", "input", "Survey", "disagscors_level", "disagscors_var", "CoefName", "stat", "restrict")),
+                      data=disagscors[disagscors$draw %in% 0,], FUN=mean, keep.names = T),
       doBy::summaryBy(list(c("Estimate"), c("sample", "estType", "Tech", "input", "Survey", "disagscors_level", "disagscors_var", "CoefName", "stat", "restrict")),
-                      data=disagscors[!disagscors$draw %in% 0,], FUN=c(mean, sd, length)),
+                      data=disagscors, FUN=c(mean, sd, length)),
       by=c("sample", "estType", "Tech", "input", "Survey", "disagscors_level", "disagscors_var", "CoefName", "stat", "restrict"))
     
     disagscors$jack_zv <- disagscors$Estimate / disagscors$Estimate.sd
     disagscors$jack_pv <- round(2 * (1 - pt(abs(disagscors$jack_zv), df=disagscors$Estimate.length)), 5)
+    res_list[["disagscors"]] <- disagscors
   }
-  
+
   #---------------------------------------------------
   # Summary- Risk                                  ####
   rk_mean <- NULL
@@ -553,13 +566,16 @@ draw_msf_summary <- function(res, technology_legend) {
                                data=rk_mean, FUN=mean, keep.names = T)
     
     rk_mean <- dplyr::inner_join(
-      rk_mean[rk_mean$draw %in% 0, c("sample", "Tech", "Survey", "stat", "CoefName", "restrict", "Estimate")],
+      doBy::summaryBy(list(c("Estimate"), 
+                           c("sample", "Tech", "Survey", "stat", "CoefName", "restrict")),
+                      data=rk_mean[rk_mean$draw %in% 0,], FUN=mean, keep.names = T),
       doBy::summaryBy(list(c("Estimate"), c("sample", "Tech", "Survey", "stat", "CoefName", "restrict")),
-                      data=rk_mean[!rk_mean$draw %in% 0,], FUN=c(mean, sd, length)),
+                      data=rk_mean, FUN=c(mean, sd, length)),
       by=c("sample", "Tech", "Survey", "stat", "CoefName", "restrict"))
     rk_mean$jack_zv <- rk_mean$Estimate / rk_mean$Estimate.sd
     rk_mean$jack_pv <- round(2 * (1 - pt(abs(rk_mean$jack_zv), df=rk_mean$Estimate.length)), 5)
     rk_mean$type <- "risk"
+    res_list[["rk_mean"]] <- rk_mean
   }
   
   #---------------------------------------------------
@@ -572,25 +588,25 @@ draw_msf_summary <- function(res, technology_legend) {
     
     rk_dist <- doBy::summaryBy(list(c("Estimate"), c("Survey", "sample", "Tech", "range", "Frqlevel", "stat", "restrict", "draw")),
                                data=rk_dist, FUN=mean, keep.names = T)
-    
+
     rk_dist <- dplyr::inner_join(
-      rk_dist[rk_dist$draw %in% 0, c("Survey", "sample", "Tech", "range", "Frqlevel", "stat", "restrict", "Estimate")],
+      doBy::summaryBy(list(c("Estimate"), 
+                           c("Survey", "sample", "Tech", "range", "Frqlevel", "stat", "restrict")),
+                      data=rk_dist[rk_dist$draw %in% 0,], FUN=mean, keep.names = T),
       doBy::summaryBy(list(c("Estimate"), c("Survey", "sample", "Tech", "range", "Frqlevel", "stat", "restrict")),
-                      data=rk_dist[!rk_dist$draw %in% 0,], FUN=c(mean, sd, length)),
+                      data=rk_dist, FUN=c(mean, sd, length)),
       by=c("Survey", "sample", "Tech", "range", "Frqlevel", "stat", "restrict"))
     
     rk_dist$jack_zv <- rk_dist$Estimate / rk_dist$Estimate.sd
     rk_dist$jack_pv <- round(2 * (1 - pt(abs(rk_dist$jack_zv), df=rk_dist$Estimate.length)), 5)
     rk_dist$stat <- gsub("est_", "", rk_dist$stat)
     rk_dist$type <- "risk"
+    res_list[["rk_dist"]] <- rk_dist
   }
   
   #---------------------------------------------------
   # Summary and export                             ####
-  res <- list(sf_estm=sf_estm, el_mean=el_mean, ef_mean=ef_mean,
-              rk_mean=rk_mean, ef_dist=ef_dist, rk_dist=rk_dist, disagscors=disagscors,
-              el_samp=res[[1]]$el_samp, ef_samp=res[[1]]$ef_samp, rk_samp=res[[1]]$rk_samp)
-  
-  return(res)
+
+  return(res_list)
   #---------------------------------------------------
 }

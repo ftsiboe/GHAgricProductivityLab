@@ -22,13 +22,16 @@ VignetteBuilder: knitr
 Depends: R (>= 4.1.0)
 Imports: MatchIt, data.table, haven, stats, sfaR, piggyback
 Remotes: github::dylan-turner25/rfcip
-Suggests: dplyr, knitr, crayon, tidyr, withr, rmarkdown, lavaan, emdbook, cobalt, quadprog, cli,
- dplyr,doBy, stringr, MASS, Matrix, corpcor, testthat (>= 3.0.0), car, frontier, micEcon, rgenoud
+Suggests: knitr, crayon, tidyr, withr, rmarkdown, lavaan, quadprog, emdbook, cobalt, cli,
+ dplyr, doBy, stringr, MASS, Matrix, corpcor, testthat (>= 3.0.0), car, frontier, micEcon, rgenoud,
+ purrr, randomForest, CBPS, dbarts, optmatch, Matching
 LazyData: true
 Cite-us: If you find it useful, please consider staring the repository and citing the following studies
-  - Tsiboe, F. and Turner, D. (2025). "Incorporating buy‐up price loss coverage into the United States
-    farm safety net." Applied Economic Perspectives and Policy.
-  - Tsiboe, F., et al. (2025). "Risk reduction impacts of crop insurance in the United States."
-    Applied Economic Perspectives and Policy.
-  - Gaku, S. and Tsiboe, F. (2024). Evaluation of alternative farm safety net program combination
-    strategies. Agricultural Finance Review.
+  - Tsiboe F. (2021). Chronic sources of low cocoa production in Ghana, new insights from meta-analysis of old survey data. 
+    Agricultural and Resource Economics Review.50(2) 226-251.
+  - Tsiboe, F., Egyir, I. S., & Anaman, G. (2021). Effect of fertilizer subsidy on household level cereal production in Ghana. 
+    Scientific African, 13, e00916.
+  - Tsiboe F. (2022). Nationally Representative Farm/Household Level Dataset on Crop Production in Ghana from 1987-2017.
+
+
+

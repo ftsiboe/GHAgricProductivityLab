@@ -1021,7 +1021,7 @@ msf_workhorse <- function(
 #' shape-constrained (restricted) frontier using minimum-distance methods.
 #' The function wraps the underlying \code{sfaR} estimation routines and a set
 #' helper utilities (e.g., \code{sf_functional_forms()}, \code{equation_editor()},
-#' \code{Fxn.fit_organizer()}, \code{translogEla()}, curvature/monotonicity
+#' \code{fit_organizer()}, \code{translogEla()}, curvature/monotonicity
 #' checks) to produce:
 #' \enumerate{
 #'   \item Unrestricted stochastic frontier estimates and diagnostics.
@@ -1104,7 +1104,7 @@ msf_workhorse <- function(
 #'     output.
 #'
 #'   \item \strong{Elasticities and regularity checks:}
-#'     Using \code{Fxn.fit_organizer()} and \code{translogEla()}, the function
+#'     Using \code{fit_organizer()} and \code{translogEla()}, the function
 #'     computes elasticities and returns-to-scale-type measures, and evaluates
 #'     monotonicity and curvature via \code{translogCheckMono()} and
 #'     \code{translogCheckCurvature()} (or a coefficient-sign check for CD/LN
@@ -1337,7 +1337,7 @@ sf_workhorse <- function(
           if(is.null(sf_minDist)) {
             tryCatch({
               inv_est_vcov <- corpcor::make.positive.definite(inv_est_vcov)
-              sf_minDist <- solve.QP(Dmat=inv_est_vcov, dvec=rep(0, length(est_coef)), Amat=t(monoRestr), bvec=-monoRestr %*% est_coef)
+              sf_minDist <- quadprog::solve.QP(Dmat=inv_est_vcov, dvec=rep(0, length(est_coef)), Amat=t(monoRestr), bvec=-monoRestr %*% est_coef)
             }, error=function(e){})
           }
         }, error=function(e){})
@@ -1349,6 +1349,10 @@ sf_workhorse <- function(
           diag(inv_est_vcov) <- 1
           sf_minDist <- quadprog::solve.QP(Dmat=inv_est_vcov, dvec=rep(0, length(est_coef)), Amat=t(monoRestr), bvec=-monoRestr %*% est_coef)
         }, error=function(e){})
+      }
+      
+      if(is.null(sf_minDist)) {
+        stop("Minimum-distance QP failed for all attempts; cannot construct constrained coefficients.")
       }
       
       est_coefc <- sf_minDist$solution + est_coef
