@@ -308,9 +308,6 @@ test_that("efficiency study has no issues", {
 
   rm(list = ls(all = TRUE)); gc()  
   
-  library(dplyr);library(sfaR) ;library(micEcon);library(frontier)
-  library(rgenoud);library(quadprog);library(car)
-
   project_name = "test"
   
   # Detect operating system to determine runtime environment

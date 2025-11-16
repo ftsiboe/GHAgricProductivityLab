@@ -23,7 +23,7 @@ Depends: R (>= 4.1.0)
 Imports: MatchIt, data.table, haven, stats, sfaR, piggyback
 Remotes: github::dylan-turner25/rfcip
 Suggests: dplyr, knitr, crayon, tidyr, withr, rmarkdown, lavaan, emdbook, cobalt, quadprog, cli,
- dplyr,doBy, stringr, MASS, Matrix, corpcor, testthat (>= 3.0.0)
+ dplyr,doBy, stringr, MASS, Matrix, corpcor, testthat (>= 3.0.0), car, frontier, micEcon, rgenoud
 LazyData: true
 Cite-us: If you find it useful, please consider staring the repository and citing the following studies
   - Tsiboe, F. and Turner, D. (2025). "Incorporating buy‐up price loss coverage into the United States

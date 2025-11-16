@@ -8,6 +8,13 @@
 
 library(testthat)
 library(data.table)
+library(dplyr)
+library(sfaR)
+library(micEcon)
+library(frontier)
+library(rgenoud)
+library(quadprog)
+library(car)
 library(GHAgricProductivityLab)
 test_check("GHAgricProductivityLab")
 
