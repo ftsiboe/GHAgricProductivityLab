@@ -193,19 +193,19 @@ lapply(
           d                       = d,
           technology_variable     = technology_variable,
           matching_type           = matching_type) 
-        
+        #res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
         # Summarize results across draws (means, stats, etc.)
         res <- draw_msf_summary(res=res,technology_legend=technology_legend)
         
         # Attach metadata (functional form, distribution, tech labels)
         for(i in 1:length(res)){
           tryCatch({
-            res[[i]][,"FXN"]     <- names(fxnforms)[f]
-            res[[i]][,"DIS"]     <- names(distforms)[d]
-            res[[i]][,"disasg"]  <- disaggregate_variable
-            res[[i]][,"level"]   <- disaggregate_level
-            res[[i]][,"TCH"]     <- technology_variable
-            res[[i]][,"TCHLvel"] <- factor(res[[i]][,"Tech"],levels = c(-999,technology_legend$Tech,999),labels = c("National",technology_legend[,2],"Meta"))
+            res[[i]][,"fxnforms"]               <- names(fxnforms)[f]
+            res[[i]][,"distforms"]              <- names(distforms)[d]
+            res[[i]][,"disaggregate_variable"]  <- disaggregate_variable
+            res[[i]][,"disaggregate_level"]     <- disaggregate_level
+            res[[i]][,"technology_variable"]    <- technology_variable
+            res[[i]][,"TCHLvel"]                <- factor(res[[i]][,"Tech"],levels = c(-999,technology_legend$Tech,999),labels = c("National",technology_legend[,2],"Meta"))
           }, error=function(e){})
         }
         
