@@ -264,7 +264,7 @@ test_that("efficiency study has no issues", {
 
   # --- Block 1: Treatment Effect Estimation
   # Executed if running locally (Windows) or on SLURM jobs named “te_all” or “te_disa”
-  if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "te_disa")) {
+  #if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "te_disa")) {
 
     # Restrict to a single specification if SLURM_ARRAY_TASK_ID is set
     if (!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
@@ -300,7 +300,7 @@ test_that("efficiency study has no issues", {
     })
 
     cli::cli_progress_done()
-  }
+    #}
   
   # --- Block 2: Treatment Effect Summary
   # Executed if running locally (Windows) or on SLURM jobs named “te_sum”
