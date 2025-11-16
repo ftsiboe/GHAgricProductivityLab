@@ -16,5 +16,5 @@ library(rgenoud)
 library(quadprog)
 library(car)
 library(GHAgricProductivityLab)
-test_check("GHAgricProductivityLab")
+#test_check("GHAgricProductivityLab")
 

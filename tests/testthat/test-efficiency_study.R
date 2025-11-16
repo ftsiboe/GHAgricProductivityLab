@@ -103,7 +103,7 @@ test_that("efficiency study has no issues", {
   
   # Local convenience bindings
   match_specifications <- m.specs$m.specs[1:8,]
-  sample_draw_list     <- as.data.frame(m.specs$drawlist)
+  sample_draw_list     <- as.data.frame(m.specs$drawlist)[1:3,]
   
   # Persist key objects in the study_environment container
   study_environment[["match_specifications"]]   <- match_specifications
@@ -133,7 +133,7 @@ test_that("efficiency study has no issues", {
     lapply(
       idx,
       function(i, data) {
-        tryCatch({
+        #tryCatch({
           # Produce matched sample & (optionally) matching object for spec i
           sampels <- draw_matched_samples(
             i,
@@ -156,7 +156,7 @@ test_that("efficiency study has no issues", {
               paste0("match_",stringr::str_pad(match_specifications$ARRAY[i], 4, pad = "0"), ".rds")
             )
           )
-        }, error = function(e) {})
+          #}, error = function(e) {})
         return(i)
       },
       data = data
@@ -373,7 +373,7 @@ test_that("efficiency study has no issues", {
       
       # Only run estimation if this result does NOT already exist
       if(!file.exists(out_path)){
-        tryCatch({ 
+        #tryCatch({ 
           
           # Data Preparation for this specification
           data <- estimation_data[estimation_data[,model_specifications$disasg[fit]] %in% model_specifications$level[fit],]
@@ -429,38 +429,38 @@ test_that("efficiency study has no issues", {
           
           # Multi-stage frontier estimation over sample draws
           res <- lapply(
-            unique(drawlist$ID)[1:3],
+            unique(drawlist$ID),
             draw_msf_estimations,
-            data                = data,
-            surveyy             = FALSE,
-            intercept_shifters  = list(Svarlist=crop_area_list,Fvarlist=c("Survey","Ecozon")),
-            intercept_shiftersM = list(Svarlist=crop_area_list,Fvarlist=c("Survey","Ecozon")),
-            drawlist            = drawlist,
-            wvar                = "Weight",
-            yvar                = "HrvstKg",
-            xlist               = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
-            ulist               = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
-            ulistM              = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
-            identifiers         = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
-            disagscors_list     = disagscors_list,
-            f                   = f,
-            d                   = d,
-            tvar                = technology_variable,
-            matching_type       = matching_type) 
+            data                    = data,
+            surveyy                 = FALSE,
+            intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+            intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+            drawlist                = drawlist,
+            weight_variable         = "Weight",
+            output_variable         = "HrvstKg",
+            input_variables         = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
+            inefficiency_covariates = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
+            adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
+            identifiers             = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
+            disagscors_list         = disagscors_list,
+            f                       = f,
+            d                       = d,
+            technology_variable     = technology_variable,
+            matching_type           = matching_type) 
           
           # Summarize results across draws (means, stats, etc.)
           res <- draw_msf_summary(res=res,technology_legend=technology_legend)
           
           # Attach metadata (functional form, distribution, tech labels)
           for(i in 1:length(res)){
-            tryCatch({
+            # tryCatch({
               res[[i]][,"FXN"]     <- names(fxnforms)[f]
               res[[i]][,"DIS"]     <- names(distforms)[d]
               res[[i]][,"disasg"]  <- disaggregate_variable
               res[[i]][,"level"]   <- disaggregate_level
               res[[i]][,"TCH"]     <- technology_variable
               res[[i]][,"TCHLvel"] <- factor(res[[i]][,"Tech"],levels = c(-999,technology_legend$Tech,999),labels = c("National",technology_legend[,2],"Meta"))
-            }, error=function(e){})
+              # }, error=function(e){})
           }
           
           # (Optional) Quick extraction of key efficiency results (not saved)
@@ -483,7 +483,7 @@ test_that("efficiency study has no issues", {
           # Save full results for this model specification
           saveRDS(res,file=out_path)
           
-        }, error=function(e){ invisible()})
+          # }, error=function(e){ invisible()})
       }
       invisible()
     })

@@ -6,36 +6,36 @@
 \usage{
 sf_workhorse(
   data,
-  yvar,
-  xlist,
-  wvar = NULL,
+  output_variable,
+  input_variables,
+  weight_variable = NULL,
   d,
   f,
-  slope_shifter = "NONE",
+  production_slope_shifters = NULL,
   intercept_shifters = NULL,
-  ulist = NULL,
-  vlist = NULL,
+  inefficiency_covariates = NULL,
+  risk_covariates = NULL,
   identifiers,
   include_trend = FALSE
 )
 }
 \arguments{
 \item{data}{A data.frame or data.table containing all variables required for
-estimation, including the dependent variable \code{yvar}, inputs
-\code{xlist}, the weight variable \code{wvar} (if used), the unique ID
+estimation, including the dependent variable \code{output_variable}, inputs
+\code{input_variables}, the weight variable \code{weight_variable} (if used), the unique ID
 variables listed in \code{identifiers}, and any variables referenced in
-\code{slope_shifter}, \code{intercept_shifters}, \code{ulist}, or
-\code{vlist}.}
+\code{production_slope_shifters}, \code{intercept_shifters}, \code{inefficiency_covariates}, or
+\code{risk_covariates}.}
 
-\item{yvar}{Character scalar. Name of the dependent/output variable in
+\item{output_variable}{Character scalar. Name of the dependent/output variable in
 \code{data} used for the production frontier.}
 
-\item{xlist}{Character vector of input variable names (e.g., land, labor,
-capital). The order of variables in \code{xlist} determines how they map
+\item{input_variables}{Character vector of input variable names (e.g., land, labor,
+capital). The order of variables in \code{input_variables} determines how they map
 into the generic input labels \code{I1}, \code{I2}, \ldots used in the
 functional-form utilities.}
 
-\item{wvar}{Optional character scalar. Name of the sampling/observation
+\item{weight_variable}{Optional character scalar. Name of the sampling/observation
 weight variable. If \code{NULL}, all observations are given unit weight.}
 
 \item{d}{Distributional form index for the inefficiency term. This is passed
@@ -49,22 +49,22 @@ by \code{sf_functional_forms()}. The name of the chosen form (e.g., \code{"CD"},
 \code{"TL"}, \code{"QD"}, \code{"LN"}) influences logging of variables and
 regularity checks.}
 
-\item{slope_shifter}{Character scalar giving the name of a slope-shifter
+\item{production_slope_shifters}{Character scalar giving the name of a slope-shifter
 variable in \code{data} (e.g., technology shift, policy dummy). Defaults
-to \code{"NONE"} for no slope shifter and is passed to
+to \code{NULL} for no slope shifter and is passed to
 \code{equation_editor()}.}
 
 \item{intercept_shifters}{Optional named list of intercept shifter variables
 for the production function. Typical structure:
-\code{list(Svarlist = c(...), Fvarlist = c(...))}, where the specific
+\code{list(scalar_variables = c(...), factor_variables = c(...))}, where the specific
 interpretation is handled inside \code{equation_editor()}.}
 
-\item{ulist}{Optional named list describing the inefficiency-function
+\item{inefficiency_covariates}{Optional named list describing the inefficiency-function
 covariates. Typical structure:
-\code{list(Svarlist = c(...), Fvarlist = c(...))}, passed as
+\code{list(scalar_variables = c(...), factor_variables = c(...))}, passed as
 \code{uhet} and \code{muhet} to \code{sfacross()} when non-\code{NULL}.}
 
-\item{vlist}{Optional named list describing the production-risk (noise)
+\item{risk_covariates}{Optional named list describing the production-risk (noise)
 covariates. When non-\code{NULL}, used as \code{vhet} in
 \code{sfacross()} to allow heteroskedasticity of the noise term.}
 
@@ -73,7 +73,7 @@ observations (e.g., \code{c("unique_identifier","Survey","CropID","HhId","EaId",
 These IDs are carried through to efficiency, elasticity, and risk
 outputs.}
 
-\item{include_trend}{Logical; if \code{TRUE}, the last element in \code{xlist} is
+\item{include_trend}{Logical; if \code{TRUE}, the last element in \code{input_variables} is
 treated as a trend/technology variable and handled accordingly in the
 functional-form and elasticity calculations. Defaults to \code{FALSE}.}
 }
@@ -125,7 +125,7 @@ and the \code{include_trend} flag. This includes whether the model is specified
 in logs (e.g., CD/TL/GP/TP) or levels.
 
 \item \strong{Variable construction and equation building:}
-Inputs in \code{xlist} are mapped to generic labels (\code{I1}, \code{I2},
+Inputs in \code{input_variables} are mapped to generic labels (\code{I1}, \code{I2},
 \dots) and their log transforms are created when needed. The outcome
 variable is set to \code{Y} or \code{lnY}. The function then calls
 \code{equation_editor()} to construct the production, inefficiency,

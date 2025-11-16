@@ -89,7 +89,7 @@ m.specs <- match_sample_specifications(data = data, myseed = study_environment$m
 
 # Local convenience bindings
 match_specifications <- m.specs$m.specs[1:8,]
-sample_draw_list     <- as.data.frame(m.specs$drawlist)
+sample_draw_list     <- as.data.frame(m.specs$drawlist)[1:3,]
 
 # Persist key objects in the study_environment container
 study_environment[["match_specifications"]]   <- match_specifications

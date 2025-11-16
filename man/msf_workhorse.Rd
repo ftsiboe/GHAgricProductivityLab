@@ -6,57 +6,57 @@
 \usage{
 msf_workhorse(
   data,
-  yvar,
-  xlist,
-  ulist = NULL,
-  vlist = NULL,
-  wvar = NULL,
-  slope_shifter = "NONE",
+  output_variable,
+  input_variables,
+  inefficiency_covariates = NULL,
+  risk_covariates = NULL,
+  weight_variable = NULL,
+  production_slope_shifters = NULL,
   intercept_shifters = NULL,
   f,
   d,
   identifiers,
   include_trend = FALSE,
-  tvar = NULL,
+  technology_variable = NULL,
   matching_type = NULL,
-  ulistM = NULL,
-  intercept_shiftersM = NULL
+  adoption_covariates = NULL,
+  intercept_shifters_meta = NULL
 )
 }
 \arguments{
 \item{data}{A data.frame or data.table containing the estimation sample.
-Must include the dependent variable \code{yvar}, the inputs in \code{xlist},
-the weight variable \code{wvar}, unique ID variables in \code{identifiers}, any
-inefficiency and risk covariates in \code{ulist} and \code{vlist}, the
-technology variable \code{tvar} (if used), and any variables required by
+Must include the dependent variable \code{output_variable}, the inputs in \code{input_variables},
+the weight variable \code{weight_variable}, unique ID variables in \code{identifiers}, any
+inefficiency and risk covariates in \code{inefficiency_covariates} and \code{risk_covariates}, the
+technology variable \code{technology_variable} (if used), and any variables required by
 matching objects on disk (e.g., \code{"Surveyx"}, \code{"EaId"}, \code{"HhId"},
 \code{"Mid"}, \code{"unique_identifier"}).}
 
-\item{yvar}{Character scalar. Name of the dependent (output) variable used
+\item{output_variable}{Character scalar. Name of the dependent (output) variable used
 in the production frontier.}
 
-\item{xlist}{Character vector of input variable names (e.g., land, labor,
+\item{input_variables}{Character vector of input variable names (e.g., land, labor,
 capital) passed through to \code{\link{sf_workhorse}}.}
 
-\item{ulist}{Optional named list specifying variables in the inefficiency
+\item{inefficiency_covariates}{Optional named list specifying variables in the inefficiency
 function for the naive and group frontiers. Typical structure:
-\code{list(Svarlist = c(...), Fvarlist = c(...))}.}
+\code{list(scalar_variables = c(...), factor_variables = c(...))}.}
 
-\item{vlist}{Optional named list specifying variables in the production
+\item{risk_covariates}{Optional named list specifying variables in the production
 risk (noise) function for the naive and group frontiers. Same structure
-as \code{ulist}. If \code{NULL}, a homoskedastic noise term is usually
+as \code{inefficiency_covariates}. If \code{NULL}, a homoskedastic noise term is usually
 implied.}
 
-\item{wvar}{Character scalar. Name of the sampling/observation weight
+\item{weight_variable}{Character scalar. Name of the sampling/observation weight
 variable in \code{data}. Observations with zero weight are dropped.}
 
-\item{slope_shifter}{Character scalar giving the name of a slope-shifter
+\item{production_slope_shifters}{Character scalar giving the name of a slope-shifter
 variable in \code{data} (e.g., technology shifter, policy dummy). Defaults
-to \code{"NONE"} for no slope shifter.}
+to \code{NULL} for no slope shifter.}
 
 \item{intercept_shifters}{Optional named list of intercept shifter variables
 for the naive and group frontiers. Typical structure:
-\code{list(Svarlist = c(...), Fvarlist = c(...))}, passed to
+\code{list(scalar_variables = c(...), factor_variables = c(...))}, passed to
 \code{\link{sf_workhorse}}.}
 
 \item{f}{Functional form index for the production frontier (e.g.,
@@ -72,11 +72,11 @@ observations (e.g., \code{c("unique_identifier","Survey","CropID","HhId","EaId",
 These IDs are used when merging scores and summarizing by technology or
 sample.}
 
-\item{include_trend}{Logical; if \code{TRUE}, the last element in \code{xlist} is
+\item{include_trend}{Logical; if \code{TRUE}, the last element in \code{input_variables} is
 treated as a trend/technology variable in the production function.
 Passed through to \code{\link{sf_workhorse}}. Defaults to \code{FALSE}.}
 
-\item{tvar}{Optional character scalar naming the technology variable (e.g.,
+\item{technology_variable}{Optional character scalar naming the technology variable (e.g.,
 region, system, period) used to define groups for group SF and meta-frontier
 estimation. If \code{NULL}, no technology groups are formed and only the
 naive frontier and TE are computed.}
@@ -88,11 +88,11 @@ samples from \code{"results/matching/"} and related RDS files. Setting
 \code{matching_type = "optimal"} restricts attention to the subset of matching
 specifications labeled as optimal.}
 
-\item{ulistM}{Optional named list specifying inefficiency-function covariates
+\item{adoption_covariates}{Optional named list specifying inefficiency-function covariates
 for the meta-frontier (matched/unmatched) estimation. If \code{NULL},
-defaults to \code{ulist}.}
+defaults to \code{inefficiency_covariates}.}
 
-\item{intercept_shiftersM}{Optional named list of intercept shifters for the
+\item{intercept_shifters_meta}{Optional named list of intercept shifters for the
 meta-frontier estimation. If \code{NULL}, defaults to
 \code{intercept_shifters}.}
 }
@@ -106,7 +106,7 @@ technology identifiers (\code{Tech}) and \code{sample} labels
 \item \code{ef_mean}: Data.frame of aggregated efficiency statistics
 (TE0, TE, TGR, MTE), including weighted/unweighted means, medians, and
 modes, by survey, sample, technology, type, estimation type, and
-restriction status. When \code{tvar} is supplied, also includes
+restriction status. When \code{technology_variable} is supplied, also includes
 efficiency gap levels and percentages.
 \item \code{ef_dist}: Data.frame of efficiency distributions (histogram
 counts and weights) over efficiency ranges, by survey, sample,
@@ -116,10 +116,10 @@ and weights) analogous to \code{ef_dist}, with \code{type = "risk"}.
 \item \code{el_mean}: Data.frame of aggregated elasticity statistics
 (weighted/unweighted means, medians, modes) by input, survey, sample,
 technology, and restriction, including elasticity-gap measures when
-\code{tvar} is provided.
+\code{technology_variable} is provided.
 \item \code{rk_mean}: Data.frame of aggregated risk statistics (weighted
 and unweighted) by survey, sample, technology, and restriction, with
-risk-gap measures when \code{tvar} is provided.
+risk-gap measures when \code{technology_variable} is provided.
 \item \code{el_samp}: Data.frame of observation-level elasticities for
 all models and samples (excluding the synthetic \code{"GLSS0"} survey
 rows).
@@ -136,7 +136,7 @@ Performs Meta Stochastic Frontier (MSF) analysis in several stages:
 \enumerate{
 \item \strong{Naive SF:} Fits a pooled stochastic frontier and computes
 baseline technical efficiency (TE) measures.
-\item \strong{Group SF:} If a technology variable \code{tvar} is supplied,
+\item \strong{Group SF:} If a technology variable \code{technology_variable} is supplied,
 splits the sample into technology groups and fits group-specific SF
 models.
 \item \strong{Meta SF (unmatched and matched):} Constructs a meta-frontier
@@ -158,11 +158,11 @@ The workflow can be summarized as:
 \itemize{
 \item \strong{Naive SFA (TE0):} Calls \code{\link{sf_workhorse}} on the full
 sample to obtain baseline efficiencies (\code{teBC}, \code{teJLMS},
-\code{teMO}). If no technology variable is specified (\code{tvar = NULL}),
+\code{teMO}). If no technology variable is specified (\code{technology_variable = NULL}),
 these naive efficiencies are the final scores and only TE-related
 summaries are produced.
 
-\item \strong{Group SFA (TE):} When \code{tvar} is provided, the sample
+\item \strong{Group SFA (TE):} When \code{technology_variable} is provided, the sample
 is recoded into numeric technology groups (\code{Tech}), and
 \code{\link{sf_workhorse}} is applied separately to each group.
 Group-level efficiencies are combined into TE measures by group and survey.
@@ -186,19 +186,19 @@ the set of scores and summaries with these matched samples.
 aggregated to compute weighted/unweighted means, medians, modes, and
 distribution histograms (both count-based and weight-based) across
 surveys, samples, technologies, and estimation types. When
-\code{tvar} is not \code{NULL}, the function also computes
+\code{technology_variable} is not \code{NULL}, the function also computes
 technology gaps (level and percent) relative to the minimum
 technology in \code{  technology_legend}.}
 \item{Elasticities:}{Elasticities from the underlying SF models
 (naive, group, meta) are combined and summarized in a similar way,
-including technology-gap metrics for elasticities when \code{tvar}
+including technology-gap metrics for elasticities when \code{technology_variable}
 is provided.}
 \item{Risk:}{Risk measures derived from \code{sf_workhorse} are
 combined, summarized, and used to build distributional statistics
 analogous to those for efficiency.}
 }
 
-\item \strong{LR tests:} When \code{tvar} is not \code{NULL}, the function
+\item \strong{LR tests:} When \code{technology_variable} is not \code{NULL}, the function
 builds likelihood ratio test statistics comparing a naive pooled
 frontier to the combination of group and meta-frontiers, storing these
 as rows with \code{CoefName = "LRT"} in the \code{sf_estm} output.

@@ -24,25 +24,25 @@
 #'   assigned to a synthetic survey labeled \code{"GLSS0"} for estimation.
 #' @param data A data.frame or data.table containing the estimation sample.
 #'   Must include, at minimum, the columns referenced in other arguments
-#'   (e.g., \code{yvar}, \code{xlist}, \code{identifiers}, \code{wvar}, technology
+#'   (e.g., \code{output_variable}, \code{input_variables}, \code{identifiers}, \code{weight_variable}, technology
 #'   and matching variables, and any variables used in
 #'   \code{disagscors_list}).
-#' @param yvar Character scalar. Name of the dependent (output) variable used
+#' @param output_variable Character scalar. Name of the dependent (output) variable used
 #'   in the production frontier.
-#' @param xlist Character vector of input (production) variables entering the
+#' @param input_variables Character vector of input (production) variables entering the
 #'   stochastic frontier.
-#' @param ulist Optional named list specifying variables in the inefficiency
+#' @param inefficiency_covariates Optional named list specifying variables in the inefficiency
 #'   function. Typical structure:
 #'   \code{list(Svarlist = c(...), Fvarlist = c(...))}.
-#' @param vlist Optional named list specifying variables in the production
+#' @param risk_covariates Optional named list specifying variables in the production
 #'   risk (noise) function. If \code{NULL}, a homoskedastic noise term is
 #'   usually implied.
-#' @param wvar Optional character scalar giving the name of the sampling
+#' @param weight_variable Optional character scalar giving the name of the sampling
 #'   weight variable in \code{data}. Used when computing weighted summaries
 #'   (e.g., weighted means) of efficiency scores.
-#' @param slope_shifter Character scalar naming a variable that shifts the
+#' @param production_slope_shifters Character scalar naming a variable that shifts the
 #'   production-function slope (e.g., technology shifter). Defaults to
-#'   \code{"NONE"} to indicate no slope shifter.
+#'   \code{NULL} to indicate no slope shifter.
 #' @param intercept_shifters Optional named list of intercept shifter
 #'   variables for the baseline (unmatched) sample. Typical structure:
 #'   \code{list(Svarlist = c(...), Fvarlist = c(...))}.
@@ -56,16 +56,16 @@
 #'   (e.g., household, plot, or observation IDs). These are used to merge
 #'   efficiency scores back to \code{data} and for disaggregated summaries.
 #' @param include_trend Logical; if \code{TRUE}, includes a technology trend variable
-#'   (given by \code{tvar}) in the frontier. Defaults to \code{FALSE}.
-#' @param tvar Optional character scalar naming the technology (trend)
+#'   (given by \code{technology_variable}) in the frontier. Defaults to \code{FALSE}.
+#' @param technology_variable Optional character scalar naming the technology (trend)
 #'   variable to be used when \code{include_trend = TRUE}.
 #' @param matching_type Optional variable or object controlling nearest-neighbor
 #'   matching; passed to \code{msf_workhorse()}. The expected type and
 #'   structure depend on the implementation of that workhorse function.
-#' @param ulistM Optional named list specifying inefficiency-function
+#' @param adoption_covariates Optional named list specifying inefficiency-function
 #'   variables for the matched sample (post-matching specification). Same
-#'   structure as \code{ulist}.
-#' @param intercept_shiftersM Optional named list of intercept shifters for
+#'   structure as \code{inefficiency_covariates}.
+#' @param intercept_shifters_meta Optional named list of intercept shifters for
 #'   the matched sample. Same structure as \code{intercept_shifters}.
 #' @param disagscors_list Optional character vector of variable names for
 #'   which disaggregated efficiency score summaries should be computed.
@@ -130,40 +130,40 @@
 draw_msf_estimations <- function(
     draw, 
     drawlist, 
-    surveyy=FALSE, 
+    surveyy                   = FALSE, 
     data, 
-    yvar, 
-    xlist, 
-    ulist=NULL, 
-    vlist=NULL, 
-    wvar=NULL,
-    slope_shifter="NONE", 
-    intercept_shifters=NULL, 
+    output_variable, 
+    input_variables, 
+    inefficiency_covariates   = NULL, 
+    risk_covariates           = NULL, 
+    weight_variable           = NULL,
+    production_slope_shifters = NULL, 
+    intercept_shifters        = NULL, 
     f, 
     d, 
     identifiers, 
-    include_trend=FALSE, 
-    tvar=NULL,
-    matching_type=NULL, 
-    ulistM=NULL, 
-    intercept_shiftersM=NULL, 
-    disagscors_list=NULL) {
+    include_trend             = FALSE, 
+    technology_variable       = NULL,
+    matching_type             = NULL, 
+    adoption_covariates       = NULL, 
+    intercept_shifters_meta   = NULL, 
+    disagscors_list           = NULL) {
   
   tryCatch({ 
     function(){
-      slope_shifter       ="NONE"
+      production_slope_shifters       =NULL
       include_trend       =FALSE
-      tvar                = technology_variable
+      technology_variable                = technology_variable
       draw                = 0
       surveyy             = FALSE
       intercept_shifters  = list(Svarlist=crop_area_list,Fvarlist=c("Survey","Ecozon"))
-      intercept_shiftersM = list(Svarlist=crop_area_list,Fvarlist=c("Survey","Ecozon"))
-      wvar                = "Weight"
-      yvar                = "HrvstKg"
-      vlist               = NULL
-      xlist               = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt")
-      ulist               = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
-      ulistM              = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
+      intercept_shifters_meta = list(Svarlist=crop_area_list,Fvarlist=c("Survey","Ecozon"))
+      weight_variable                = "Weight"
+      output_variable                = "HrvstKg"
+      risk_covariates               = NULL
+      input_variables               = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt")
+      inefficiency_covariates               = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
+      adoption_covariates              = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
       identifiers                 = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid")
     }
     #---------------------------------------------
@@ -188,9 +188,9 @@ draw_msf_estimations <- function(
         tryCatch({ 
           # glss <-"GLSS0"
           res <- msf_workhorse(
-            data=data[data[,"Surveyy"] %in% glss,], yvar=yvar, xlist=xlist,
-            slope_shifter=slope_shifter, intercept_shifters=intercept_shifters, intercept_shiftersM=intercept_shiftersM,
-            ulist=ulist, ulistM=ulistM, vlist=vlist, wvar=wvar, f=f, d=d, identifiers=identifiers, tvar=tvar, matching_type=matching_type, include_trend=include_trend)
+            data=data[data[,"Surveyy"] %in% glss,], output_variable=output_variable, input_variables=input_variables,
+            production_slope_shifters=production_slope_shifters, intercept_shifters=intercept_shifters, intercept_shifters_meta=intercept_shifters_meta,
+            inefficiency_covariates=inefficiency_covariates, adoption_covariates=adoption_covariates, risk_covariates=risk_covariates, weight_variable=weight_variable, f=f, d=d, identifiers=identifiers, technology_variable=technology_variable, matching_type=matching_type, include_trend=include_trend)
           
           function() {
             Main <- res$ef_mean
@@ -345,7 +345,7 @@ draw_msf_estimations <- function(
 #'   \itemize{
 #'     \item \code{Tech}: numeric technology index used internally in MSF
 #'       estimation, and
-#'     \item a corresponding label column (e.g., the original \code{tvar}).
+#'     \item a corresponding label column (e.g., the original \code{technology_variable}).
 #'   }
 #'   This is used to compute technology gaps (e.g., efficiency or
 #'   disaggregated efficiency gaps) relative to the reference technology
@@ -417,7 +417,7 @@ draw_msf_estimations <- function(
 #' @import data.table
 #'
 #' @export
-draw_msf_summary <- function(res,   technology_legend) {
+draw_msf_summary <- function(res, technology_legend) {
   #---------------------------------------------------
   # Summary Estimates                              ####
   # Combine results from all draws for summary estimates

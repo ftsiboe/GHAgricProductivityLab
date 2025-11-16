@@ -35,7 +35,7 @@ codes and their labels, typically with at least:
 \itemize{
 \item \code{Tech}: numeric technology index used internally in MSF
 estimation, and
-\item a corresponding label column (e.g., the original \code{tvar}).
+\item a corresponding label column (e.g., the original \code{technology_variable}).
 }
 This is used to compute technology gaps (e.g., efficiency or
 disaggregated efficiency gaps) relative to the reference technology

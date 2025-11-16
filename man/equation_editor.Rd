@@ -8,16 +8,16 @@ equation_editor(
   data,
   FXN,
   outcome,
-  slope_shifter = "NONE",
+  production_slope_shifters = NULL,
   intercept_shifters = NULL,
-  ulist = NULL,
-  vlist = NULL
+  inefficiency_covariates = NULL,
+  risk_covariates = NULL
 )
 }
 \arguments{
 \item{data}{Data.frame or similar object containing all variables referenced
-in \code{FXN}, \code{outcome}, \code{slope_shifter},
-\code{intercept_shifters}, \code{ulist}, and \code{vlist}.}
+in \code{FXN}, \code{outcome}, \code{production_slope_shifters},
+\code{intercept_shifters}, \code{inefficiency_covariates}, and \code{risk_covariates}.}
 
 \item{FXN}{Functional form of the production function. Typically a named
 object where \code{FXN[[1]]} is a character string representing the
@@ -27,40 +27,40 @@ production frontier in terms of input variables (e.g.,
 \item{outcome}{Character scalar giving the dependent variable name for the
 production equation (e.g., \code{"Y"} or \code{"lnY"}).}
 
-\item{slope_shifter}{Character scalar naming a variable used as a slope
-shifter in the production function. If equal to \code{"NONE"} (default),
+\item{production_slope_shifters}{Character scalar naming a variable used as a slope
+shifter in the production function. If equal to \code{NULL} (default),
 no slope shifter is applied. Otherwise, the production equation is
-specified as an interaction between \code{factor(slope_shifter)} and
+specified as an interaction between \code{factor(production_slope_shifters)} and
 \code{FXN[[1]]}, net of the baseline \code{FXN[[1]]}.}
 
 \item{intercept_shifters}{Optional list of intercept shifters for the
 production function with elements:
 \itemize{
-\item \code{Svarlist}: character vector of continuous shifter variables.
-\item \code{Fvarlist}: character vector of categorical shifter variables
+\item \code{scalar_variables}: character vector of continuous shifter variables.
+\item \code{factor_variables}: character vector of categorical shifter variables
 (included as \code{factor()} terms).
 }
 If \code{intercept_shifters} is \code{NULL} or both components are
 \code{NULL}, the production function only uses \code{FXN[[1]]}.}
 
-\item{ulist}{Optional list of covariates for the inefficiency (\eqn{u})
+\item{inefficiency_covariates}{Optional list of covariates for the inefficiency (\eqn{u})
 equation with elements:
 \itemize{
-\item \code{Svarlist}: character vector of continuous covariates.
-\item \code{Fvarlist}: character vector of categorical covariates
+\item \code{scalar_variables}: character vector of continuous covariates.
+\item \code{factor_variables}: character vector of categorical covariates
 (included as \code{factor()} terms).
 }
-If \code{ulist} is \code{NULL} or both components are \code{NULL},
+If \code{inefficiency_covariates} is \code{NULL} or both components are \code{NULL},
 the inefficiency equation is set to \code{NULL}.}
 
-\item{vlist}{Optional list of covariates for the production risk (\eqn{v})
+\item{risk_covariates}{Optional list of covariates for the production risk (\eqn{v})
 equation with elements:
 \itemize{
-\item \code{Svarlist}: character vector of continuous covariates.
-\item \code{Fvarlist}: character vector of categorical covariates
+\item \code{scalar_variables}: character vector of continuous covariates.
+\item \code{factor_variables}: character vector of categorical covariates
 (included as \code{factor()} terms).
 }
-If \code{vlist} is \code{NULL} or both components are \code{NULL},
+If \code{risk_covariates} is \code{NULL} or both components are \code{NULL},
 the risk equation is set to \code{NULL}.}
 }
 \value{
@@ -95,20 +95,20 @@ The function builds three formula objects:
 Starts from \code{outcome ~ FXN[[1]]}. If intercept shifters are
 supplied, they are appended as additive terms (continuous variables
 directly, categorical variables as \code{factor()}). When a
-\code{slope_shifter} is specified (not \code{"NONE"}), the main
+\code{production_slope_shifters} is specified (not \code{NULL}), the main
 production part is reparameterized as:
 \preformatted{
-    outcome ~ factor(slope_shifter) * (FXN[[1]]) - (FXN[[1]]) + shifters
+    outcome ~ factor(production_slope_shifters) * (FXN[[1]]) - (FXN[[1]]) + shifters
     }
 }
 \item{Inefficiency function (\code{uequ})}{
 Built as \code{~ 1 + ...} using continuous and/or categorical variables
-specified in \code{ulist}. If neither \code{Svarlist} nor
-\code{Fvarlist} are supplied (or all are filtered out), \code{uequ} is
+specified in \code{inefficiency_covariates}. If neither \code{scalar_variables} nor
+\code{factor_variables} are supplied (or all are filtered out), \code{uequ} is
 set to \code{NULL}.
 }
 \item{Risk function (\code{vequ})}{
-Built analogously to \code{uequ} using \code{vlist}. If no valid
+Built analogously to \code{uequ} using \code{risk_covariates}. If no valid
 covariates remain, \code{vequ} is set to \code{NULL}.
 }
 }

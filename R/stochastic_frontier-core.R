@@ -74,14 +74,14 @@
 #' @export
 sf_model_specifications <- function(
     data,
-    distforms = sf_functional_forms()$distforms,
-    fxnforms  = sf_functional_forms()$fxnforms,
+    distforms             = sf_functional_forms()$distforms,
+    fxnforms              = sf_functional_forms()$fxnforms,
     technology_variables,
-    mainF = 2,
-    mainD = 1,
+    mainF                 = 2,
+    mainD                 = 1,
     demographic_variables = c("Female","Region","Ecozon","EduCat","EduLevel","AgeCat"),
-    crop_list = c("Beans","Cassava","Cocoa","Cocoyam","Maize","Millet","Okra","Palm","Peanut",
-                  "Pepper","Plantain","Rice","Sorghum","Tomatoe","Yam")){
+    crop_list             = c("Beans","Cassava","Cocoa","Cocoyam","Maize","Millet","Okra","Palm","Peanut",
+                              "Pepper","Plantain","Rice","Sorghum","Tomatoe","Yam")){
   
   # Create a dataframe with all combinations of fxnforms and distforms, labeled as "Pooled".
   SPECS <- as.data.frame(
@@ -204,7 +204,9 @@ sf_model_specifications <- function(
 #' is not defined).
 #' @family frontier analysis
 #' @export
-sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
+sf_functional_forms <- function(
+    number_of_inputs = 5, 
+    include_trend    = FALSE) {
   
   # ---- validation
   if (!is.numeric(number_of_inputs) || length(number_of_inputs) != 1 || number_of_inputs < 1) {
@@ -274,7 +276,7 @@ sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
 #' \enumerate{
 #'   \item \strong{Naive SF:} Fits a pooled stochastic frontier and computes
 #'     baseline technical efficiency (TE) measures.
-#'   \item \strong{Group SF:} If a technology variable \code{tvar} is supplied,
+#'   \item \strong{Group SF:} If a technology variable \code{technology_variable} is supplied,
 #'     splits the sample into technology groups and fits group-specific SF
 #'     models.
 #'   \item \strong{Meta SF (unmatched and matched):} Constructs a meta-frontier
@@ -292,31 +294,31 @@ sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
 #' results into a unified output structure suitable for MSF analysis.
 #'
 #' @param data A data.frame or data.table containing the estimation sample.
-#'   Must include the dependent variable \code{yvar}, the inputs in \code{xlist},
-#'   the weight variable \code{wvar}, unique ID variables in \code{identifiers}, any
-#'   inefficiency and risk covariates in \code{ulist} and \code{vlist}, the
-#'   technology variable \code{tvar} (if used), and any variables required by
+#'   Must include the dependent variable \code{output_variable}, the inputs in \code{input_variables},
+#'   the weight variable \code{weight_variable}, unique ID variables in \code{identifiers}, any
+#'   inefficiency and risk covariates in \code{inefficiency_covariates} and \code{risk_covariates}, the
+#'   technology variable \code{technology_variable} (if used), and any variables required by
 #'   matching objects on disk (e.g., \code{"Surveyx"}, \code{"EaId"}, \code{"HhId"},
 #'   \code{"Mid"}, \code{"unique_identifier"}).
-#' @param yvar Character scalar. Name of the dependent (output) variable used
+#' @param output_variable Character scalar. Name of the dependent (output) variable used
 #'   in the production frontier.
-#' @param xlist Character vector of input variable names (e.g., land, labor,
+#' @param input_variables Character vector of input variable names (e.g., land, labor,
 #'   capital) passed through to \code{\link{sf_workhorse}}.
-#' @param ulist Optional named list specifying variables in the inefficiency
+#' @param inefficiency_covariates Optional named list specifying variables in the inefficiency
 #'   function for the naive and group frontiers. Typical structure:
-#'   \code{list(Svarlist = c(...), Fvarlist = c(...))}.
-#' @param vlist Optional named list specifying variables in the production
+#'   \code{list(scalar_variables = c(...), factor_variables = c(...))}.
+#' @param risk_covariates Optional named list specifying variables in the production
 #'   risk (noise) function for the naive and group frontiers. Same structure
-#'   as \code{ulist}. If \code{NULL}, a homoskedastic noise term is usually
+#'   as \code{inefficiency_covariates}. If \code{NULL}, a homoskedastic noise term is usually
 #'   implied.
-#' @param wvar Character scalar. Name of the sampling/observation weight
+#' @param weight_variable Character scalar. Name of the sampling/observation weight
 #'   variable in \code{data}. Observations with zero weight are dropped.
-#' @param slope_shifter Character scalar giving the name of a slope-shifter
+#' @param production_slope_shifters Character scalar giving the name of a slope-shifter
 #'   variable in \code{data} (e.g., technology shifter, policy dummy). Defaults
-#'   to \code{"NONE"} for no slope shifter.
+#'   to \code{NULL} for no slope shifter.
 #' @param intercept_shifters Optional named list of intercept shifter variables
 #'   for the naive and group frontiers. Typical structure:
-#'   \code{list(Svarlist = c(...), Fvarlist = c(...))}, passed to
+#'   \code{list(scalar_variables = c(...), factor_variables = c(...))}, passed to
 #'   \code{\link{sf_workhorse}}.
 #' @param f Functional form index for the production frontier (e.g.,
 #'   Cobb-Douglas, translog, quadratic). The index is passed to
@@ -328,10 +330,10 @@ sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
 #'   observations (e.g., \code{c("unique_identifier","Survey","CropID","HhId","EaId","Mid")}).
 #'   These IDs are used when merging scores and summarizing by technology or
 #'   sample.
-#' @param include_trend Logical; if \code{TRUE}, the last element in \code{xlist} is
+#' @param include_trend Logical; if \code{TRUE}, the last element in \code{input_variables} is
 #'   treated as a trend/technology variable in the production function.
 #'   Passed through to \code{\link{sf_workhorse}}. Defaults to \code{FALSE}.
-#' @param tvar Optional character scalar naming the technology variable (e.g.,
+#' @param technology_variable Optional character scalar naming the technology variable (e.g.,
 #'   region, system, period) used to define groups for group SF and meta-frontier
 #'   estimation. If \code{NULL}, no technology groups are formed and only the
 #'   naive frontier and TE are computed.
@@ -341,10 +343,10 @@ sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
 #'   samples from \code{"results/matching/"} and related RDS files. Setting
 #'   \code{matching_type = "optimal"} restricts attention to the subset of matching
 #'   specifications labeled as optimal.
-#' @param ulistM Optional named list specifying inefficiency-function covariates
+#' @param adoption_covariates Optional named list specifying inefficiency-function covariates
 #'   for the meta-frontier (matched/unmatched) estimation. If \code{NULL},
-#'   defaults to \code{ulist}.
-#' @param intercept_shiftersM Optional named list of intercept shifters for the
+#'   defaults to \code{inefficiency_covariates}.
+#' @param intercept_shifters_meta Optional named list of intercept shifters for the
 #'   meta-frontier estimation. If \code{NULL}, defaults to
 #'   \code{intercept_shifters}.
 #'
@@ -353,11 +355,11 @@ sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
 #' \itemize{
 #'   \item \strong{Naive SFA (TE0):} Calls \code{\link{sf_workhorse}} on the full
 #'     sample to obtain baseline efficiencies (\code{teBC}, \code{teJLMS},
-#'     \code{teMO}). If no technology variable is specified (\code{tvar = NULL}),
+#'     \code{teMO}). If no technology variable is specified (\code{technology_variable = NULL}),
 #'     these naive efficiencies are the final scores and only TE-related
 #'     summaries are produced.
 #'
-#'   \item \strong{Group SFA (TE):} When \code{tvar} is provided, the sample
+#'   \item \strong{Group SFA (TE):} When \code{technology_variable} is provided, the sample
 #'     is recoded into numeric technology groups (\code{Tech}), and
 #'     \code{\link{sf_workhorse}} is applied separately to each group. 
 #'     Group-level efficiencies are combined into TE measures by group and survey.
@@ -381,19 +383,19 @@ sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
 #'         aggregated to compute weighted/unweighted means, medians, modes, and
 #'         distribution histograms (both count-based and weight-based) across
 #'         surveys, samples, technologies, and estimation types. When
-#'         \code{tvar} is not \code{NULL}, the function also computes
+#'         \code{technology_variable} is not \code{NULL}, the function also computes
 #'         technology gaps (level and percent) relative to the minimum
 #'         technology in \code{  technology_legend}.}
 #'       \item{Elasticities:}{Elasticities from the underlying SF models
 #'         (naive, group, meta) are combined and summarized in a similar way,
-#'         including technology-gap metrics for elasticities when \code{tvar}
+#'         including technology-gap metrics for elasticities when \code{technology_variable}
 #'         is provided.}
 #'       \item{Risk:}{Risk measures derived from \code{sf_workhorse} are
 #'         combined, summarized, and used to build distributional statistics
 #'         analogous to those for efficiency.}
 #'     }
 #'
-#'   \item \strong{LR tests:} When \code{tvar} is not \code{NULL}, the function
+#'   \item \strong{LR tests:} When \code{technology_variable} is not \code{NULL}, the function
 #'     builds likelihood ratio test statistics comparing a naive pooled
 #'     frontier to the combination of group and meta-frontiers, storing these
 #'     as rows with \code{CoefName = "LRT"} in the \code{sf_estm} output.
@@ -413,7 +415,7 @@ sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
 #'   \item \code{ef_mean}: Data.frame of aggregated efficiency statistics
 #'     (TE0, TE, TGR, MTE), including weighted/unweighted means, medians, and
 #'     modes, by survey, sample, technology, type, estimation type, and
-#'     restriction status. When \code{tvar} is supplied, also includes
+#'     restriction status. When \code{technology_variable} is supplied, also includes
 #'     efficiency gap levels and percentages.
 #'   \item \code{ef_dist}: Data.frame of efficiency distributions (histogram
 #'     counts and weights) over efficiency ranges, by survey, sample,
@@ -423,10 +425,10 @@ sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
 #'   \item \code{el_mean}: Data.frame of aggregated elasticity statistics
 #'     (weighted/unweighted means, medians, modes) by input, survey, sample,
 #'     technology, and restriction, including elasticity-gap measures when
-#'     \code{tvar} is provided.
+#'     \code{technology_variable} is provided.
 #'   \item \code{rk_mean}: Data.frame of aggregated risk statistics (weighted
 #'     and unweighted) by survey, sample, technology, and restriction, with
-#'     risk-gap measures when \code{tvar} is provided.
+#'     risk-gap measures when \code{technology_variable} is provided.
 #'   \item \code{el_samp}: Data.frame of observation-level elasticities for
 #'     all models and samples (excluding the synthetic \code{"GLSS0"} survey
 #'     rows).
@@ -442,31 +444,31 @@ sf_functional_forms <- function(number_of_inputs=5, include_trend=FALSE) {
 #' @export
 msf_workhorse <- function(
     data ,
-    yvar,
-    xlist,
-    ulist= NULL,
-    vlist=NULL,
-    wvar= NULL,
-    slope_shifter= "NONE",
-    intercept_shifters= NULL,
+    output_variable,
+    input_variables,
+    inefficiency_covariates   = NULL,
+    risk_covariates           = NULL,
+    weight_variable           = NULL,
+    production_slope_shifters = NULL,
+    intercept_shifters        = NULL,
     f,
     d,
     identifiers,
-    include_trend=FALSE,
-    tvar=NULL,
-    matching_type= NULL,
-    ulistM=NULL,
-    intercept_shiftersM=NULL){
+    include_trend             = FALSE,
+    technology_variable       = NULL,
+    matching_type             = NULL,
+    adoption_covariates       = NULL,
+    intercept_shifters_meta   = NULL){
   # data <- DATA #[DATA$FMTYPOL %in% 7,]
   #---------------------------------------------------
   # Preliminaries                                  ####
-  data <- data[!data[,wvar] %in% 0,]
+  data <- data[!data[,weight_variable] %in% 0,]
   
-  if(!is.null(tvar)){
-    data$Tech <- as.numeric(as.integer(as.factor(as.character(data[,tvar]))))
+  if(!is.null(technology_variable)){
+    data$Tech <- as.numeric(as.integer(as.factor(as.character(data[,technology_variable]))))
     TechList  <- unique(data$Tech)
     
-      technology_legend <- unique(data[c("Tech",tvar)])
+      technology_legend <- unique(data[c("Tech",technology_variable)])
       technology_legend <- technology_legend[order(  technology_legend$Tech),]
   }
   #---------------------------------------------------
@@ -474,21 +476,21 @@ msf_workhorse <- function(
   cat(crayon::green("SF Estimation [Naive TE]",Sys.time()),fill=T)
   sf_Naive <- sf_workhorse(
     data=data,
-    yvar=yvar,
-    xlist=xlist,wvar=wvar,d=d,f=f,
-    slope_shifter=slope_shifter,
+    output_variable=output_variable,
+    input_variables=input_variables,weight_variable=weight_variable,d=d,f=f,
+    production_slope_shifters=production_slope_shifters,
     intercept_shifters=intercept_shifters,
-    ulist=ulist,
-    vlist=vlist,
+    inefficiency_covariates=inefficiency_covariates,
+    risk_covariates=risk_covariates,
     identifiers=identifiers,
     include_trend=include_trend)
-  if(is.null(tvar)){ 
+  if(is.null(technology_variable)){ 
     score <- sf_Naive$ef[names(sf_Naive$ef)[names(sf_Naive$ef) %in% c(identifiers,"teBC","teJLMS","teMO","restrict")]]
     score <- score |> tidyr::gather(estType, TE, names(score)[!names(score) %in% c(identifiers,"restrict")])
     score$sample <- "unmatched"
-    score <- dplyr::inner_join(data[c(identifiers,wvar)],score,by=identifiers)
+    score <- dplyr::inner_join(data[c(identifiers,weight_variable)],score,by=identifiers)
     score$Tech <- -999
-    names(score)[names(score) %in% wvar] <- "weights"
+    names(score)[names(score) %in% weight_variable] <- "weights"
   }
   # cc <- sf_Naive$ef
   # cc <- cc[cc$CoefName %in% "Nobs",]
@@ -496,7 +498,7 @@ msf_workhorse <- function(
   #---------------------------------------------------
   # MSF Estimation                                 ####
   sf_Group <- NULL;mflist<-NULL
-  if(!is.null(tvar)){
+  if(!is.null(technology_variable)){
     #-------------------------------------------------
     # Group SF Estimation [Group TE]               ####
     
@@ -510,12 +512,12 @@ msf_workhorse <- function(
         
         sfi <- sf_workhorse(
           data=data[data$Tech %in% tech,],
-          yvar=yvar,
-          xlist=xlist,wvar=wvar,d=d,f=f,
-          slope_shifter=slope_shifter,
+          output_variable=output_variable,
+          input_variables=input_variables,weight_variable=weight_variable,d=d,f=f,
+          production_slope_shifters=production_slope_shifters,
           intercept_shifters=intercept_shifters,
-          ulist=ulist,
-          vlist=vlist,
+          inefficiency_covariates=inefficiency_covariates,
+          risk_covariates=risk_covariates,
           identifiers=identifiers,
           include_trend=include_trend)
         
@@ -544,22 +546,22 @@ msf_workhorse <- function(
     
     mf.data <- dplyr::inner_join(data,mf.data,by=identifiers)
     
-    if(is.null(ulistM)){
-      ulistM <- ulist 
+    if(is.null(adoption_covariates)){
+      adoption_covariates <- inefficiency_covariates 
     }
     
-    if(is.null(intercept_shiftersM)){
-      intercept_shiftersM <- intercept_shifters
+    if(is.null(intercept_shifters_meta)){
+      intercept_shifters_meta <- intercept_shifters
     }
     
     mflist <- list(
       unmatched=sf_workhorse(
         data=mf.data,
-        yvar="Yhat",
-        xlist=xlist,wvar=wvar,d=d,f=f,
-        slope_shifter=slope_shifter,
-        intercept_shifters=intercept_shiftersM,
-        ulist=ulistM,
+        output_variable="Yhat",
+        input_variables=input_variables,weight_variable=weight_variable,d=d,f=f,
+        production_slope_shifters=production_slope_shifters,
+        intercept_shifters=intercept_shifters_meta,
+        inefficiency_covariates=adoption_covariates,
         identifiers=identifiers,
         include_trend=include_trend))
     
@@ -593,11 +595,11 @@ msf_workhorse <- function(
                                         mf.data,by=c("Surveyx","EaId", "HhId", "Mid","unique_identifier"))
           mfm <- sf_workhorse(
             data=as.data.frame(mfm.data),
-            yvar="Yhat",
-            xlist=xlist,wvar=wvar,d=d,f=f,
-            slope_shifter=slope_shifter,
-            intercept_shifters=intercept_shiftersM,
-            ulist=ulist,
+            output_variable="Yhat",
+            input_variables=input_variables,weight_variable=weight_variable,d=d,f=f,
+            production_slope_shifters=production_slope_shifters,
+            intercept_shifters=intercept_shifters_meta,
+            inefficiency_covariates=inefficiency_covariates,
             identifiers=identifiers,
             include_trend=include_trend)
           
@@ -643,7 +645,7 @@ msf_workhorse <- function(
   #---------------------------------------------------
   # Distribution bars- Scores                      ####
   cat(crayon::green("Distribution bars- Scores",Sys.time()),fill=T)
-  if(!is.null(tvar)){
+  if(!is.null(technology_variable)){
     dataFrq <- score |> tidyr::gather(type, value, c("TE0","TE","TGR","MTE"))
     dataFrq <- dataFrq[!dataFrq$value %in% c(NA,Inf,-Inf,NaN),]
     dataFrq00 <- dataFrq
@@ -690,7 +692,7 @@ msf_workhorse <- function(
   #---------------------------------------------------
   # Summary Scores                                 ####
   cat(crayon::green("Summary Scores",Sys.time()),fill=T)
-  if(!is.null(tvar)){
+  if(!is.null(technology_variable)){
     Estescors <- score |> tidyr::gather(type, value, c("TE0","TE","TGR","MTE"))
     Estescors <- Estescors[!Estescors$value %in% c(NA,Inf,-Inf,NaN),]
     Estescors00 <- Estescors
@@ -717,7 +719,7 @@ msf_workhorse <- function(
   Estescors <- Estescors |> tidyr::gather(stat, Estimate, c("wmean","mean","median","mode"))
   Estescors$CoefName <- "efficiency"
   
-  if(!is.null(tvar)){
+  if(!is.null(technology_variable)){
     EstescorsGAP <- Estescors[Estescors$Tech %in%   technology_legend$Tech,]
     EstescorsGAP <- dplyr::inner_join(
       EstescorsGAP[!EstescorsGAP$Tech %in% min(  technology_legend$Tech),c("sample","Survey","type","estType","restrict","Tech","stat","Estimate")],
@@ -741,7 +743,7 @@ msf_workhorse <- function(
   Estimates$Tech <- -999
   Estimates$sample <- "unmatched"
   
-  if(!is.null(tvar)){
+  if(!is.null(technology_variable)){
     Estimates <- list(Estimates)
     Estimates[[length(Estimates)+1]] <- as.data.frame(data.table::rbindlist(
       lapply(1:length(sf_Group),function(tech){
@@ -815,7 +817,7 @@ msf_workhorse <- function(
   Elasticity$Tech <- -999
   Elasticity$sample <- "unmatched"
   
-  if(!is.null(tvar)){
+  if(!is.null(technology_variable)){
     Elasticity <- list(Elasticity)
     Elasticity[[length(Elasticity)+1]] <- as.data.frame(data.table::rbindlist(
       lapply(1:length(sf_Group),function(tech){
@@ -871,7 +873,7 @@ msf_workhorse <- function(
   Elasticity <- Elasticity |> tidyr::gather(stat, Estimate, c("wmean","mean","median","mode"))
   Elasticity$CoefName <- "elasticity"
   
-  if(!is.null(tvar)){
+  if(!is.null(technology_variable)){
     ElasticityGAP <- Elasticity[Elasticity$Tech %in%   technology_legend$Tech,]
     ElasticityGAP <- dplyr::inner_join(
       ElasticityGAP[!ElasticityGAP$Tech %in% min(  technology_legend$Tech),c("sample","Survey","input","restrict","Tech","stat","Estimate")],
@@ -895,7 +897,7 @@ msf_workhorse <- function(
   Risk$Tech <- -999
   Risk$sample <- "unmatched"
   
-  if(!is.null(tvar)){
+  if(!is.null(technology_variable)){
     Risk <- list(Risk)
     Risk[[length(Risk)+1]] <- as.data.frame(data.table::rbindlist(
       lapply(1:length(sf_Group),function(tech){
@@ -939,7 +941,7 @@ msf_workhorse <- function(
   Risk <- Risk |> tidyr::gather(stat, Estimate, c("wmean","mean","median","mode"))
   Risk$CoefName <- "risk"
   
-  if(!is.null(tvar)){
+  if(!is.null(technology_variable)){
     RiskGAP <- Risk[Risk$Tech %in%   technology_legend$Tech,]
     RiskGAP <- dplyr::inner_join(
       RiskGAP[!RiskGAP$Tech %in% min(  technology_legend$Tech),c("sample","Survey","restrict","Tech","stat","Estimate")],
@@ -1030,18 +1032,18 @@ msf_workhorse <- function(
 #' }
 #'
 #' @param data A data.frame or data.table containing all variables required for
-#'   estimation, including the dependent variable \code{yvar}, inputs
-#'   \code{xlist}, the weight variable \code{wvar} (if used), the unique ID
+#'   estimation, including the dependent variable \code{output_variable}, inputs
+#'   \code{input_variables}, the weight variable \code{weight_variable} (if used), the unique ID
 #'   variables listed in \code{identifiers}, and any variables referenced in
-#'   \code{slope_shifter}, \code{intercept_shifters}, \code{ulist}, or
-#'   \code{vlist}.
-#' @param yvar Character scalar. Name of the dependent/output variable in
+#'   \code{production_slope_shifters}, \code{intercept_shifters}, \code{inefficiency_covariates}, or
+#'   \code{risk_covariates}.
+#' @param output_variable Character scalar. Name of the dependent/output variable in
 #'   \code{data} used for the production frontier.
-#' @param xlist Character vector of input variable names (e.g., land, labor,
-#'   capital). The order of variables in \code{xlist} determines how they map
+#' @param input_variables Character vector of input variable names (e.g., land, labor,
+#'   capital). The order of variables in \code{input_variables} determines how they map
 #'   into the generic input labels \code{I1}, \code{I2}, \ldots used in the
 #'   functional-form utilities.
-#' @param wvar Optional character scalar. Name of the sampling/observation
+#' @param weight_variable Optional character scalar. Name of the sampling/observation
 #'   weight variable. If \code{NULL}, all observations are given unit weight.
 #' @param d Distributional form index for the inefficiency term. This is passed
 #'   to \code{sf_functional_forms()} and ultimately to \code{sfacross()} (e.g., to
@@ -1052,26 +1054,26 @@ msf_workhorse <- function(
 #'   by \code{sf_functional_forms()}. The name of the chosen form (e.g., \code{"CD"},
 #'   \code{"TL"}, \code{"QD"}, \code{"LN"}) influences logging of variables and
 #'   regularity checks.
-#' @param slope_shifter Character scalar giving the name of a slope-shifter
+#' @param production_slope_shifters Character scalar giving the name of a slope-shifter
 #'   variable in \code{data} (e.g., technology shift, policy dummy). Defaults
-#'   to \code{"NONE"} for no slope shifter and is passed to
+#'   to \code{NULL} for no slope shifter and is passed to
 #'   \code{equation_editor()}.
 #' @param intercept_shifters Optional named list of intercept shifter variables
 #'   for the production function. Typical structure:
-#'   \code{list(Svarlist = c(...), Fvarlist = c(...))}, where the specific
+#'   \code{list(scalar_variables = c(...), factor_variables = c(...))}, where the specific
 #'   interpretation is handled inside \code{equation_editor()}.
-#' @param ulist Optional named list describing the inefficiency-function
+#' @param inefficiency_covariates Optional named list describing the inefficiency-function
 #'   covariates. Typical structure:
-#'   \code{list(Svarlist = c(...), Fvarlist = c(...))}, passed as
+#'   \code{list(scalar_variables = c(...), factor_variables = c(...))}, passed as
 #'   \code{uhet} and \code{muhet} to \code{sfacross()} when non-\code{NULL}.
-#' @param vlist Optional named list describing the production-risk (noise)
+#' @param risk_covariates Optional named list describing the production-risk (noise)
 #'   covariates. When non-\code{NULL}, used as \code{vhet} in
 #'   \code{sfacross()} to allow heteroskedasticity of the noise term.
 #' @param identifiers Character vector of variable names that uniquely identify
 #'   observations (e.g., \code{c("unique_identifier","Survey","CropID","HhId","EaId","Mid")}).
 #'   These IDs are carried through to efficiency, elasticity, and risk
 #'   outputs.
-#' @param include_trend Logical; if \code{TRUE}, the last element in \code{xlist} is
+#' @param include_trend Logical; if \code{TRUE}, the last element in \code{input_variables} is
 #'   treated as a trend/technology variable and handled accordingly in the
 #'   functional-form and elasticity calculations. Defaults to \code{FALSE}.
 #'
@@ -1086,7 +1088,7 @@ msf_workhorse <- function(
 #'     in logs (e.g., CD/TL/GP/TP) or levels.
 #'
 #'   \item \strong{Variable construction and equation building:}
-#'     Inputs in \code{xlist} are mapped to generic labels (\code{I1}, \code{I2},
+#'     Inputs in \code{input_variables} are mapped to generic labels (\code{I1}, \code{I2},
 #'     \dots) and their log transforms are created when needed. The outcome
 #'     variable is set to \code{Y} or \code{lnY}. The function then calls
 #'     \code{equation_editor()} to construct the production, inefficiency,
@@ -1155,20 +1157,20 @@ msf_workhorse <- function(
 #' @export
 sf_workhorse <- function(
     data, 
-    yvar, 
-    xlist, 
-    wvar=NULL, 
+    output_variable, 
+    input_variables, 
+    weight_variable           = NULL, 
     d, 
     f,
-    slope_shifter="NONE",
-    intercept_shifters=NULL,
-    ulist=NULL,
-    vlist=NULL,
+    production_slope_shifters = NULL,
+    intercept_shifters        = NULL,
+    inefficiency_covariates   = NULL,
+    risk_covariates           = NULL,
     identifiers,
-    include_trend=FALSE) {
+    include_trend             = FALSE) {
   
   # Number of independent variables
-  number_of_inputs <- length(xlist)
+  number_of_inputs <- length(input_variables)
   xNames <- paste0("I", 1:number_of_inputs)
   
   # Get the functional forms and distribution forms
@@ -1182,30 +1184,30 @@ sf_workhorse <- function(
   if(logDepVar) xNames <- paste0("ln", xNames)
   
   # Set weights
-  if(is.null(wvar)) data$weights <- 1
-  if(!is.null(wvar)) data$weights <- data[, wvar]
+  if(is.null(weight_variable)) data$weights <- 1
+  if(!is.null(weight_variable)) data$weights <- data[, weight_variable]
   
   # Set the dependent variable
-  data$Y <- data[, yvar]
+  data$Y <- data[, output_variable]
   if(logDepVar) data$lnY <- log(data$Y)
   
   # Create the independent variables
   for(i in 1:number_of_inputs) {
-    data[, paste0("I", i)] <- data[, xlist[i]]  
+    data[, paste0("I", i)] <- data[, input_variables[i]]  
     if(logDepVar) data[, paste0("lnI", i)] <- log(data[, paste0("I", i)] + 0.00001)
   }
   
   # Include trend variable if specified
   if(include_trend) {
-    data[, paste0("I", number_of_inputs)] <- data[, xlist[number_of_inputs]]
-    if(logDepVar) data[, paste0("lnI", number_of_inputs)] <- data[, xlist[number_of_inputs]]
+    data[, paste0("I", number_of_inputs)] <- data[, input_variables[number_of_inputs]]
+    if(logDepVar) data[, paste0("lnI", number_of_inputs)] <- data[, input_variables[number_of_inputs]]
   }
   
   # Create the equations for the production function, inefficiency function, and risk function
   equations <- equation_editor(
     outcome=ifelse(logDepVar, "lnY", "Y"),
-    data=data, FXN=FXN, slope_shifter=slope_shifter,
-    intercept_shifters=intercept_shifters, ulist=ulist, vlist=vlist
+    data=data, FXN=FXN, production_slope_shifters=production_slope_shifters,
+    intercept_shifters=intercept_shifters, inefficiency_covariates=inefficiency_covariates, risk_covariates=risk_covariates
   )
   
   sf <- list(optStatus="")
@@ -1385,8 +1387,8 @@ sf_workhorse <- function(
     data$lcFitted <- lcFitted
     equations <- equation_editor(
       outcome=ifelse(logDepVar, "lnY", "Y"),
-      data=data, FXN="lcFitted", slope_shifter=slope_shifter,
-      intercept_shifters=intercept_shifters, ulist=ulist, vlist=vlist
+      data=data, FXN="lcFitted", production_slope_shifters=production_slope_shifters,
+      intercept_shifters=intercept_shifters, inefficiency_covariates=inefficiency_covariates, risk_covariates=risk_covariates
     )
     
     # Try different optimization methods and tolerances until a successful convergence is achieved
@@ -1517,45 +1519,45 @@ sf_workhorse <- function(
 #' avoid numerical issues from nearly-constant or extremely sparse regressors.
 #'
 #' @param data Data.frame or similar object containing all variables referenced
-#'   in \code{FXN}, \code{outcome}, \code{slope_shifter},
-#'   \code{intercept_shifters}, \code{ulist}, and \code{vlist}.
+#'   in \code{FXN}, \code{outcome}, \code{production_slope_shifters},
+#'   \code{intercept_shifters}, \code{inefficiency_covariates}, and \code{risk_covariates}.
 #' @param FXN Functional form of the production function. Typically a named
 #'   object where \code{FXN[[1]]} is a character string representing the
 #'   production frontier in terms of input variables (e.g.,
 #'   \code{"lnI1 + lnI2 + I(1/2 * lnI1^2) + lnI1:lnI2"} for a translog).
 #' @param outcome Character scalar giving the dependent variable name for the
 #'   production equation (e.g., \code{"Y"} or \code{"lnY"}).
-#' @param slope_shifter Character scalar naming a variable used as a slope
-#'   shifter in the production function. If equal to \code{"NONE"} (default),
+#' @param production_slope_shifters Character scalar naming a variable used as a slope
+#'   shifter in the production function. If equal to \code{NULL} (default),
 #'   no slope shifter is applied. Otherwise, the production equation is
-#'   specified as an interaction between \code{factor(slope_shifter)} and
+#'   specified as an interaction between \code{factor(production_slope_shifters)} and
 #'   \code{FXN[[1]]}, net of the baseline \code{FXN[[1]]}.
 #' @param intercept_shifters Optional list of intercept shifters for the
 #'   production function with elements:
 #'   \itemize{
-#'     \item \code{Svarlist}: character vector of continuous shifter variables.
-#'     \item \code{Fvarlist}: character vector of categorical shifter variables
+#'     \item \code{scalar_variables}: character vector of continuous shifter variables.
+#'     \item \code{factor_variables}: character vector of categorical shifter variables
 #'           (included as \code{factor()} terms).
 #'   }
 #'   If \code{intercept_shifters} is \code{NULL} or both components are
 #'   \code{NULL}, the production function only uses \code{FXN[[1]]}.
-#' @param ulist Optional list of covariates for the inefficiency (\eqn{u})
+#' @param inefficiency_covariates Optional list of covariates for the inefficiency (\eqn{u})
 #'   equation with elements:
 #'   \itemize{
-#'     \item \code{Svarlist}: character vector of continuous covariates.
-#'     \item \code{Fvarlist}: character vector of categorical covariates
+#'     \item \code{scalar_variables}: character vector of continuous covariates.
+#'     \item \code{factor_variables}: character vector of categorical covariates
 #'           (included as \code{factor()} terms).
 #'   }
-#'   If \code{ulist} is \code{NULL} or both components are \code{NULL},
+#'   If \code{inefficiency_covariates} is \code{NULL} or both components are \code{NULL},
 #'   the inefficiency equation is set to \code{NULL}.
-#' @param vlist Optional list of covariates for the production risk (\eqn{v})
+#' @param risk_covariates Optional list of covariates for the production risk (\eqn{v})
 #'   equation with elements:
 #'   \itemize{
-#'     \item \code{Svarlist}: character vector of continuous covariates.
-#'     \item \code{Fvarlist}: character vector of categorical covariates
+#'     \item \code{scalar_variables}: character vector of continuous covariates.
+#'     \item \code{factor_variables}: character vector of categorical covariates
 #'           (included as \code{factor()} terms).
 #'   }
-#'   If \code{vlist} is \code{NULL} or both components are \code{NULL},
+#'   If \code{risk_covariates} is \code{NULL} or both components are \code{NULL},
 #'   the risk equation is set to \code{NULL}.
 #'
 #' @details
@@ -1565,20 +1567,20 @@ sf_workhorse <- function(
 #'     Starts from \code{outcome ~ FXN[[1]]}. If intercept shifters are
 #'     supplied, they are appended as additive terms (continuous variables
 #'     directly, categorical variables as \code{factor()}). When a
-#'     \code{slope_shifter} is specified (not \code{"NONE"}), the main
+#'     \code{production_slope_shifters} is specified (not \code{NULL}), the main
 #'     production part is reparameterized as:
 #'     \preformatted{
-#'     outcome ~ factor(slope_shifter) * (FXN[[1]]) - (FXN[[1]]) + shifters
+#'     outcome ~ factor(production_slope_shifters) * (FXN[[1]]) - (FXN[[1]]) + shifters
 #'     }
 #'   }
 #'   \item{Inefficiency function (\code{uequ})}{
 #'     Built as \code{~ 1 + ...} using continuous and/or categorical variables
-#'     specified in \code{ulist}. If neither \code{Svarlist} nor
-#'     \code{Fvarlist} are supplied (or all are filtered out), \code{uequ} is
+#'     specified in \code{inefficiency_covariates}. If neither \code{scalar_variables} nor
+#'     \code{factor_variables} are supplied (or all are filtered out), \code{uequ} is
 #'     set to \code{NULL}.
 #'   }
 #'   \item{Risk function (\code{vequ})}{
-#'     Built analogously to \code{uequ} using \code{vlist}. If no valid
+#'     Built analogously to \code{uequ} using \code{risk_covariates}. If no valid
 #'     covariates remain, \code{vequ} is set to \code{NULL}.
 #'   }
 #' }
@@ -1610,19 +1612,19 @@ equation_editor <- function(
     data,
     FXN,
     outcome,
-    slope_shifter="NONE",
-    intercept_shifters=NULL,
-    ulist=NULL,
-    vlist=NULL){
+    production_slope_shifters = NULL,
+    intercept_shifters        = NULL,
+    inefficiency_covariates   = NULL,
+    risk_covariates           = NULL){
   
   #---------------------------------------------------
   # Production function                            ####
   # Initialize the shifters formula with an intercept term
   shifters <- "~1"
   
-  # Loop through the continuous intercept shifters (Svarlist) and add them to the shifters formula
-  if(!is.null(intercept_shifters$Svarlist)){
-    for(sv in intercept_shifters$Svarlist){
+  # Loop through the continuous intercept shifters (scalar_variables) and add them to the shifters formula
+  if(!is.null(intercept_shifters$scalar_variables)){
+    for(sv in intercept_shifters$scalar_variables){
       # Only add the variable if its coefficient of variation is greater than a small threshold
       if(abs((sd(data[,sv],na.rm=T)/mean(data[,sv],na.rm=T))) > 0.001){ 
         shifters <- paste0(shifters,"+",sv)
@@ -1630,9 +1632,9 @@ equation_editor <- function(
     }
   }
   
-  # Loop through the categorical intercept shifters (Fvarlist) and add them to the shifters formula as factors
-  if(!is.null(intercept_shifters$Fvarlist)){
-    for(fv in intercept_shifters$Fvarlist){
+  # Loop through the categorical intercept shifters (factor_variables) and add them to the shifters formula as factors
+  if(!is.null(intercept_shifters$factor_variables)){
+    for(fv in intercept_shifters$factor_variables){
       # Only add the variable if it has more than one unique value and each category has a sufficient number of observations
       if(length(unique(as.character(data[,fv]))) > 1 & min(table(as.character(data[,fv]))/nrow(data))>0.0001){
         shifters <- paste0(shifters,"+",paste0("factor(",fv,")"))
@@ -1641,7 +1643,7 @@ equation_editor <- function(
   }
   
   # If no intercept shifters are provided, create the production function formula using only the FXN
-  if(is.null(intercept_shifters$Svarlist) & is.null(intercept_shifters$Fvarlist)){
+  if(is.null(intercept_shifters$scalar_variables) & is.null(intercept_shifters$factor_variables)){
     prodfxn <- as.formula(paste0(outcome," ~",FXN[[1]]))
   } else {
     # Remove the initial intercept term if other shifters are present
@@ -1650,8 +1652,8 @@ equation_editor <- function(
     prodfxn <- as.formula(paste0(outcome,"~",FXN[[1]],"+",shifters))
     
     # If a slope shifter is provided, modify the production function formula accordingly
-    if(!slope_shifter %in% "NONE"){
-      prodfxn <- as.formula(paste0(paste0(outcome,"~factor(",slope_shifter,")*(",FXN[[1]],") - (",FXN[[1]],")"),"+",shifters))
+    if(!is.null(production_slope_shifters)){
+      prodfxn <- as.formula(paste0(paste0(outcome,"~factor(",production_slope_shifters,")*(",FXN[[1]],") - (",FXN[[1]],")"),"+",shifters))
     }
   }
   
@@ -1660,9 +1662,9 @@ equation_editor <- function(
   # Initialize the inefficiency function formula with an intercept term
   uequ <- "~1"
   
-  # Loop through the continuous variables in ulist (Svarlist) and add them to the inefficiency function formula
-  if(!is.null(ulist$Svarlist)){
-    for(sv in ulist$Svarlist){
+  # Loop through the continuous variables in inefficiency_covariates (scalar_variables) and add them to the inefficiency function formula
+  if(!is.null(inefficiency_covariates$scalar_variables)){
+    for(sv in inefficiency_covariates$scalar_variables){
       # Only add the variable if its coefficient of variation is greater than a small threshold
       if(abs((sd(data[,sv],na.rm=T)/mean(data[,sv],na.rm=T))) > 0.001){ 
         uequ <- paste0(uequ,"+",sv)
@@ -1670,9 +1672,9 @@ equation_editor <- function(
     }
   }
   
-  # Loop through the categorical variables in ulist (Fvarlist) and add them to the inefficiency function formula as factors
-  if(!is.null(ulist$Fvarlist)){
-    for(fv in ulist$Fvarlist){
+  # Loop through the categorical variables in inefficiency_covariates (factor_variables) and add them to the inefficiency function formula as factors
+  if(!is.null(inefficiency_covariates$factor_variables)){
+    for(fv in inefficiency_covariates$factor_variables){
       # Only add the variable if it has more than one unique value and each category has a sufficient number of observations
       if(length(unique(as.character(data[,fv]))) > 1 & min(table(as.character(data[,fv]))/nrow(data))>0.0001){
         uequ <- paste0(uequ,"+",paste0("factor(",fv,")"))
@@ -1681,7 +1683,7 @@ equation_editor <- function(
   }
   
   # If no variables are provided for the inefficiency function, set uequ to NULL
-  if(is.null(ulist$Svarlist) & is.null(ulist$Fvarlist)){
+  if(is.null(inefficiency_covariates$scalar_variables) & is.null(inefficiency_covariates$factor_variables)){
     uequ <- NULL
   } else {
     # Remove the initial intercept term if other variables are present
@@ -1695,9 +1697,9 @@ equation_editor <- function(
   # Initialize the production risk function formula with an intercept term
   vequ <- "~1"
   
-  # Loop through the continuous variables in vlist (Svarlist) and add them to the production risk function formula
-  if(!is.null(vlist$Svarlist)){
-    for(sv in vlist$Svarlist){
+  # Loop through the continuous variables in risk_covariates (scalar_variables) and add them to the production risk function formula
+  if(!is.null(risk_covariates$scalar_variables)){
+    for(sv in risk_covariates$scalar_variables){
       # Only add the variable if its coefficient of variation is greater than a small threshold
       if(abs((sd(data[,sv],na.rm=T)/mean(data[,sv],na.rm=T))) > 0.001){ 
         vequ <- paste0(vequ,"+",sv)
@@ -1705,9 +1707,9 @@ equation_editor <- function(
     }
   }
   
-  # Loop through the categorical variables in vlist (Fvarlist) and add them to the production risk function formula as factors
-  if(!is.null(vlist$Fvarlist)){
-    for(fv in vlist$Fvarlist){
+  # Loop through the categorical variables in risk_covariates (factor_variables) and add them to the production risk function formula as factors
+  if(!is.null(risk_covariates$factor_variables)){
+    for(fv in risk_covariates$factor_variables){
       # Only add the variable if it has more than one unique value and each category has a sufficient number of observations
       if(length(unique(as.character(data[,fv]))) > 1 & min(table(as.character(data[,fv]))/nrow(data))>0.0001){
         vequ <- paste0(vequ,"+",paste0("factor(",fv,")"))
@@ -1716,7 +1718,7 @@ equation_editor <- function(
   }
   
   # If no variables are provided for the production risk function, set vequ to NULL
-  if(is.null(vlist$Svarlist) & is.null(vlist$Fvarlist)){
+  if(is.null(risk_covariates$scalar_variables) & is.null(risk_covariates$factor_variables)){
     vequ <- NULL
   } else {
     # Remove the initial intercept term if other variables are present

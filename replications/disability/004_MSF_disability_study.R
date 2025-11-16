@@ -177,22 +177,22 @@ lapply(
         res <- lapply(
           unique(drawlist$ID),
           draw_msf_estimations,
-          data                = data,
-          surveyy             = FALSE,
-          intercept_shifters  = list(Svarlist=crop_area_list,Fvarlist=c("Survey","Ecozon")),
-          intercept_shiftersM = list(Svarlist=crop_area_list,Fvarlist=c("Survey","Ecozon")),
-          drawlist            = drawlist,
-          wvar                = "Weight",
-          yvar                = "HrvstKg",
-          xlist               = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
-          ulist               = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
-          ulistM              = list(Svarlist=c("lnAgeYr","lnYerEdu","CrpMix"),Fvarlist=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
-          identifiers         = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
-          disagscors_list     = disagscors_list,
-          f                   = f,
-          d                   = d,
-          tvar                = technology_variable,
-          matching_type       = matching_type) 
+          data                    = data,
+          surveyy                 = FALSE,
+          intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+          intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+          drawlist                = drawlist,
+          weight_variable         = "Weight",
+          output_variable         = "HrvstKg",
+          input_variables         = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
+          inefficiency_covariates = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
+          adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
+          identifiers             = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
+          disagscors_list         = disagscors_list,
+          f                       = f,
+          d                       = d,
+          technology_variable     = technology_variable,
+          matching_type           = matching_type) 
         
         # Summarize results across draws (means, stats, etc.)
         res <- draw_msf_summary(res=res,technology_legend=technology_legend)
