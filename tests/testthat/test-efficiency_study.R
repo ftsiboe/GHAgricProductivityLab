@@ -152,7 +152,7 @@ test_that("efficiency study has no issues", {
 
   # --- Matching stage
   # Executed if running locally (Windows) or on SLURM jobs named match_all or match_disa
-  if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("match_all", "match_disa")) {
+  #if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("match_all", "match_disa")) {
 
     idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = paste0( "Drawing matched samples for ",project_name," study"))
 
@@ -189,11 +189,11 @@ test_that("efficiency study has no issues", {
     )
 
     cli::cli_progress_done()
-  }
+    #}
 
   # --- Covariate balance stage
   # Executed if running locally (Windows) or on SLURM jobs named cov_bal
-  if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("cov_bal")) {
+    #if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("cov_bal")) {
 
     # Reload environment (paths/specs) to ensure clean context
     project_name <- "test"
@@ -218,7 +218,7 @@ test_that("efficiency study has no issues", {
       study_environment,
       file.path(study_environment$wd$output, paste0(project_name,"_study_environment.rds"))
     )
-  }
+    #}
 
   expect_true(
     all(names(study_environment)
@@ -304,7 +304,7 @@ test_that("efficiency study has no issues", {
   
   # --- Block 2: Treatment Effect Summary
   # Executed if running locally (Windows) or on SLURM jobs named “te_sum”
-  if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
+  #if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
 
     # Reload environment to ensure clean references (paths, specs, etc.)
     project_name <- "test"
@@ -317,7 +317,7 @@ test_that("efficiency study has no issues", {
 
     # Save the combined summary table
     saveRDS(res, file = file.path(study_environment$wd$output, "te_summary.rds"))
-  }
+    #}
 
   expect_true(
     all(names(study_environment)
@@ -331,7 +331,6 @@ test_that("efficiency study has no issues", {
   obj <- readRDS(
     file.path(paste0("replications/", project_name, "/output"),
               paste0(project_name,"_study_environment.rds")))
-  
   
   expect_true(nrow(obj$match_specification_ranking) >= 8)
   expect_true(nrow(obj$balance_table) >= 8)
