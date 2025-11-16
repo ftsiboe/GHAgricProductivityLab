@@ -115,7 +115,9 @@ if (!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
 # --- Matching stage 
 # Executed if running locally (Windows) or on SLURM jobs named match_all or match_disa
 if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("match_all", "match_disa")) {
-  idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = "Drawing matched samples")
+  
+  idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = paste0( "Drawing matched samples for ",project_name," study"))
+
   lapply(
     idx,
     function(i, data) {
@@ -147,6 +149,8 @@ if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("match_all", 
     },
     data = data
   )
+  
+  cli::cli_progress_done()
 }
 
 # --- Covariate balance stage 

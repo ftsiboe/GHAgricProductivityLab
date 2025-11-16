@@ -66,8 +66,7 @@ if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "
   }
   
   # Create progress bar for visual feedback
-  idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)),
-                                 name = "Computing log-linear treatment effects")
+  idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = paste0( "Computing log-linear treatment effects for ",project_name," study"))
   
   # Iterate through each matching specification and compute treatment effects
   lapply(idx, function(i) {
@@ -93,11 +92,13 @@ if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "
     
     invisible()
   })
+  
+  cli::cli_progress_done()
 }
 
 # --- Block 2: Treatment Effect Summary
 # Executed if running locally (Windows) or on SLURM jobs named “te_sum”
-if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")) {
+if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
   
   # Reload environment to ensure clean references (paths, specs, etc.)
   project_name <- "disability"

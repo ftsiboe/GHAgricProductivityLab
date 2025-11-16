@@ -21,7 +21,14 @@ piggyback::pb_release_create(
 
 # Upload the assets
 asset_list <- list.files(output_directory, full.names = TRUE, recursive = TRUE)
-asset_list <- asset_list[!grepl("README",asset_list)]
+asset_list <- asset_list[grepl(
+  paste(c("farmer_data",
+          "disability_data",
+          "disability_data",
+          "education_data",
+          "financial_inclusion_data"),
+         collapse = "|"),asset_list)]
+
 piggyback::pb_upload(
   asset_list,
   repo  = "ftsiboe/GHAgricProductivityLab",
