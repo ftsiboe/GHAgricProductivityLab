@@ -462,7 +462,7 @@ test_that("efficiency study has no issues", {
 
           # Multi-stage frontier estimation over sample draws
           res <- lapply(
-            unique(drawlist$ID)[1],
+            unique(drawlist$ID)[1:4],
             draw_msf_estimations,
             data                    = data,
             surveyy                 = FALSE,
@@ -482,7 +482,7 @@ test_that("efficiency study has no issues", {
             matching_type           = matching_type)
 
           # Summarize results across draws (means, stats, etc.)
-          res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
+          # res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
           res <- draw_msf_summary(res=res,technology_legend=technology_legend)
           # res <- res[[1]]
           

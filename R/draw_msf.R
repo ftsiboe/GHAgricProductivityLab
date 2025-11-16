@@ -442,7 +442,7 @@ draw_msf_summary <- function(res, technology_legend) {
   # sf_estmX <- sf_estmX[sf_estmX$restrict %in% "Unrestricted",]
   # sf_estmX <- sf_estmX[sf_estmX$Tech %in% 999,]
   # sf_estmX <- sf_estmX[sf_estmX$sample %in% "unmatched",]
-  
+ 
   # Calculate summary statistics for the estimates
   sf_estm <- dplyr::inner_join(
     doBy::summaryBy(list(c("Estimate", "StdError", "Zvalue", "Pvalue"), 
@@ -524,7 +524,8 @@ draw_msf_summary <- function(res, technology_legend) {
       tidyr::gather(stat, Estimate, c("wmean", "mean", "median", "mode")) 
     disagscors <- disagscors[!disagscors$Estimate %in% c(NA, Inf, -Inf, NaN),]
     
-    disagscors <- doBy::summaryBy(list(c("Estimate"), c("sample", "estType", "Tech", "input", "Survey", "disagscors_level", "disagscors_var", "CoefName", "stat", "restrict", "draw")),
+    disagscors <- doBy::summaryBy(list(c("Estimate"), c("sample", "estType", "Tech", "input", "Survey", "disagscors_level",
+                                                        "disagscors_var", "CoefName", "stat", "restrict", "draw")),
                                   data=disagscors, FUN=mean, keep.names = T)
     
     # Calculate disaggregated efficiency gaps
