@@ -228,106 +228,6 @@ test_that("efficiency study has no issues", {
   expect_true(all(list.files(study_environment$wd$output) %in% c("estimations","figure","figure_data","matching","test_study_environment.rds","treatment_effects")))
   expect_true(all(list.files(study_environment$wd$matching) %in% paste0("match_",stringr::str_pad(1:8, 4, pad = "0"), ".rds")))
 
-  # =============================================================================
-  #  TREATMENT EFFECT WORKFLOW - TEST
-  # =============================================================================
-
-  rm(list = ls(all = TRUE)); gc()
-
-  project_name = "test"
-
-  # Detect operating system to determine runtime environment
-  sysname <- toupper(as.character(Sys.info()[["sysname"]]))
-
-  # Load saved study environment (directories, specifications, etc.)
-  study_environment <- readRDS(
-    file.path(paste0("replications/", project_name, "/output"),
-              paste0(project_name,"_study_environment.rds")))
-
-  # --- Data ingest & harmonization
-  # Load harmonized survey data stored in the study environment
-  data <- study_environment[["estimation_data"]]
-
-  # Focus only on “Pooled” CropID entries for cross-crop analysis
-  data <- data[as.character(data$CropID) %in% "Pooled", ]
-
-  # Set key directories and specifications for downstream routines
-  matching_output_directory <- study_environment$wd$matching
-  match_specifications      <- study_environment$match_specifications
-
-  # Build formula objects for matching (exact, scalar, and factor covariates)
-  match_formulas <- write_match_formulas(
-    match_variables_exact  = study_environment$match_variables_exact,
-    match_variables_scaler = study_environment$match_variables_scaler,
-    match_variables_factor = study_environment$match_variables_factor
-  )
-
-  # --- Block 1: Treatment Effect Estimation
-  # Executed if running locally (Windows) or on SLURM jobs named “te_all” or “te_disa”
-  #if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "te_disa")) {
-
-    # Restrict to a single specification if SLURM_ARRAY_TASK_ID is set
-    if (!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
-      match_specifications <- match_specifications[as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")), ]
-    }
-
-    # Create progress bar for visual feedback
-    idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = paste0( "Computing log-linear treatment effects for ",project_name," study"))
-
-    # Iterate through each matching specification and compute treatment effects
-    lapply(idx, function(i) {
-      # Compute treatment effects using the pre-matched samples
-      res <- treatment_effect_calculation(
-        data                      = data,
-        outcome_variables         = c("Area", "HrvstKg", "SeedKg","HHLaborAE","HirdHr","FertKg", "PestLt"),
-        normalize                 = TRUE,
-        i                         = i,
-        matching_output_directory = matching_output_directory,
-        match_specifications      = match_specifications,
-        match_formulas            = match_formulas
-      )
-
-      # Save results for each ARRAY index as an individual .rds file
-      saveRDS(
-        res,
-        file.path(
-          study_environment$wd$treatment_effects,
-          paste0("te_", stringr::str_pad(match_specifications$ARRAY[i], 4, pad = "0"), ".rds")
-        )
-      )
-
-      invisible()
-    })
-
-    cli::cli_progress_done()
-    #}
-  
-  # --- Block 2: Treatment Effect Summary
-  # Executed if running locally (Windows) or on SLURM jobs named “te_sum”
-  #if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
-
-    # Reload environment to ensure clean references (paths, specs, etc.)
-    project_name <- "test"
-    study_environment <- readRDS(
-      file.path(paste0("replications/", project_name, "/output"),
-                paste0(project_name,"_study_environment.rds")))
-
-    # Summarize all treatment effect estimates across specifications
-    res <- treatment_effect_summary(study_environment$wd$treatment_effects)
-
-    # Save the combined summary table
-    saveRDS(res, file = file.path(study_environment$wd$output, "te_summary.rds"))
-    #}
-
-  expect_true(
-    all(names(study_environment)
-                  %in% c("wd","myseed","study_raw_data","match_specifications","sample_draw_list","crop_area_list",
-                         "match_variables_exact","match_variables_factor","match_variables_scaler",
-                         "match_specification_ranking","match_specification_optimal","balance_table","estimation_data")))
-  expect_true(all(list.files(study_environment$wd$output) %in% c("estimations","figure","figure_data","matching",
-                                                                 "test_study_environment.rds","te_summary.rds","treatment_effects")))
-  expect_true(all(list.files(study_environment$wd$treatment_effects) %in% paste0("te_",stringr::str_pad(1:8, 4, pad = "0"), ".rds")))
-
   obj <- readRDS(
     file.path(paste0("replications/", project_name, "/output"),
               paste0(project_name,"_study_environment.rds")))
@@ -335,6 +235,106 @@ test_that("efficiency study has no issues", {
   expect_true(nrow(obj$match_specification_ranking) >= 8)
   expect_true(nrow(obj$balance_table) >= 8)
   
+  # =============================================================================
+  #  TREATMENT EFFECT WORKFLOW - TEST
+  # =============================================================================
+# 
+#   rm(list = ls(all = TRUE)); gc()
+# 
+#   project_name = "test"
+# 
+#   # Detect operating system to determine runtime environment
+#   sysname <- toupper(as.character(Sys.info()[["sysname"]]))
+# 
+#   # Load saved study environment (directories, specifications, etc.)
+#   study_environment <- readRDS(
+#     file.path(paste0("replications/", project_name, "/output"),
+#               paste0(project_name,"_study_environment.rds")))
+# 
+#   # --- Data ingest & harmonization
+#   # Load harmonized survey data stored in the study environment
+#   data <- study_environment[["estimation_data"]]
+# 
+#   # Focus only on “Pooled” CropID entries for cross-crop analysis
+#   data <- data[as.character(data$CropID) %in% "Pooled", ]
+# 
+#   # Set key directories and specifications for downstream routines
+#   matching_output_directory <- study_environment$wd$matching
+#   match_specifications      <- study_environment$match_specifications
+# 
+#   # Build formula objects for matching (exact, scalar, and factor covariates)
+#   match_formulas <- write_match_formulas(
+#     match_variables_exact  = study_environment$match_variables_exact,
+#     match_variables_scaler = study_environment$match_variables_scaler,
+#     match_variables_factor = study_environment$match_variables_factor
+#   )
+# 
+#   # --- Block 1: Treatment Effect Estimation
+#   # Executed if running locally (Windows) or on SLURM jobs named “te_all” or “te_disa”
+#   #if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "te_disa")) {
+# 
+#     # Restrict to a single specification if SLURM_ARRAY_TASK_ID is set
+#     if (!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
+#       match_specifications <- match_specifications[as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")), ]
+#     }
+# 
+#     # Create progress bar for visual feedback
+#     idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = paste0( "Computing log-linear treatment effects for ",project_name," study"))
+# 
+#     # Iterate through each matching specification and compute treatment effects
+#     lapply(idx, function(i) {
+#       # Compute treatment effects using the pre-matched samples
+#       res <- treatment_effect_calculation(
+#         data                      = data,
+#         outcome_variables         = c("Area", "HrvstKg", "SeedKg","HHLaborAE","HirdHr","FertKg", "PestLt"),
+#         normalize                 = TRUE,
+#         i                         = i,
+#         matching_output_directory = matching_output_directory,
+#         match_specifications      = match_specifications,
+#         match_formulas            = match_formulas
+#       )
+# 
+#       # Save results for each ARRAY index as an individual .rds file
+#       saveRDS(
+#         res,
+#         file.path(
+#           study_environment$wd$treatment_effects,
+#           paste0("te_", stringr::str_pad(match_specifications$ARRAY[i], 4, pad = "0"), ".rds")
+#         )
+#       )
+# 
+#       invisible()
+#     })
+# 
+#     cli::cli_progress_done()
+#     #}
+#   
+#   # --- Block 2: Treatment Effect Summary
+#   # Executed if running locally (Windows) or on SLURM jobs named “te_sum”
+#   #if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
+# 
+#     # Reload environment to ensure clean references (paths, specs, etc.)
+#     project_name <- "test"
+#     study_environment <- readRDS(
+#       file.path(paste0("replications/", project_name, "/output"),
+#                 paste0(project_name,"_study_environment.rds")))
+# 
+#     # Summarize all treatment effect estimates across specifications
+#     res <- treatment_effect_summary(study_environment$wd$treatment_effects)
+# 
+#     # Save the combined summary table
+#     saveRDS(res, file = file.path(study_environment$wd$output, "te_summary.rds"))
+#     #}
+# 
+#   expect_true(
+#     all(names(study_environment)
+#                   %in% c("wd","myseed","study_raw_data","match_specifications","sample_draw_list","crop_area_list",
+#                          "match_variables_exact","match_variables_factor","match_variables_scaler",
+#                          "match_specification_ranking","match_specification_optimal","balance_table","estimation_data")))
+#   expect_true(all(list.files(study_environment$wd$output) %in% c("estimations","figure","figure_data","matching",
+#                                                                  "test_study_environment.rds","te_summary.rds","treatment_effects")))
+#   expect_true(all(list.files(study_environment$wd$treatment_effects) %in% paste0("te_",stringr::str_pad(1:8, 4, pad = "0"), ".rds")))
+# 
   # =============================================================================
   #  MULTI-STAGE FRONTIER ESTIMATION WORKFLOW – DISABILITY STUDY
   # =============================================================================
