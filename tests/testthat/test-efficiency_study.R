@@ -471,52 +471,28 @@ test_that("efficiency study has no issues", {
     match_path                  = study_environment$wd$matching)
   
   # Summarize results across draws (means, stats, etc.)
-  # res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
-  
-  
-  # res <- draw_msf_summary(res=res,technology_legend=technology_legend)
-  # # res <- res[[1]]
-  # 
-  # # Attach metadata (functional form, distribution, tech labels)
-  # for(i in 1:length(res)){
-  #   tryCatch({
-  #     res[[i]][,"fxnforms"]               <- names(fxnforms)[f]
-  #     res[[i]][,"distforms"]              <- names(distforms)[d]
-  #     res[[i]][,"disaggregate_variable"]  <- disaggregate_variable
-  #     res[[i]][,"disaggregate_level"]     <- disaggregate_level
-  #     res[[i]][,"technology_variable"]    <- technology_variable
-  #     res[[i]][,"TCHLvel"]                <- factor(res[[i]][,"Tech"],levels = c(-999,technology_legend$Tech,999),labels = c("National",technology_legend[,2],"Meta"))
-  #   }, error=function(e){})
-  # }
-  # 
-  # # (Optional) Quick extraction of key efficiency results (not saved)
-  # function(){
-  #   Main <- res$ef_mean
-  #   Main <- Main[Main$Survey %in% "GLSS0",]
-  #   Main <- Main[!Main$sample %in% "unmatched",]
-  #   Main <- Main[Main$stat %in% "wmean",]
-  #   Main <- Main[Main$CoefName %in% "efficiencyGap_lvl",]
-  #   Main <- Main[Main$restrict %in% "Restricted",]
-  #   Main <- Main[Main$estType %in% "teBC",]
-  #   Main[Main$type %in% "TGR",c("sample","type","Tech","Estimate")]
-  #   Main[Main$type %in% "TE",c("sample","type","Tech","Estimate")]
-  #   Main[Main$type %in% "MTE",c("sample","type","Tech","Estimate")]
-  # }
-  # 
-  # # Add the estimation name to the result list
-  # res[["names"]] <- est_name
-  # 
-  # # Save full results for this model specification
-  # saveRDS(res,file=out_path)
-  
-  # }, error=function(e){ invisible()})
+  res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
+  res <- draw_msf_summary(res=res,technology_legend=technology_legend)
+  # res <- res[[1]]
 
-  expect_true(all(names(res[[1]]) %in% c("sf_estm","el_mean","ef_mean","rk_mean","ef_dist","rk_dist","el_samp","ef_samp","rk_samp","disagscors")))
-  # expect_true(nrow(res[[1]][["sf_estm"]]) > 0)
-  # expect_true(nrow(res[[1]][["el_mean"]]) > 0)
-  # expect_true(nrow(res[[1]][["ef_mean"]]) > 0)
-  # expect_true(nrow(res[[1]][["ef_dist"]]) > 0)
-  # expect_true(nrow(res[[1]][["el_samp"]]) > 0)
-  # expect_true(nrow(res[[1]][["ef_samp"]]) > 0)
-  # expect_true(nrow(res[[1]][["disagscors"]]) > 0)
+  # Attach metadata (functional form, distribution, tech labels)
+  for(i in 1:length(res)){
+    tryCatch({
+      res[[i]][,"fxnforms"]               <- names(fxnforms)[f]
+      res[[i]][,"distforms"]              <- names(distforms)[d]
+      res[[i]][,"disaggregate_variable"]  <- disaggregate_variable
+      res[[i]][,"disaggregate_level"]     <- disaggregate_level
+      res[[i]][,"technology_variable"]    <- technology_variable
+      res[[i]][,"TCHLvel"]                <- factor(res[[i]][,"Tech"],levels = c(-999,technology_legend$Tech,999),labels = c("National",technology_legend[,2],"Meta"))
+    }, error=function(e){})
+  }
+
+  expect_true(all(names(res) %in% c("sf_estm","el_mean","ef_mean","rk_mean","ef_dist","rk_dist","el_samp","ef_samp","rk_samp","disagscors")))
+  expect_true(nrow(res[["sf_estm"]]) > 0)
+  expect_true(nrow(res[["el_mean"]]) > 0)
+  expect_true(nrow(res[["ef_mean"]]) > 0)
+  expect_true(nrow(res[["ef_dist"]]) > 0)
+  expect_true(nrow(res[["el_samp"]]) > 0)
+  expect_true(nrow(res[["ef_samp"]]) > 0)
+  expect_true(nrow(res[["disagscors"]]) > 0)
 })
