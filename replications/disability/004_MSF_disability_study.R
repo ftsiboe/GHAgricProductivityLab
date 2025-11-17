@@ -89,10 +89,9 @@ if(!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))){
   model_specifications <- model_specifications[as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")),]
 }
 
-
-
-
-
+match_specifications <- study_environment$match_specifications
+match_specifications <- match_specifications[!grepl("linear",match_specifications$link),]
+match_specifications <- match_specifications[match_specifications$boot %in% 0,c("ARRAY","method","distance","link")] 
 
 # Create progress bar for visual feedback
 idx <- cli::cli_progress_along(seq_len(nrow(model_specifications)), name = paste0( "Estimating frontier models for ",project_name," study"))
@@ -198,7 +197,7 @@ lapply(
           d                       = d,
           technology_variable     = technology_variable,
           matching_type           = matching_type,
-          match_specifications        = study_environment$match_specifications,
+          match_specifications        = match_specifications,
           match_specification_optimal = study_environment$match_specification_optimal[c("ARRAY","method","distance","link")],
           match_path                  = study_environment$wd$matching
           ) 

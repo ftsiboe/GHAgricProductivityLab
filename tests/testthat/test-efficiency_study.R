@@ -378,6 +378,10 @@ test_that("efficiency study has no issues", {
     model_specifications <- model_specifications[as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")),]
   }
 
+  match_specifications <- study_environment$match_specifications
+  match_specifications <- match_specifications[!grepl("linear",match_specifications$link),]
+  match_specifications <- match_specifications[match_specifications$boot %in% 0,c("ARRAY","method","distance","link")] 
+  
   fit <- 2;matching_type <- "optimal"
   
   # Pull out this specification’s functional form, distribution, etc.
@@ -462,7 +466,7 @@ test_that("efficiency study has no issues", {
     d                       = d,
     technology_variable     = technology_variable,
     matching_type           = matching_type,
-    match_specifications        = study_environment$match_specifications,
+    match_specifications        = match_specifications,
     match_specification_optimal = study_environment$match_specification_optimal[c("ARRAY","method","distance","link")],
     match_path                  = study_environment$wd$matching)
   

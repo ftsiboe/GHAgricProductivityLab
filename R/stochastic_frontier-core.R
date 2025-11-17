@@ -577,21 +577,17 @@ msf_workhorse <- function(
     #-------------------------------------------------
     # Meta SF Estimation matched [TGR]             ####
     if(!is.null(matching_type)){
-      
-      mspecs_optimal <- match_specification_optimal
-      mspecs_fullset <- match_specifications[!grepl("linear",match_specifications$link),]
-      mspecs_fullset <- mspecs_fullset[mspecs_fullset$boot %in% 0,c("ARRAY","method","distance","link")] 
-      
+    
       m.specs <- match_specifications[match_specifications$boot %in% 0,] #!!!
-      m.specs <- m.specs[m.specs$method %in% mspecs_fullset$method,]
-      m.specs <- m.specs[m.specs$distance %in% mspecs_fullset$distance,]
-      m.specs <- m.specs[m.specs$link %in% mspecs_fullset$link,]
+      m.specs <- m.specs[m.specs$method %in% match_specifications$method,]
+      m.specs <- m.specs[m.specs$distance %in% match_specifications$distance,]
+      m.specs <- m.specs[m.specs$link %in% match_specifications$link,]
       m.specs$name <- ifelse(m.specs$link %in% NA,m.specs$distance,m.specs$link)
       
       if(matching_type %in% "optimal"){
-        m.specs <- m.specs[m.specs$method %in% mspecs_optimal$method,]
-        m.specs <- m.specs[m.specs$distance %in% mspecs_optimal$distance,]
-        m.specs <- m.specs[m.specs$link %in% mspecs_optimal$link,]
+        m.specs <- m.specs[m.specs$method %in% match_specification_optimal$method,]
+        m.specs <- m.specs[m.specs$distance %in% match_specification_optimal$distance,]
+        m.specs <- m.specs[m.specs$link %in% match_specification_optimal$link,]
       }
       
       for(mm in c(1:nrow(m.specs))){
