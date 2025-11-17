@@ -193,10 +193,26 @@ draw_msf_estimations <- function(
         tryCatch({ 
           # glss <-"GLSS0"
           res <- msf_workhorse(
-            data=data[data[,"Surveyy"] %in% glss,], output_variable=output_variable, input_variables=input_variables,
-            production_slope_shifters=production_slope_shifters, intercept_shifters=intercept_shifters, intercept_shifters_meta=intercept_shifters_meta,
-            inefficiency_covariates=inefficiency_covariates, adoption_covariates=adoption_covariates, risk_covariates=risk_covariates, weight_variable=weight_variable, f=f, d=d, identifiers=identifiers, technology_variable=technology_variable, matching_type=matching_type, include_trend=include_trend)
-          
+            data=data[data[,"Surveyy"] %in% glss,], 
+            output_variable=output_variable, 
+            input_variables=input_variables,
+            production_slope_shifters=production_slope_shifters, 
+            intercept_shifters=intercept_shifters, 
+            intercept_shifters_meta=intercept_shifters_meta,
+            inefficiency_covariates=inefficiency_covariates, 
+            adoption_covariates=adoption_covariates, 
+            risk_covariates=risk_covariates, 
+            weight_variable=weight_variable, 
+            f=f, 
+            d=d, 
+            identifiers=identifiers, 
+            technology_variable=technology_variable, 
+            matching_type=matching_type, 
+            include_trend=include_trend,
+            match_specifications = match_specifications,
+            match_specification_optimal = match_specification_optimal,
+            match_path = match_path)
+
           function() {
             Main <- res$ef_mean
             Main <- Main[Main$Survey %in% "GLSS0",]
