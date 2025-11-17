@@ -179,7 +179,7 @@ lapply(
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
-          unique(drawlist$ID)[1],
+          unique(drawlist$ID),
           draw_msf_estimations,
           data                    = data,
           surveyy                 = FALSE,
@@ -201,9 +201,6 @@ lapply(
           match_specification_optimal = study_environment$match_specification_optimal[c("ARRAY","method","distance","link")],
           match_path                  = study_environment$wd$matching
           ) 
-        # res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
-        # saveRDS(res,"data-raw/res.rds")
-        # res <- readRDS("data-raw/res.rds")
         # Summarize results across draws (means, stats, etc.)
         res <- draw_msf_summary(res=res,technology_legend=technology_legend)
         
@@ -215,7 +212,9 @@ lapply(
             res[[i]][,"disaggregate_variable"]  <- disaggregate_variable
             res[[i]][,"disaggregate_level"]     <- disaggregate_level
             res[[i]][,"technology_variable"]    <- technology_variable
-            res[[i]][,"TCHLvel"]                <- factor(res[[i]][,"Tech"],levels = c(-999,technology_legend$Tech,999),labels = c("National",technology_legend[,2],"Meta"))
+            res[[i]][,"TCHLvel"]                <- factor(
+              res[[i]][,"Tech"],levels = c(-999,technology_legend$Tech,999),
+              labels = c("National",technology_legend[,2],"Meta"))
           }, error=function(e){})
         }
         
@@ -228,9 +227,9 @@ lapply(
           Main <- Main[Main$CoefName %in% "efficiencyGap_lvl",]
           Main <- Main[Main$restrict %in% "Restricted",]
           Main <- Main[Main$estType %in% "teBC",]
-          Main[Main$type %in% "TGR",c("sample","type","Tech","Estimate")]
-          Main[Main$type %in% "TE",c("sample","type","Tech","Estimate")]
-          Main[Main$type %in% "MTE",c("sample","type","Tech","Estimate")]
+          Main[Main$type %in% "TGR", c("sample","type","Tech","Estimate")]
+          Main[Main$type %in% "TE" , c("sample","type","Tech","Estimate")]
+          Main[Main$type %in% "MTE", c("sample","type","Tech","Estimate")]
         }
         
         # Add the estimation name to the result list

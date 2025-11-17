@@ -3,7 +3,6 @@
 .RData
 .Ruserdata
 job_*.sbatch
-slurm-*.out
 .DS_Store
 replications/**/*.dta
 replications/**/*.rds
