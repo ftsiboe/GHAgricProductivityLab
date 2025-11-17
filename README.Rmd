@@ -1,5 +1,5 @@
 ---
-title: "Tools and data for Agricultural Productivity Analaysis in Ghana"
+title: "Agricultural Productivity Analaysis in Ghana"
 
 output:
   github_document:

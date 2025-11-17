@@ -1,4 +1,4 @@
-Tools and data for Agricultural Productivity Analaysis in Ghana
+Agricultural Productivity Analaysis in Ghana
 ================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
