@@ -175,7 +175,7 @@ lapply(
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
-          unique(drawlist$ID),
+          unique(drawlist$ID)[1],
           draw_msf_estimations,
           data                    = data,
           surveyy                 = FALSE,
@@ -193,7 +193,9 @@ lapply(
           d                       = d,
           technology_variable     = technology_variable,
           matching_type           = matching_type) 
-        #res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
+        # res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
+        # saveRDS(res,"data-raw/res.rds")
+        # res <- readRDS("data-raw/res.rds")
         # Summarize results across draws (means, stats, etc.)
         res <- draw_msf_summary(res=res,technology_legend=technology_legend)
         

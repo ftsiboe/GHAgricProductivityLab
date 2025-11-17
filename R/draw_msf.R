@@ -435,14 +435,7 @@ draw_msf_summary <- function(res, technology_legend) {
     sf_estm <- rbind(sf_estm00, sf_estm)
     rm(sf_estm00)
   }
-  
-  # Filter specific conditions for summary estimates
-  # sf_estmX <- sf_estm[sf_estm$CoefName %in% "Nobs",]
-  # sf_estmX <- sf_estmX[sf_estmX$draw %in% 0,]
-  # sf_estmX <- sf_estmX[sf_estmX$restrict %in% "Unrestricted",]
-  # sf_estmX <- sf_estmX[sf_estmX$Tech %in% 999,]
-  # sf_estmX <- sf_estmX[sf_estmX$sample %in% "unmatched",]
- 
+
   # Calculate summary statistics for the estimates
   sf_estm <- dplyr::inner_join(
     doBy::summaryBy(list(c("Estimate", "StdError", "Zvalue", "Pvalue"), 
