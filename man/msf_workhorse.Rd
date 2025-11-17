@@ -20,7 +20,10 @@ msf_workhorse(
   technology_variable = NULL,
   matching_type = NULL,
   adoption_covariates = NULL,
-  intercept_shifters_meta = NULL
+  intercept_shifters_meta = NULL,
+  match_path,
+  match_specifications,
+  match_specification_optimal
 )
 }
 \arguments{
@@ -95,6 +98,12 @@ defaults to \code{inefficiency_covariates}.}
 \item{intercept_shifters_meta}{Optional named list of intercept shifters for the
 meta-frontier estimation. If \code{NULL}, defaults to
 \code{intercept_shifters}.}
+
+\item{match_path}{match path}
+
+\item{match_specifications}{match specifications}
+
+\item{match_specification_optimal}{match specifications}
 }
 \value{
 A named list with the following components:

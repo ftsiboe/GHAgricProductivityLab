@@ -24,7 +24,10 @@ draw_msf_estimations(
   matching_type = NULL,
   adoption_covariates = NULL,
   intercept_shifters_meta = NULL,
-  disagscors_list = NULL
+  disagscors_list = NULL,
+  match_specifications,
+  match_specification_optimal,
+  match_path
 )
 }
 \arguments{
@@ -107,6 +110,12 @@ which disaggregated efficiency score summaries should be computed.
 For each variable in this list, the function builds weighted and
 unweighted summaries of TE/TE0/TGR/MTE by survey, sample, and
 disaggregation level.}
+
+\item{match_specifications}{match specifications}
+
+\item{match_specification_optimal}{match specifications}
+
+\item{match_path}{match path}
 }
 \value{
 A named list with components:

@@ -349,7 +349,10 @@ sf_functional_forms <- function(
 #' @param intercept_shifters_meta Optional named list of intercept shifters for the
 #'   meta-frontier estimation. If \code{NULL}, defaults to
 #'   \code{intercept_shifters}.
-#'
+#' @param match_specifications match specifications
+#' @param match_specification_optimal match specifications
+#' @param match_path match path
+#' 
 #' @details
 #' The workflow can be summarized as:
 #' \itemize{
@@ -458,7 +461,10 @@ msf_workhorse <- function(
     technology_variable       = NULL,
     matching_type             = NULL,
     adoption_covariates       = NULL,
-    intercept_shifters_meta   = NULL){
+    intercept_shifters_meta   = NULL,
+    match_path,
+    match_specifications,
+    match_specification_optimal){
   # data <- DATA #[DATA$FMTYPOL %in% 7,]
   #---------------------------------------------------
   # Preliminaries                                  ####
@@ -556,26 +562,27 @@ msf_workhorse <- function(
     
     mflist <- list(
       unmatched=sf_workhorse(
-        data=mf.data,
-        output_variable="Yhat",
-        input_variables=input_variables,weight_variable=weight_variable,d=d,f=f,
-        production_slope_shifters=production_slope_shifters,
-        intercept_shifters=intercept_shifters_meta,
-        inefficiency_covariates=adoption_covariates,
-        identifiers=identifiers,
-        include_trend=include_trend))
+        data                      = mf.data,
+        output_variable           = "Yhat",
+        input_variables           = input_variables,
+        weight_variable           = weight_variable,
+        d                         = d,
+        f                         = f,
+        production_slope_shifters = production_slope_shifters,
+        intercept_shifters        = intercept_shifters_meta,
+        inefficiency_covariates   = adoption_covariates,
+        identifiers               = identifiers,
+        include_trend             = include_trend))
     
     #-------------------------------------------------
     # Meta SF Estimation matched [TGR]             ####
     if(!is.null(matching_type)){
       
-      mspecs_path    <- study_environment$wd$matching
-      mspecs         <- study_environment$match_specifications
-      mspecs_optimal <- study_environment$match_specification_optimal[c("ARRAY","method","distance","link")]
-      mspecs_fullset <- mspecs[!grepl("linear",mspecs$link),]
-      mspecs_fullset <- mspecs_fullset[mspecs_fullset$boot %in% 0,c("ARRAY","method","distance","link")] #!!!
+      mspecs_optimal <- match_specification_optimal
+      mspecs_fullset <- match_specifications[!grepl("linear",match_specifications$link),]
+      mspecs_fullset <- mspecs_fullset[mspecs_fullset$boot %in% 0,c("ARRAY","method","distance","link")] 
       
-      m.specs <- mspecs[mspecs$boot %in% 0,] #!!!
+      m.specs <- match_specifications[match_specifications$boot %in% 0,] #!!!
       m.specs <- m.specs[m.specs$method %in% mspecs_fullset$method,]
       m.specs <- m.specs[m.specs$distance %in% mspecs_fullset$distance,]
       m.specs <- m.specs[m.specs$link %in% mspecs_fullset$link,]
@@ -591,7 +598,7 @@ msf_workhorse <- function(
         tryCatch({
           # mm <- 1
           cat(crayon::green("matched Meta SF-",as.character(m.specs$name[mm]),Sys.time()),fill=T)
-          mfm.data <- dplyr::inner_join(unique(readRDS(file.path(mspecs_path,paste0("match_",stringr::str_pad(m.specs$ARRAY[mm],4,pad="0"),".rds")))$md),
+          mfm.data <- dplyr::inner_join(unique(readRDS(file.path(match_path,paste0("match_",stringr::str_pad(m.specs$ARRAY[mm],4,pad="0"),".rds")))$md),
                                         mf.data,by=c("Surveyx","EaId", "HhId", "Mid","unique_identifier"))
           mfm <- sf_workhorse(
             data=as.data.frame(mfm.data),

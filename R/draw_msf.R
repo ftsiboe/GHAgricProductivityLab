@@ -72,7 +72,9 @@
 #'   For each variable in this list, the function builds weighted and
 #'   unweighted summaries of TE/TE0/TGR/MTE by survey, sample, and
 #'   disaggregation level.
-#'
+#' @param match_specifications match specifications
+#' @param match_specification_optimal match specifications
+#' @param match_path match path
 #' @details
 #' \enumerate{
 #'   \item \strong{Draw-specific filtering:}
@@ -147,7 +149,10 @@ draw_msf_estimations <- function(
     matching_type             = NULL, 
     adoption_covariates       = NULL, 
     intercept_shifters_meta   = NULL, 
-    disagscors_list           = NULL) {
+    disagscors_list           = NULL,
+    match_specifications,
+    match_specification_optimal,
+    match_path) {
   
   tryCatch({ 
     function(){

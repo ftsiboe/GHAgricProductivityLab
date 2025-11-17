@@ -232,6 +232,8 @@ test_that("efficiency study has no issues", {
     file.path(paste0("replications/", project_name, "/output"),
               paste0(project_name,"_study_environment.rds")))
   
+  expect_true(nrow(obj$match_specifications) >= 8)
+  expect_true(nrow(obj$match_specification_optimal) %in% 1)
   expect_true(nrow(obj$match_specification_ranking) >= 8)
   expect_true(nrow(obj$balance_table) >= 8)
   
@@ -459,7 +461,10 @@ test_that("efficiency study has no issues", {
     f                       = f,
     d                       = d,
     technology_variable     = technology_variable,
-    matching_type           = matching_type)
+    matching_type           = matching_type,
+    match_specifications        = study_environment$match_specifications,
+    match_specification_optimal = study_environment$match_specification_optimal[c("ARRAY","method","distance","link")],
+    match_path                  = study_environment$wd$matching)
   
   # Summarize results across draws (means, stats, etc.)
   # res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
