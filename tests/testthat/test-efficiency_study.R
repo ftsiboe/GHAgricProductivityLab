@@ -447,6 +447,75 @@ test_that("efficiency study has no issues", {
   }
   
   # Multi-stage frontier estimation over sample draws
+  resCD1 <- lapply(
+    unique(drawlist$ID)[1],
+    draw_msf_estimations,
+    data                    = data,
+    surveyy                 = FALSE,
+    intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+    intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+    drawlist                = drawlist,
+    weight_variable         = "Weight",
+    output_variable         = "HrvstKg",
+    input_variables         = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
+    inefficiency_covariates = list(scalar_variables=c("lnAgeYr","lnYerEdu")),
+    risk_covariates         = list(scalar_variables=c("CrpMix")),
+    adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu")),
+    identifiers             = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
+    disagscors_list         = disagscors_list,
+    f                       = 2,
+    d                       = d,
+    technology_variable     = technology_variable,
+    matching_type           = matching_type,
+    match_specifications        = match_specifications,
+    match_specification_optimal = study_environment$match_specification_optimal[c("ARRAY","method","distance","link")],
+    match_path                  = study_environment$wd$matching)
+  
+  
+  resCD2 <- lapply(
+    unique(drawlist$ID)[1],
+    draw_msf_estimations,
+    data                    = data,
+    surveyy                 = FALSE,
+    intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+    intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+    drawlist                = drawlist,
+    weight_variable         = "Weight",
+    output_variable         = "HrvstKg",
+    input_variables         = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
+    risk_covariates         = list(scalar_variables=c("CrpMix")),
+    adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu")),
+    identifiers             = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
+    disagscors_list         = disagscors_list,
+    f                       = 2,
+    d                       = d,
+    technology_variable     = technology_variable,
+    matching_type           = matching_type,
+    match_specifications        = match_specifications,
+    match_specification_optimal = study_environment$match_specification_optimal[c("ARRAY","method","distance","link")],
+    match_path                  = study_environment$wd$matching)
+  
+  resCD3 <- lapply(
+    unique(drawlist$ID)[1],
+    draw_msf_estimations,
+    data                    = data,
+    surveyy                 = FALSE,
+    intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+    intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+    drawlist                = drawlist,
+    weight_variable         = "Weight",
+    output_variable         = "HrvstKg",
+    input_variables         = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
+    identifiers             = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
+    disagscors_list         = disagscors_list,
+    f                       = 2,
+    d                       = d,
+    technology_variable     = technology_variable,
+    matching_type           = matching_type,
+    match_specifications        = match_specifications,
+    match_specification_optimal = study_environment$match_specification_optimal[c("ARRAY","method","distance","link")],
+    match_path                  = study_environment$wd$matching)
+  
   res <- lapply(
     unique(drawlist$ID)[1],
     draw_msf_estimations,
