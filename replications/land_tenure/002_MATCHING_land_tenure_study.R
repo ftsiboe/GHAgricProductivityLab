@@ -44,12 +44,13 @@ devtools::document()
 
 project_name <- "land_tenure"
 
+# Detect operating system to determine runtime environment
+sysname <- toupper(as.character(Sys.info()[["sysname"]]))
+
+
 study_environment <- readRDS(
   file.path(paste0("replications/", project_name, "/output"),
             paste0(project_name,"_study_environment.rds")))
-
-# Detect operating system to determine runtime environment
-sysname <- toupper(as.character(Sys.info()[["sysname"]]))
 
 # --- Data ingest & harmonization
 DATA <- harmonized_data_prep(study_environment$study_raw_data)           
@@ -87,20 +88,28 @@ m.specs <- match_sample_specifications(data = data, myseed = study_environment$m
 match_specifications <- m.specs$m.specs #[1:8,]
 sample_draw_list     <- as.data.frame(m.specs$drawlist) #[1:3,]
 
-# Persist key objects in the study_environment container
-study_environment[["match_specifications"]]   <- match_specifications
-study_environment[["sample_draw_list"]]       <- sample_draw_list
-study_environment[["crop_area_list"]]         <- crop_area_list
-study_environment[["match_variables_exact"]]  <- match_variables_exact
-study_environment[["match_variables_factor"]] <- match_variables_factor
-study_environment[["match_variables_scaler"]] <- match_variables_scaler
-study_environment[["estimation_data"]]        <- DATA
-
-# Save environment snapshot for downstream stages
-saveRDS(
-  study_environment,
-  file.path(study_environment$wd$output, paste0(project_name,"_study_environment.rds"))
-)
+if (is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
+  # Persist key objects in the study_environment container
+  study_environment[["match_specifications"]]   <- match_specifications
+  study_environment[["sample_draw_list"]]       <- sample_draw_list
+  study_environment[["crop_area_list"]]         <- crop_area_list
+  study_environment[["match_variables_exact"]]  <- match_variables_exact
+  study_environment[["match_variables_factor"]] <- match_variables_factor
+  study_environment[["match_variables_scaler"]] <- match_variables_scaler
+  study_environment[["estimation_data"]]        <- DATA
+  
+  # Save environment snapshot for downstream stages
+  saveRDS(
+    study_environment,
+    file.path(study_environment$wd$output, paste0(project_name,"_study_environment.rds"))
+  )
+}else{
+  
+  study_environment <- readRDS(
+    file.path(paste0("replications/", project_name, "/output"),
+              paste0(project_name,"_study_environment.rds")))
+  
+}
 
 # --- SLURM array subsetting 
 # Executed if running locally (Windows) or launched as an array job, run only the row indexed by SLURM_ARRAY_TASK_ID
@@ -113,7 +122,7 @@ if (!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
 if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("match_all", "match_land")) {
   
   idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = paste0( "Drawing matched samples for ",project_name," study"))
-
+  
   lapply(
     idx,
     function(i, data) {
@@ -171,7 +180,7 @@ if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("cov_bal")) {
   study_environment[["match_specification_ranking"]] <- res$rate
   study_environment[["match_specification_optimal"]] <- res$rate[nrow(res$rate),]
   study_environment[["balance_table"]]               <- res$bal_tab
-
+  
   saveRDS(
     study_environment,
     file.path(study_environment$wd$output, paste0(project_name,"_study_environment.rds"))

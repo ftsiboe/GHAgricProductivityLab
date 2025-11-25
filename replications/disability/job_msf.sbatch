@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=3
 #SBATCH --mem=28G 
 #SBATCH --array=1-18
-#SBATCH --mail-user=ftsiboe@ksu.edu
+#SBATCH --mail-user=ftsiboe@hotmail.com
 #SBATCH --mail-type=ALL
 #SBATCH --output=/dev/null
 

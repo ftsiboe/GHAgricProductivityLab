@@ -75,8 +75,8 @@ model_specifications <- sf_model_specifications(
   technology_variables = c("OwnLnd","LndOwn","LndRgt"))
 
 # Drop specifications that use disaggregation variables you do NOT want
-model_specifications <- model_specifications[!model_specifications$disasg %in% c("Female","Region","Ecozon","EduCat","EduLevel","AgeCat"),]
-model_specifications <- model_specifications[model_specifications$level %in% c( "Pooled"),]
+#model_specifications <- model_specifications[model_specifications$disasg %in% c("Female","Region","Ecozon","EduCat","EduLevel","AgeCat"),]
+#model_specifications <- model_specifications[model_specifications$level %in% c( "Pooled"),]
 
 row.names(model_specifications) <- 1:nrow(model_specifications)
 
@@ -180,7 +180,7 @@ lapply(
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
-          unique(drawlist$ID)[1],
+          unique(drawlist$ID),
           draw_msf_estimations,
           data                    = data,
           surveyy                 = TRUE,

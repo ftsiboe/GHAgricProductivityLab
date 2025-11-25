@@ -112,7 +112,7 @@ sf_model_specifications <- function(
                 demographic_variables,
                 function(w) {
                   tryCatch({
-                    DONE <- data.frame(disasg=w, level=unique(DATA[,w]), 
+                    DONE <- data.frame(disasg=w, level=unique(data[,w]), 
                                        SPECS[(SPECS$f %in% mainF & SPECS$d %in% mainD), c("f","d")])
                     return(DONE)
                   }, error = function(e) { return(NULL) })

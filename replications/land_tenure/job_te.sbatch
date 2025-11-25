@@ -1,12 +1,12 @@
 #!/bin/bash -l
 
-#SBATCH --job-name=te_disa
+#SBATCH --job-name=te_land
 #SBATCH --time=0-30:00:00    
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=20
 #SBATCH --mem=5G
 #SBATCH --array=1-808
-#SBATCH --mail-user=ftsiboe@ksu.edu
+#SBATCH --mail-user=ftsiboe@hotmail.com
 #SBATCH --mail-type=ALL
 #SBATCH --output=/dev/null
 
