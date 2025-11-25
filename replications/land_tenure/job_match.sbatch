@@ -12,4 +12,4 @@
 
 module purge
 module load R/4.2.1-foss-2022a GDAL/3.5.0-foss-2022a PROJ/9.0.0-GCCcore-11.3.0
-R --no-save -q < replications/disability/002_MATCHING_land_tenure_study.R
+R --no-save -q < replications/land_tenure/002_MATCHING_land_tenure_study.R
