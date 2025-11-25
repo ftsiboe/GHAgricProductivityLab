@@ -55,7 +55,7 @@ match_formulas <- write_match_formulas(
 
 # --- Block 1: Treatment Effect Estimation
 # Executed if running locally (Windows) or on SLURM jobs named “te_all” or “te_land”
-if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "te_land")) {
+#if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "te_land")) {
   
   # Restrict to a single specification if SLURM_ARRAY_TASK_ID is set
   if (!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
@@ -91,11 +91,11 @@ if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "
   })
   
   cli::cli_progress_done()
-}
+  #}
 
 # --- Block 2: Treatment Effect Summary
 # Executed if running locally (Windows) or on SLURM jobs named “te_sum”
-if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
+  #if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
   
   # Reload environment to ensure clean references (paths, specs, etc.)
   project_name <- "land_tenure"
@@ -108,4 +108,4 @@ if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
   
   # Save the combined summary table
   saveRDS(res, file = file.path(study_environment$wd$output, "te_summary.rds"))
-}
+  #}

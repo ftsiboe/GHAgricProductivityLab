@@ -110,7 +110,7 @@ if (!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
 
 # --- Matching stage 
 # Executed if running locally (Windows) or on SLURM jobs named match_all or match_disa
-if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("match_all", "match_land")) {
+#if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("match_all", "match_land")) {
   
   idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = paste0( "Drawing matched samples for ",project_name," study"))
 
@@ -147,11 +147,11 @@ if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("match_all", 
   )
   
   cli::cli_progress_done()
-}
+  #}
 
 # --- Covariate balance stage 
 # Executed if running locally (Windows) or on SLURM jobs named cov_bal
-if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("cov_bal")) {
+  #if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("cov_bal")) {
   
   # Reload environment (paths/specs) to ensure clean context
   project_name <- "land_tenure"
@@ -176,7 +176,7 @@ if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("cov_bal")) {
     study_environment,
     file.path(study_environment$wd$output, paste0(project_name,"_study_environment.rds"))
   )
-}
+  #}
 
 # --- Cleanup (optional)
 # unlink(list.files(getwd(), pattern = paste0(".out"), full.names = TRUE))

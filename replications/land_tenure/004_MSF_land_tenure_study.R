@@ -223,7 +223,7 @@ lapply(
         # (Optional) Quick extraction of key efficiency results (not saved)
         function(){
           Main <- res$ef_mean
-          Main <- Main[!Main$Survey %in% "GLSS0",]
+          Main <- Main[Main$Survey %in% "GLSS0",]
           Main <- Main[!Main$sample %in% "unmatched",]
           Main <- Main[Main$stat %in% "wmean",]
           Main <- Main[Main$CoefName %in% "efficiencyGap_lvl",]
