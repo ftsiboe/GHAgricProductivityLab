@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-job_*.sbatch
 .DS_Store
 replications/**/*.dta
 replications/**/*.rds
