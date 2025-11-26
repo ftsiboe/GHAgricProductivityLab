@@ -198,7 +198,7 @@ lapply(
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
-          unique(drawlist$ID)[1],
+          unique(drawlist$ID),
           draw_msf_estimations,
           data                    = data,
           surveyy                 = TRUE,

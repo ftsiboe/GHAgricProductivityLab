@@ -41,7 +41,6 @@ financial_data  <- as.data.frame(haven::read_dta("data-raw/releases/harmonized_d
 # financial_index <- get_household_data("financial_inclusion_index")
 financial_index  <- as.data.frame(haven::read_dta("data-raw/releases/harmonized_data/financial_inclusion_index.dta"))
 
-
 # ---- Merge farmer and land tenure data at the household-member level
 # Merge keys:
 #   - Surveyx : survey round 
