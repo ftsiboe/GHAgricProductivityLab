@@ -1213,15 +1213,12 @@ sf_workhorse <- function(
   sf <- list(optStatus="")
   
   # Try different optimization methods and tolerances until a successful convergence is achieved
-  for(sf_gradtol in c(1e-6, 1e-3)) {
-    for(sf_tol in c(1e-12, 1e-6)) {
+  for(sf_gradtol in c(1e-7, 1e-6, 1e-5, 1e-4, 1e-3)) {
+    for(sf_tol in c(1e-12, 1e-11, 1e-10, 1e-9, 1e-8, 1e-7, 1e-6)) {
       for(sf_method in c('nr', 'nm', 'bfgs', 'bhhh', 'cg', 'sann', 'ucminf', 'mla', 'sr1', 'sparse', 'nlminb')) {
-        if(!sf$optStatus %in% "successful convergence ") {
+        if(!grepl("SUCCESSFUL CONVERGENCE",sf$optStatus)){
           tryCatch({
-            
             # sf_method <- "nr"; sf_gradtol<- 1e-12; sf_tol <- 1e-6
-            
-            
             if(is.null(equations$uequ) & is.null(equations$vequ)) {
               sf <- sfacross(formula = equations$prodfxn, udist = udist,
                              scaling = scaling, S = 1, method = sf_method, logDepVar=logDepVar, data = data,
@@ -1964,21 +1961,22 @@ sfaR_summary <- function(fit){
   
   # Create a dataframe to hold various statistics and test results
   TEST <- data.frame(
-    Nobs = ifelse(is.null(summary(fit)$Nobs), NA, summary(fit)$Nobs),
-    nXvar = ifelse(is.null(summary(fit)$nXvar), NA, summary(fit)$nXvar),
-    nuZUvar = ifelse(is.null(summary(fit)$nuZUvar), NA, summary(fit)$nuZUvar),
-    nvZVvar = ifelse(is.null(summary(fit)$nvZVvar), NA, summary(fit)$nvZVvar),
-    mlLoglik = ifelse(is.null(summary(fit)$mlLoglik), NA, summary(fit)$mlLoglik),
-    AIC = ifelse(is.null(summary(fit)$AIC), NA, summary(fit)$AIC),
-    BIC = ifelse(is.null(summary(fit)$BIC), NA, summary(fit)$BIC),
-    HQIC = ifelse(is.null(summary(fit)$HQIC), NA, summary(fit)$HQIC),
-    sigmavSq = ifelse(is.null(summary(fit)$sigmavSq), NA, summary(fit)$sigmavSq),
-    sigmauSq = ifelse(is.null(summary(fit)$sigmauSq), NA, summary(fit)$sigmauSq),
-    Varu = ifelse(is.null(summary(fit)$Varu), NA, summary(fit)$Varu),
-    Eu = ifelse(is.null(summary(fit)$Eu), NA, summary(fit)$Eu),
-    Expu = ifelse(is.null(summary(fit)$Expu), NA, summary(fit)$Expu)
+    Nobs     = ifelse(is.null(summary(fit)$Nobs)      , NA, summary(fit)$Nobs),
+    nXvar    = ifelse(is.null(summary(fit)$nXvar)     , NA, summary(fit)$nXvar),
+    nuZUvar  = ifelse(is.null(summary(fit)$nuZUvar)   , NA, summary(fit)$nuZUvar),
+    nvZVvar  = ifelse(is.null(summary(fit)$nvZVvar)   , NA, summary(fit)$nvZVvar),
+    mlLoglik = ifelse(is.null(summary(fit)$mlLoglik)  , NA, summary(fit)$mlLoglik),
+    AIC      = ifelse(is.null(summary(fit)$AIC)       , NA, summary(fit)$AIC),
+    BIC      = ifelse(is.null(summary(fit)$BIC)       , NA, summary(fit)$BIC),
+    HQIC     = ifelse(is.null(summary(fit)$HQIC)      , NA, summary(fit)$HQIC),
+    sigmavSq = ifelse(is.null(summary(fit)$sigmavSq)  , NA, summary(fit)$sigmavSq),
+    sigmauSq = ifelse(is.null(summary(fit)$sigmauSq)  , NA, summary(fit)$sigmauSq),
+    Varu     = ifelse(is.null(summary(fit)$Varu)      , NA, summary(fit)$Varu),
+    Eu       = ifelse(is.null(summary(fit)$Eu)        , NA, summary(fit)$Eu),
+    Expu     = ifelse(is.null(summary(fit)$Expu)      , NA, summary(fit)$Expu),
+    optStatus= ifelse(is.null(summary(fit)$optStatus) , NA, summary(fit)$optStatus)
   )
-  
+
   # Calculate additional statistics
   TEST$Sigma <- sqrt(TEST$sigmauSq + TEST$sigmavSq)
   TEST$Gamma <- TEST$sigmauSq / (TEST$Sigma^2)
