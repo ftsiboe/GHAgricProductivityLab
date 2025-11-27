@@ -1,9 +1,9 @@
 #!/bin/bash -l
 
 #SBATCH --job-name=te_res
-#SBATCH --time=0-30:00:00    
+#SBATCH --time=0-05:00:00    
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=20
+#SBATCH --ntasks-per-node=1
 #SBATCH --mem=5G
 #SBATCH --array=1-808
 #SBATCH --mail-user=ftsiboe@hotmail.com

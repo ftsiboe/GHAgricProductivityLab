@@ -1,12 +1,12 @@
 # =============================================================================
-#  DATA and SETUP - LAND TENURE STUDY 
+#  DATA and SETUP - EDUCATION STUDY 
 # =============================================================================
 #  General Description:
 #  ---------------------------------------------------------------------------
-#  This script prepares analysis-ready data for the land tenure study within the
+#  This script prepares analysis-ready data for the education study within the
 #  GHAgricProductivityLab project. It:
 #    - Initializes a study-specific environment (folders, paths, metadata),
-#    - Loads harmonized farm/household and land tenure modules,
+#    - Loads harmonized farm/household and education modules,
 #    - Merges them at the household-farmer level,
 #    - Restricts the sample to relevant GLSS waves,
 #    - Saves both the processed study dataset and the study environment object
@@ -21,7 +21,7 @@ rm(list = ls(all = TRUE)); gc()
 devtools::document()                         
 
 # ---- Define study name and initialize study environment
-project_name <- "land_tenure"
+project_name <- "education"
 
 # study_setup() is assumed to:
 #   - create / verify directories,
@@ -34,12 +34,12 @@ study_environment <- study_setup(project_name = project_name)
 # Wrapper that downloads (via piggyback) and caches Stata .dta files from
 # the GHAgricProductivityLab GitHub repo, then reads them with haven.
 farmer_data <- get_household_data("harmonized_crop_farmer_data")
-farmer_data <- farmer_data[names(farmer_data)[!grepl("OwnLnd", names(farmer_data))]]
 
-# land_tenure_data <- get_household_data("harmonized_land_tenure_data")
-land_tenure_data  <- as.data.frame(haven::read_dta("data-raw/releases/harmonized_data/harmonized_land_tenure_data.dta"))
+# education_data <- get_household_data("harmonized_education_data")
+education_data  <- as.data.frame(haven::read_dta("data-raw/releases/harmonized_data/harmonized_education_data.dta"))
+education_data  <- education_data[names(education_data)[!grepl("YerEdu|EduLevel|EduWhyNo", names(education_data))]]
 
-# ---- Merge farmer and land tenure data at the household-member level
+# ---- Merge farmer and education data at the household-member level
 # Merge keys:
 #   - Surveyx : survey round 
 #   - EaId    : enumeration area
@@ -47,14 +47,13 @@ land_tenure_data  <- as.data.frame(haven::read_dta("data-raw/releases/harmonized
 #   - Mid     : member ID
 study_data <- dplyr::inner_join(
   farmer_data,
-  land_tenure_data,
+  education_data,
   by = c("Surveyx", "EaId", "HhId", "Mid")
 )
 
 # ---- Restrict to relevant survey rounds and drop certain variables
 study_data <- study_data[
-  study_data$Surveyx %in% c("GLSS3","GLSS4","GLSS5","GLSS6","GLSS7"),
-  names(study_data)[!grepl("EduWhyNo", names(study_data))]
+  study_data$Surveyx %in% c("GLSS6","GLSS7"),
 ]
 
 # ---- Attach raw data to study environment (potential issue)

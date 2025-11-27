@@ -1,5 +1,5 @@
 # =============================================================================
-#  TREATMENT EFFECT WORKFLOW - LAND TENURE STUDY 
+#  TREATMENT EFFECT WORKFLOW - EDUCATION STUDY 
 # =============================================================================
 #  General Description:
 # -----------------------------------------------------------------------------
@@ -25,7 +25,7 @@ rm(list = ls(all = TRUE)); gc()
 
 devtools::document()  
 
-project_name = "land_tenure"
+project_name = "education"
 
 # Detect operating system to determine runtime environment
 sysname <- toupper(as.character(Sys.info()[["sysname"]]))
@@ -54,8 +54,8 @@ match_formulas <- write_match_formulas(
 )
 
 # --- Block 1: Treatment Effect Estimation
-# Executed if running locally (Windows) or on SLURM jobs named “te_all” or “te_land”
-if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "te_land")) {
+# Executed if running locally (Windows) or on SLURM jobs named “te_all” or “te_edu”
+if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "te_edu")) {
   
   # Restrict to a single specification if SLURM_ARRAY_TASK_ID is set
   if (!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
@@ -98,7 +98,7 @@ if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "
 if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
   
   # Reload environment to ensure clean references (paths, specs, etc.)
-  project_name <- "land_tenure"
+  project_name <- "education"
   study_environment <- readRDS(
     file.path(paste0("replications/", project_name, "/output"),
               paste0(project_name,"_study_environment.rds")))
