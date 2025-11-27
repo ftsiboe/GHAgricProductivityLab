@@ -18,12 +18,12 @@ file in the repository root for details.
 
 ### Contributers
 
--   [Francis
-    Tsiboe](https://scholar.google.com/citations?user=ox2t_YIAAAAJ&hl=en)
--   [Edward
-    Martey](https://scholar.google.com/citations?user=SMoBI3wAAAAJ&hl=en)
--   [Jacob
-    Asravor](https://scholar.google.com/citations?user=_zUi3FsAAAAJ&hl=en)
+- [Francis
+  Tsiboe](https://scholar.google.com/citations?user=ox2t_YIAAAAJ&hl=en)
+- [Edward
+  Martey](https://scholar.google.com/citations?user=SMoBI3wAAAAJ&hl=en)
+- [Jacob
+  Asravor](https://scholar.google.com/citations?user=_zUi3FsAAAAJ&hl=en)
 
 ### Abstract
 

@@ -1210,50 +1210,21 @@ sf_workhorse <- function(
     intercept_shifters=intercept_shifters, inefficiency_covariates=inefficiency_covariates, risk_covariates=risk_covariates
   )
   
-  sf <- list(optStatus="")
-  
-  # Try different optimization methods and tolerances until a successful convergence is achieved
-  for(sf_gradtol in c(1e-7, 1e-6, 1e-5, 1e-4, 1e-3)) {
-    for(sf_tol in c(1e-12, 1e-11, 1e-10, 1e-9, 1e-8, 1e-7, 1e-6)) {
-      for(sf_method in c('nr', 'nm', 'bfgs', 'bhhh', 'cg', 'sann', 'ucminf', 'mla', 'sr1', 'sparse', 'nlminb')) {
-        if(!grepl("SUCCESSFUL CONVERGENCE",sf$optStatus)){
-          tryCatch({
-            # sf_method <- "nr"; sf_gradtol<- 1e-12; sf_tol <- 1e-6
-            if(is.null(equations$uequ) & is.null(equations$vequ)) {
-              sf <- sfacross(formula = equations$prodfxn, udist = udist,
-                             scaling = scaling, S = 1, method = sf_method, logDepVar=logDepVar, data = data,
-                             gradtol=sf_gradtol, tol=sf_tol)
-            }
-            if(!is.null(equations$uequ) & is.null(equations$vequ)) {
-              sf <- sfacross(formula = equations$prodfxn, udist = udist, uhet = equations$uequ, muhet = equations$uequ,
-                             scaling = scaling, S = 1, method = sf_method, logDepVar=logDepVar, data = data,
-                             gradtol=sf_gradtol, tol=sf_tol)
-            }
-            if(is.null(equations$uequ) & !is.null(equations$vequ)) {
-              sf <- sfacross(formula = equations$prodfxn, udist = udist, vhet = equations$vequ,
-                             scaling = scaling, S = 1, method = sf_method, logDepVar=logDepVar, data = data,
-                             gradtol=sf_gradtol, tol=sf_tol)
-            }
-            if(!is.null(equations$uequ) & !is.null(equations$vequ)) {
-              sf <- sfacross(formula = equations$prodfxn, uhet = equations$uequ, muhet = equations$uequ, 
-                             vhet = equations$vequ, udist = udist, scaling = scaling, S = 1, method = sf_method, 
-                             logDepVar=logDepVar, data = data, gradtol=sf_gradtol, tol=sf_tol)
-            }
-          }, error=function(e){})
-        }
-      }
-    }
-  }
+  # Attempt Stochastic Frontier Convergence via Multi-Step Search
+  sf <- .sf_try_convergence(
+    equations = equations,
+    udist     = udist,
+    scaling   = scaling,
+    logDepVar = logDepVar,
+    data      = data
+  )
   
   # Extract efficiencies and fitted values
   ef <- sfaR::efficiencies(sf)
   ef <- data.frame(data[row.names(ef), c(identifiers, "weights")], ef)
   ef$mlFitted <- sf$dataTable$mlFitted
   if(logDepVar) { ef$mlFitted <- exp(ef$mlFitted) }
-  
-  
-  identifiers[!identifiers %in% names(data)]
-  
+
   data <- data[row.names(ef),]
   
   rk <- data.frame(data[c(identifiers, "weights")])
@@ -1392,38 +1363,14 @@ sf_workhorse <- function(
       intercept_shifters=intercept_shifters, inefficiency_covariates=inefficiency_covariates, risk_covariates=risk_covariates
     )
     
-    # Try different optimization methods and tolerances until a successful convergence is achieved
-    sfc <- list(optStatus="")
-    for(sf_gradtol in c(1e-6, 1e-3)) {
-      for(sf_tol in c(1e-12, 1e-6)) {
-        for(sf_method in c('nr', 'nm', 'bfgs', 'bhhh', 'cg', 'sann', 'ucminf', 'mla', 'sr1', 'sparse', 'nlminb')) {
-          if(!sfc$optStatus %in% "successful convergence ") {
-            tryCatch({
-              if(is.null(equations$uequ) & is.null(equations$vequ)) {
-                sfc <- sfacross(formula = equations$prodfxn, udist = udist,
-                                scaling = scaling, S = 1, method = sf_method, logDepVar=logDepVar, data = data,
-                                gradtol=sf_gradtol, tol=sf_tol)
-              }
-              if(!is.null(equations$uequ) & is.null(equations$vequ)) {
-                sfc <- sfacross(formula = equations$prodfxn, udist = udist, uhet = equations$uequ, muhet = equations$uequ,
-                                scaling = scaling, S = 1, method = sf_method, logDepVar=logDepVar, data = data,
-                                gradtol=sf_gradtol, tol=sf_tol)
-              }
-              if(is.null(equations$uequ) & !is.null(equations$vequ)) {
-                sfc <- sfacross(formula = equations$prodfxn, udist = udist, vhet = equations$vequ,
-                                scaling = scaling, S = 1, method = sf_method, logDepVar=logDepVar, data = data,
-                                gradtol=sf_gradtol, tol=sf_tol)
-              }
-              if(!is.null(equations$uequ) & !is.null(equations$vequ)) {
-                sfc <- sfacross(formula = equations$prodfxn, uhet = equations$uequ, muhet = equations$uequ, 
-                                vhet = equations$vequ, udist = udist, scaling = scaling, S = 1, method = sf_method, 
-                                logDepVar=logDepVar, data = data, gradtol=sf_gradtol, tol=sf_tol)
-              }
-            }, error=function(e){})
-          }
-        }
-      }
-    }
+    # Attempt Stochastic Frontier Convergence via Multi-Step Search
+    sfc <- .sf_try_convergence(
+      equations = equations,
+      udist     = udist,
+      scaling   = scaling,
+      logDepVar = logDepVar,
+      data      = data
+    )
     
     est_coefca <- est_coefc * coef(sfc)["lcFitted"]
     est_coefca[1] <- est_coefca[1] + coef(sfc)["(Intercept)"]
@@ -2019,4 +1966,193 @@ sfaR_summary <- function(fit){
   return(mlRes)
 }
 
+
+
+#' Attempt Stochastic Frontier Convergence via Multi-Step Search
+#'
+#' @description
+#' Internal utility that repeatedly attempts to fit a stochastic frontier model
+#' using `sfacross()` by cycling over multiple optimization methods, gradient
+#' tolerances, and convergence tolerances.
+#'
+#' This helper exists because frontier models frequently fail to converge under
+#' a single optimization configuration. The function implements a systematic,
+#' silent fallback strategy that tries a grid of solver configurations until a
+#' model reports `"SUCCESSFUL CONVERGENCE"` in `sf$optStatus` or all
+#' combinations have been attempted.
+#'
+#' @details
+#' The search pattern loops over:
+#'
+#' - **Gradient tolerances:** default `c(1e-6, 1e-3)`  
+#' - **Function tolerances:** default `c(1e-12, 1e-6)`  
+#' - **Optimization methods:** default  
+#'   `c("nr", "nm", "bfgs", "bhhh", "cg", "sann", "ucminf",
+#'      "mla", "sr1", "sparse", "nlminb")`
+#'
+#' Custom grids can be supplied via `sf_gradtol_options`, `sf_tol_options` and
+#' `sf_method_options` if a narrower or different search is desired.
+#'
+#' For each combination, the function calls `sfacross()` with the appropriate
+#' specification of heterogeneity equations (`uequ`, `vequ`) found in the input
+#' `equations` list.
+#'
+#' Once `"SUCCESSFUL CONVERGENCE"` is detected, the function stops trying new
+#' combinations and returns the last successful `sfacross()` result.
+#'
+#' @param equations A named list containing:
+#'   - `prodfxn`: the production function formula  
+#'   - `uequ`: (optional) formula for u-heterogeneity  
+#'   - `vequ`: (optional) formula for v-heterogeneity
+#'
+#' @param udist Character string specifying the inefficiency distribution used
+#'   by `sfacross()`.
+#'
+#' @param scaling Logical or numeric control passed to `sfacross()` to enable
+#'   scaling of the model.
+#'
+#' @param logDepVar Logical indicating whether the dependent variable in the
+#'   production function is logged.
+#'
+#' @param data A data frame containing variables required for the production
+#'   frontier and heterogeneity equations.
+#'
+#' @param sf_gradtol_options Optional numeric vector of gradient tolerances to
+#'   try. If `NULL`, defaults to `c(1e-6, 1e-3)`.
+#'
+#' @param sf_tol_options Optional numeric vector of function tolerances to try.
+#'   If `NULL`, defaults to `c(1e-12, 1e-6)`.
+#'
+#' @param sf_method_options Optional character vector of optimization methods to
+#'   try. If `NULL`, defaults to
+#'   `c("nr", "nm", "bfgs", "bhhh", "cg", "sann", "ucminf",
+#'      "mla", "sr1", "sparse", "nlminb")`.
+#'
+#' @return
+#' The final `sf` object returned by the last successful call to `sfacross()`.
+#' If no configuration converges, the object will contain whatever the last
+#' failed attempt returned (typically with `optStatus` not indicating
+#' convergence).
+#'
+#' @noRd
+.sf_try_convergence <- function(
+    equations,
+    udist,
+    scaling,
+    logDepVar,
+    data,
+    sf_gradtol_options = NULL,
+    sf_tol_options     = NULL,
+    sf_method_options  = NULL) {
+  
+  if (is.null(sf_gradtol_options)) {
+    sf_gradtol_options <- c(1e-6, 1e-3)
+  }
+  
+  if (is.null(sf_tol_options)) {
+    sf_tol_options <- c(1e-12, 1e-6)
+  }
+
+  if (is.null(sf_method_options)) {
+    sf_method_options <- c(
+      "nr", "nm", "bfgs", "bhhh", "cg", "sann",
+      "ucminf", "mla", "sr1", "sparse", "nlminb"
+    )
+  }
+  
+  # initialize a dummy sf object with optStatus field
+  sf <- list(optStatus = "")
+  
+  # Loop over combinations of gradient tolerances, function tolerances, and optimization methods
+  for (sf_gradtol in sf_gradtol_options) {
+    
+    for (sf_tol in sf_tol_options) {
+      
+      for (sf_method in sf_method_options) {
+        
+        # Stop trying if convergence already achieved
+        if (!grepl("SUCCESSFUL CONVERGENCE", sf$optStatus)) {
+          
+          tryCatch({
+            
+            # CASE 1: no u-het & no v-het
+            if (is.null(equations$uequ) && is.null(equations$vequ)) {
+              sf <- sfacross(
+                formula   = equations$prodfxn,
+                udist     = udist,
+                scaling   = scaling,
+                S         = 1,
+                method    = sf_method,
+                logDepVar = logDepVar,
+                data      = data,
+                gradtol   = sf_gradtol,
+                tol       = sf_tol
+              )
+            }
+            
+            # CASE 2: u-het only
+            if (!is.null(equations$uequ) && is.null(equations$vequ)) {
+              sf <- sfacross(
+                formula   = equations$prodfxn,
+                udist     = udist,
+                uhet      = equations$uequ,
+                muhet     = equations$uequ,
+                scaling   = scaling,
+                S         = 1,
+                method    = sf_method,
+                logDepVar = logDepVar,
+                data      = data,
+                gradtol   = sf_gradtol,
+                tol       = sf_tol
+              )
+            }
+            
+            # CASE 3: v-het only
+            if (is.null(equations$uequ) && !is.null(equations$vequ)) {
+              sf <- sfacross(
+                formula   = equations$prodfxn,
+                udist     = udist,
+                vhet      = equations$vequ,
+                scaling   = scaling,
+                S         = 1,
+                method    = sf_method,
+                logDepVar = logDepVar,
+                data      = data,
+                gradtol   = sf_gradtol,
+                tol       = sf_tol
+              )
+            }
+            
+            # CASE 4: both u-het and v-het
+            if (!is.null(equations$uequ) && !is.null(equations$vequ)) {
+              sf <- sfacross(
+                formula   = equations$prodfxn,
+                uhet      = equations$uequ,
+                muhet     = equations$uequ,
+                vhet      = equations$vequ,
+                udist     = udist,
+                scaling   = scaling,
+                S         = 1,
+                method    = sf_method,
+                logDepVar = logDepVar,
+                data      = data,
+                gradtol   = sf_gradtol,
+                tol       = sf_tol
+              )
+            }
+            
+          }, error = function(e) {
+            # silently ignore — next combination will be tried
+          })
+          
+        } 
+        
+      } 
+      
+    } 
+    
+  } 
+  
+  return(sf)
+}
 
