@@ -1,5 +1,5 @@
 # =============================================================================
-#  TREATMENT EFFECT WORKFLOW - LAND TENURE STUDY 
+#  TREATMENT EFFECT WORKFLOW - EDUCATION STUDY 
 # =============================================================================
 #  General Description:
 # -----------------------------------------------------------------------------
@@ -25,7 +25,7 @@ rm(list = ls(all = TRUE)); gc()
 
 devtools::document()  
 
-project_name = "land_tenure"
+project_name = "education"
 
 # Detect operating system to determine runtime environment
 sysname <- toupper(as.character(Sys.info()[["sysname"]]))
@@ -98,7 +98,7 @@ if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_all", "
 if (grepl("WINDOWS", sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("te_sum")){
   
   # Reload environment to ensure clean references (paths, specs, etc.)
-  project_name <- "land_tenure"
+  project_name <- "education"
   study_environment <- readRDS(
     file.path(paste0("replications/", project_name, "/output"),
               paste0(project_name,"_study_environment.rds")))

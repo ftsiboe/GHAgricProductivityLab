@@ -1,5 +1,5 @@
 # =============================================================================
-#  MULTI-STAGE FRONTIER ESTIMATION WORKFLOW – LAND TENURE STUDY
+#  MULTI-STAGE FRONTIER ESTIMATION WORKFLOW – EDUCATION STUDY
 # =============================================================================
 #  General Description:
 # -----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ library(rgenoud);library(quadprog);library(car)
 
 devtools::document()  
 
-project_name = "land_tenure"
+project_name = "education"
 
 # Detect operating system to determine runtime environment
 sysname <- toupper(as.character(Sys.info()[["sysname"]]))
@@ -75,11 +75,11 @@ model_specifications <- sf_model_specifications(
   distforms = distforms,
   fxnforms = fxnforms,
   data = study_environment$estimation_data,
-  technology_variables = c("OwnLnd","LndOwn","LndRgt"))
+  technology_variables = c("educated","EduLevel","numeracy","any_formal","any_read","any_write","any_literacy",
+                           "local_literacy","fregn_literacy","any_train","apprentice","student","YerEduCat"))
 
 # Drop specifications that use disaggregation variables you do NOT want
-#model_specifications <- model_specifications[model_specifications$disasg %in% c("Female","Region","Ecozon","EduCat","EduLevel","AgeCat"),]
-#model_specifications <- model_specifications[model_specifications$level %in% c( "Pooled"),]
+model_specifications <- model_specifications[model_specifications$disasg %in% c("EduLevel","EduCat","Region","Ecozon"),]
 
 row.names(model_specifications) <- 1:nrow(model_specifications)
 
@@ -175,7 +175,7 @@ lapply(
            disaggregate_variable %in% "CropID" & 
            f %in% 2 & d %in% 1){
           
-          disagscors_list <- c("Ecozon","Region","AgeCat","EduLevel","Female",
+          disagscors_list <- c("Ecozon","Region","AgeCat","Female",
                                names(data)[grepl("CROP_",names(data))],"LndAq","ShrCrpCat")
           disagscors_list <- unique(disagscors_list[disagscors_list %in% names(data)])
 
@@ -183,18 +183,18 @@ lapply(
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
-          unique(drawlist$ID),
+          unique(drawlist$ID)[1],
           draw_msf_estimations,
           data                    = data,
-          surveyy                 = TRUE,
-          intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Ecozon")),
-          intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Ecozon")),
+          surveyy                 = FALSE,
+          intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+          intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
           drawlist                = drawlist,
           weight_variable         = "Weight",
           output_variable         = "HrvstKg",
           input_variables         = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
-          inefficiency_covariates = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Ecozon","Extension","Credit","EqipMech")),
-          adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Ecozon","Extension","Credit","EqipMech")),
+          inefficiency_covariates = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","OwnLnd","EqipMech")),
+          adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","OwnLnd","EqipMech")),
           identifiers             = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
           disagscors_list         = disagscors_list,
           f                       = f,
