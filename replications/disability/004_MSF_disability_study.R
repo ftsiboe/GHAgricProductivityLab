@@ -4,7 +4,7 @@
 #  General Description:
 # -----------------------------------------------------------------------------
 # This script automates the full multi-stage stochastic frontier (MSF)
-# estimation workflow for the “disability” project replication.
+# estimation workflow for the project replication.
 #
 # It performs the following core tasks:
 #
@@ -45,7 +45,7 @@
 #    • **HPC clusters via SLURM arrays** (each task runs one specification)
 #
 # This workflow produces the full library of MSF frontier estimations used in
-# the empirical analysis of disability and agricultural productivity.
+# the empirical analysis.
 # =============================================================================
 rm(list = ls(all = TRUE)); gc()  
 

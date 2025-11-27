@@ -4,10 +4,10 @@
 #  General Description:
 # -----------------------------------------------------------------------------
 # This script automates the estimation and summarization of
-# treatment effects for the “disability” project replication.
+# treatment effects for the project replication.
 # 
 # It performs two main tasks depending on the runtime context:
-# 1. **Treatment Effect Estimation (te_all / te_disa)**:
+# 1. **Treatment Effect Estimation **:
 #    - Loads harmonized survey data and matching specifications
 #    - Iterates through all (or assigned) matching specifications
 #    - Computes log-linear treatment effects (ATE, ATET, ATEU)
@@ -19,9 +19,6 @@
 #    - Aggregates all `.rds` results using
 #      `treatment_effect_summary()`
 #    - Produces a summarized table ("te_summary.rds")
-#
-# The script is designed to run seamlessly on both Windows
-# (local development) and HPC environments (via SLURM arrays).
 # =============================================================================
 
 rm(list = ls(all = TRUE)); gc()  

@@ -4,7 +4,7 @@
 #  General Description:
 # -----------------------------------------------------------------------------
 # This script automates the estimation and summarization of
-# treatment effects for the “RESOURCE EXTRACTION” project replication.
+# treatment effects for the project replication.
 # 
 # It performs two main tasks depending on the runtime context:
 # 1. **Treatment Effect Estimation **:

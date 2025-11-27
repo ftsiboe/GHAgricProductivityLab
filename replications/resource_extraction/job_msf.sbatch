@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-#SBATCH --job-name=msf_land
+#SBATCH --job-name=msf_res
 #SBATCH --time=0-40:00:00    
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=3
@@ -12,4 +12,4 @@
 
 module purge
 module load R/4.2.1-foss-2022a GDAL/3.5.0-foss-2022a PROJ/9.0.0-GCCcore-11.3.0
-R --no-save -q < replications/land_tenure/004_MSF_land_tenure_study.R
+R --no-save -q < replications/resource_extraction/004_MSF_resource_extraction_study.R

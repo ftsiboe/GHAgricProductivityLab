@@ -4,7 +4,7 @@
 #  General Description:
 # -----------------------------------------------------------------------------
 # This script automates the full multi-stage stochastic frontier (MSF)
-# estimation workflow for the “LAND TENURE” project replication.
+# estimation workflow for the project replication.
 #
 # It performs the following core tasks:
 #
@@ -43,6 +43,9 @@
 # The script is designed to run seamlessly on:
 #    • **Local Windows/Mac/Linux machines** (full specification sweep)  
 #    • **HPC clusters via SLURM arrays** (each task runs one specification)
+#
+# This workflow produces the full library of MSF frontier estimations used in
+# the empirical analysis.
 # =============================================================================
 rm(list = ls(all = TRUE)); gc()  
 

@@ -1,10 +1,10 @@
 # =============================================================================
-#  MATCHING WORKFLOW - LAND TENURE STUDY
+#  MATCHING WORKFLOW - EDUCATION STUDY
 # =============================================================================
 #  General Description:
 #  ---------------------------------------------------------------------------
 #  This workflow executes a multi-stage matching and evaluation pipeline for
-#  the "TENURE STUDY" project. It performs the following main tasks:
+#  the project. It performs the following main tasks:
 #
 #    1. **Project Setup & Environment Creation**:
 #         - Initializes a reproducible study environment with consistent
@@ -22,16 +22,12 @@
 #           lists for replication.
 #         - Saves the resulting specifications and environment metadata.
 #
-#    4. **Parallel Matching Execution (HPC)**:
-#         - When executed under SLURM, each array task draws matched samples according to a given
-#           specification and saves the result as an `.rds` file.
-#
-#    5. **Covariate Balance Evaluation**:
+#    4. **Covariate Balance Evaluation**:
 #         - When run as a `cov_bal` SLURM job, computes covariate balance
 #           statistics using `cobalt::bal.tab()` across all specifications,
 #           produces a composite balance rate, and ranks the specifications.
 #
-#    6. **Outputs**:
+#    5. **Outputs**:
 #         - Matching results per specification (`matching/*.rds`)
 #         - Balance tables, ranked and optimal specifications
 #           (`output/match_specification_*.rds`)
@@ -42,11 +38,7 @@ rm(list = ls(all = TRUE)); gc()
 
 devtools::document()                         
 
-project_name <- "land_tenure"
-
-# Detect operating system to determine runtime environment
-sysname <- toupper(as.character(Sys.info()[["sysname"]]))
-
+project_name <- "education"
 
 study_environment <- readRDS(
   file.path(paste0("replications/", project_name, "/output"),
@@ -56,7 +48,7 @@ study_environment <- readRDS(
 DATA <- harmonized_data_prep(study_environment$study_raw_data)           
 
 # Focus analysis sample: pooled crop only; define treatment indicator
-DATA$Treat <- as.integer(as.numeric(DATA$OwnLnd %in% 1)) # logical treated flag
+DATA$Treat <- as.integer(as.numeric(DATA$educated %in% 1)) # logical treated flag
 data <- DATA[as.character(DATA$CropID) %in% "Pooled", ]
 
 # --- Matching variable sets
@@ -65,7 +57,7 @@ crop_area_list         <- get_crop_area_list(data)
 match_variables_scaler <- c("AgeYr","YerEdu","HHSizeAE","FmleAERt","Depend","CrpMix", crop_area_list)
 
 # Categorical covariates used as factors in matching distance
-match_variables_factor <- c("Credit","Ethnic","Marital","Religion","Head")
+match_variables_factor <- c("Credit","OwnLnd","Ethnic","Marital","Religion","Head")
 
 # Exact-match strata (must match identically)
 match_variables_exact  <- c("Survey", "Region", "Ecozon", "Locality", "Female")
@@ -88,104 +80,68 @@ m.specs <- match_sample_specifications(data = data, myseed = study_environment$m
 match_specifications <- m.specs$m.specs #[1:8,]
 sample_draw_list     <- as.data.frame(m.specs$drawlist) #[1:3,]
 
-if (is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
-  # Persist key objects in the study_environment container
-  study_environment[["match_specifications"]]   <- match_specifications
-  study_environment[["sample_draw_list"]]       <- sample_draw_list
-  study_environment[["crop_area_list"]]         <- crop_area_list
-  study_environment[["match_variables_exact"]]  <- match_variables_exact
-  study_environment[["match_variables_factor"]] <- match_variables_factor
-  study_environment[["match_variables_scaler"]] <- match_variables_scaler
-  study_environment[["estimation_data"]]        <- DATA
-  
-  # Save environment snapshot for downstream stages
-  saveRDS(
-    study_environment,
-    file.path(study_environment$wd$output, paste0(project_name,"_study_environment.rds"))
-  )
-}else{
-  
-  study_environment <- readRDS(
-    file.path(paste0("replications/", project_name, "/output"),
-              paste0(project_name,"_study_environment.rds")))
-  
-}
-
-# --- SLURM array subsetting 
-# Executed if running locally (Windows) or launched as an array job, run only the row indexed by SLURM_ARRAY_TASK_ID
-if (!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
-  match_specifications <- match_specifications[as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")), ]
-}
+# Persist key objects in the study_environment container
+study_environment[["match_specifications"]]   <- match_specifications
+study_environment[["sample_draw_list"]]       <- sample_draw_list
+study_environment[["crop_area_list"]]         <- crop_area_list
+study_environment[["match_variables_exact"]]  <- match_variables_exact
+study_environment[["match_variables_factor"]] <- match_variables_factor
+study_environment[["match_variables_scaler"]] <- match_variables_scaler
+study_environment[["estimation_data"]]        <- DATA
 
 # --- Matching stage 
-# Executed if running locally (Windows) or on SLURM jobs named match_all or match_land
-if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("match_all", "match_land")) {
-  
-  idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = paste0( "Drawing matched samples for ",project_name," study"))
-  
-  lapply(
-    idx,
-    function(i, data) {
-      tryCatch({
-        # Produce matched sample & (optionally) matching object for spec i
-        sampels <- draw_matched_samples(
-          i,
-          data,
-          match_variables_exact,
-          match_variables_scaler,
-          match_variables_factor,
-          match_specifications,
-          sample_draw_list
+idx <- cli::cli_progress_along(seq_len(nrow(match_specifications)), name = paste0( "Drawing matched samples for ",project_name," study"))
+
+lapply(
+  idx,
+  function(i, data) {
+    tryCatch({
+      # Produce matched sample & (optionally) matching object for spec i
+      sampels <- draw_matched_samples(
+        i,
+        data,
+        match_variables_exact,
+        match_variables_scaler,
+        match_variables_factor,
+        match_specifications,
+        sample_draw_list
+      )
+      
+      # For bootstrap specs (boot != 0), drop the heavy m.out object to save space
+      if (!match_specifications$boot[i] %in% 0) { sampels[["m.out"]] <- NULL }
+      
+      # Persist result: one RDS per ARRAY (zero-padded)
+      saveRDS(
+        sampels,
+        file.path(
+          study_environment$wd$matching,
+          paste0("match_",stringr::str_pad(match_specifications$ARRAY[i], 4, pad = "0"), ".rds")
         )
-        
-        # For bootstrap specs (boot != 0), drop the heavy m.out object to save space
-        if (!match_specifications$boot[i] %in% 0) { sampels[["m.out"]] <- NULL }
-        
-        # Persist result: one RDS per ARRAY (zero-padded)
-        saveRDS(
-          sampels,
-          file.path(
-            study_environment$wd$matching,
-            paste0("match_",stringr::str_pad(match_specifications$ARRAY[i], 4, pad = "0"), ".rds")
-          )
-        )
-      }, error = function(e) {})
-      return(i)
-    },
-    data = data
-  )
-  
-  cli::cli_progress_done()
-}
+      )
+    }, error = function(e) {})
+    return(i)
+  },
+  data = data
+)
+
+cli::cli_progress_done()
 
 # --- Covariate balance stage 
-# Executed if running locally (Windows) or on SLURM jobs named cov_bal
-if(grepl("WINDOWS",sysname) || Sys.getenv("SLURM_JOB_NAME") %in% c("cov_bal")) {
-  
-  # Reload environment (paths/specs) to ensure clean context
-  project_name <- "land_tenure"
-  
-  study_environment <- readRDS(
-    file.path(paste0("replications/", project_name, "/output"),
-              paste0(project_name,"_study_environment.rds")))
-  
-  # Compute balance tables and spec-level composite balance “rate”
-  res <- covariate_balance(
-    matching_output_directory = study_environment$wd$matching,
-    match_specifications      = study_environment$match_specifications
-  )
-  
-  # Save: full ranking, top spec, and detailed long-format balance table
-  
-  study_environment[["match_specification_ranking"]] <- res$rate
-  study_environment[["match_specification_optimal"]] <- res$rate[nrow(res$rate),]
-  study_environment[["balance_table"]]               <- res$bal_tab
-  
-  saveRDS(
-    study_environment,
-    file.path(study_environment$wd$output, paste0(project_name,"_study_environment.rds"))
-  )
-}
+res <- covariate_balance(
+  matching_output_directory = study_environment$wd$matching,
+  match_specifications      = study_environment$match_specifications
+)
 
-# --- Cleanup (optional)
-# unlink(list.files(getwd(), pattern = paste0(".out"), full.names = TRUE))
+# Save: full ranking, top spec, and detailed long-format balance table
+
+study_environment[["match_specification_ranking"]] <- res$rate
+study_environment[["match_specification_optimal"]] <- res$rate[nrow(res$rate),]
+study_environment[["balance_table"]]               <- res$bal_tab
+
+
+# Save environment snapshot for downstream stages
+saveRDS(
+  study_environment,
+  file.path(study_environment$wd$output, paste0(project_name,"_study_environment.rds"))
+)
+
