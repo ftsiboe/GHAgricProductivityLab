@@ -84,8 +84,8 @@ m.specs <- match_sample_specifications(data = data, myseed = study_environment$m
 #   m.specs$drawlist : index sets for resampling / bootstraps
 
 # Local convenience bindings
-match_specifications <- m.specs$m.specs[1:8,]
-sample_draw_list     <- as.data.frame(m.specs$drawlist)[1:3,]
+match_specifications <- m.specs$m.specs
+sample_draw_list     <- as.data.frame(m.specs$drawlist)
 
 if (is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID")))) {
   # Persist key objects in the study_environment container
