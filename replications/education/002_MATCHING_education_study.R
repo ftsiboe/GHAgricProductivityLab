@@ -54,7 +54,7 @@ data <- DATA[as.character(DATA$CropID) %in% "Pooled", ]
 # --- Matching variable sets
 # Continuous/scalar covariates (plus dynamic crop area columns discovered from data)
 crop_area_list         <- get_crop_area_list(data)
-match_variables_scaler <- c("AgeYr","YerEdu","HHSizeAE","FmleAERt","Depend","CrpMix", crop_area_list)
+match_variables_scaler <- c("AgeYr","HHSizeAE","FmleAERt","Depend","CrpMix", crop_area_list)
 
 # Categorical covariates used as factors in matching distance
 match_variables_factor <- c("Credit","OwnLnd","Ethnic","Marital","Religion","Head")
@@ -133,11 +133,9 @@ res <- covariate_balance(
 )
 
 # Save: full ranking, top spec, and detailed long-format balance table
-
 study_environment[["match_specification_ranking"]] <- res$rate
 study_environment[["match_specification_optimal"]] <- res$rate[nrow(res$rate),]
 study_environment[["balance_table"]]               <- res$bal_tab
-
 
 # Save environment snapshot for downstream stages
 saveRDS(
