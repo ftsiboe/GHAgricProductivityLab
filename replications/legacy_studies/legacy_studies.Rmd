@@ -5,6 +5,18 @@ output:
   github_document:
     toc: false
     toc_depth: 3
+    
+    
+knit: >
+  (function(inputFile, encoding) {
+    rmarkdown::render(
+      inputFile,
+      encoding      = encoding,
+      output_format = "github_document",
+      # always output README.md in the same folder as the .Rmd
+      output_file   = paste0(getwd(), "/README.md")
+    )
+  })
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->

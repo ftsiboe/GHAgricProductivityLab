@@ -16,7 +16,7 @@ piggyback::pb_release_create(
   repo = "ftsiboe/GHAgricProductivityLab",
   tag  = "legacy_studies",
   name = "Legacy studies",
-  body = readr::read_file(file.path(output_directory,"legacy_studies.md"))
+  body = readr::read_file(file.path(output_directory,"README.md"))
 )
 
 # Upload the assets

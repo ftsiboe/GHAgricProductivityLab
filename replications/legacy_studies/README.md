@@ -8,7 +8,9 @@ Agricultural Productivity in Ghana: Legacy studies
 For an overview of the broader project context, please refer to the main
 [GHAgricProductivityLab
 README](https://github.com/ftsiboe/GHAgricProductivityLab/README.md) in
-the repository root. See the
+the repository root.
+
+See the
 [LICENSE](https://github.com/ftsiboe/GHAgricProductivityLab/LICENSE)
 file in the repository root for details.
 
