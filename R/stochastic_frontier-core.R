@@ -69,9 +69,10 @@
 #'   \item \code{mainF} and \code{mainD} are valid indices within \code{fxnforms}
 #'         and \code{distforms}, respectively.
 #' }
-#' @family frontier analysis
 #' @import data.table
-#' @export
+#' @family frontier analysis
+#' @keywords internal
+#' @noRd
 sf_model_specifications <- function(
     data,
     distforms             = sf_functional_forms()$distforms,
@@ -203,7 +204,8 @@ sf_model_specifications <- function(
 #' \code{fxnforms$TP} will not have any effect (and would error if \code{TP}
 #' is not defined).
 #' @family frontier analysis
-#' @export
+#' @keywords internal
+#' @noRd
 sf_functional_forms <- function(
     number_of_inputs = 5, 
     include_trend    = FALSE) {
@@ -465,7 +467,7 @@ msf_workhorse <- function(
     match_path,
     match_specifications,
     match_specification_optimal){
-  # data <- DATA #[DATA$FMTYPOL %in% 7,]
+ 
   #---------------------------------------------------
   # Preliminaries                                  ####
   data <- data[!data[,weight_variable] %in% 0,]
@@ -609,7 +611,7 @@ msf_workhorse <- function(
       }
     }
     #-------------------------------------------------
-    # Calculate scors                              ####
+    # Calculate Scores                             ####
     cat(crayon::green("Calculate scors",Sys.time()),fill=T)
     TE0 <- sf_Naive$ef[names(sf_Naive$ef)[names(sf_Naive$ef) %in% c(identifiers,"restrict","teBC","teJLMS","teMO")]]
     TE0 <- TE0 |> tidyr::gather(estType, TE0, names(TE0)[!names(TE0) %in% c(identifiers,"restrict")])
@@ -643,100 +645,6 @@ msf_workhorse <- function(
     #-------------------------------------------------
   }
   #---------------------------------------------------
-  # Distribution bars- Scores                      ####
-  cat(crayon::green("Distribution bars- Scores",Sys.time()),fill=T)
-  if(!is.null(technology_variable)){
-    dataFrq <- score |> tidyr::gather(type, value, c("TE0","TE","TGR","MTE"))
-    dataFrq <- dataFrq[!dataFrq$value %in% c(NA,Inf,-Inf,NaN),]
-    dataFrq00 <- dataFrq
-    dataFrq00$Tech <- -999
-    dataFrq <- rbind(dataFrq,dataFrq00)
-  }else{
-    dataFrq <- score |> tidyr::gather(type, value, c("TE"))
-    dataFrq <- dataFrq[!dataFrq$value %in% c(NA,Inf,-Inf,NaN),]
-  }
-  
-  dataFrq00 <- dataFrq
-  dataFrq00$Survey <- "GLSS0"
-  dataFrq <- rbind(dataFrq,dataFrq00)
-  rm(dataFrq00)
-  
-  dataFrq$range <- cut(dataFrq$value,seq(0,1,0.05))
-  dataFrq$count <- 1
-  
-  count <- dataFrq |> group_by(Survey,sample,Tech,type,estType,restrict,range) |>
-    summarise(count = sum(count)) |> as.data.frame(.)
-  
-  count_sum <- dataFrq |> group_by(Survey,sample,Tech,type,estType,restrict) |>
-    summarise(count_sum = sum(count)) |> as.data.frame(.)
-  
-  weights <- dataFrq |> group_by(Survey,sample,Tech,type,estType,restrict,range) |>
-    summarise(weights = sum(weights)) |> as.data.frame(.)
-  
-  weights_sum <- dataFrq |> group_by(Survey,sample,Tech,type,estType,restrict) |>
-    summarise(weights_sum = sum(weights)) |> as.data.frame(.)
-  
-  dataFrq <- dplyr::inner_join(dplyr::inner_join(count,count_sum,by=c("Survey","sample","Tech","type","estType","restrict")),
-                               dplyr::inner_join(weights,weights_sum,by=c("Survey","sample","Tech","type","estType","restrict")),
-                               by=c("Survey","sample","Tech","type","estType","restrict","range"))
-  
-  dataFrq$est_weight <- dataFrq$weights/dataFrq$weights_sum
-  dataFrq$est_count  <- dataFrq$count/dataFrq$count_sum
-  dataFrq$Frqlevel   <- as.integer(dataFrq$range)
-  ef_dist <- dataFrq[c("Survey","sample","Tech","type","estType","restrict","range","Frqlevel","est_count","est_weight")]
-  
-  # check <- unique(ef_dist[c("sample","Tech","type","estType")])
-  # table(check$type,check$sample)
-  
-  rm(dataFrq)
-  #---------------------------------------------------
-  # Summary Scores                                 ####
-  cat(crayon::green("Summary Scores",Sys.time()),fill=T)
-  if(!is.null(technology_variable)){
-    Estescors <- score |> tidyr::gather(type, value, c("TE0","TE","TGR","MTE"))
-    Estescors <- Estescors[!Estescors$value %in% c(NA,Inf,-Inf,NaN),]
-    Estescors00 <- Estescors
-    Estescors00$Tech <- -999
-    Estescors <- rbind(Estescors,Estescors00)
-  }else{
-    Estescors <- score |> tidyr::gather(type, value, c("TE"))
-    Estescors <- Estescors[!Estescors$value %in% c(NA,Inf,-Inf,NaN),]
-  }
-  
-  Estescors00 <- Estescors
-  Estescors00$Survey <- "GLSS0"
-  Estescors <- rbind(Estescors,Estescors00)
-  rm(Estescors00)
-  
-  Estescors <- Estescors |>
-    group_by(Survey, sample, Tech, type, estType, restrict) |>
-    summarise(wmean  = weighted.mean(value, weights, na.rm = TRUE),
-              mean   = mean(value,na.rm = TRUE),
-              median = median(value,na.rm = TRUE),
-              mode   = mode(value, na.rm = TRUE)) |>
-    as.data.frame()
-  
-  Estescors <- Estescors |> tidyr::gather(stat, Estimate, c("wmean","mean","median","mode"))
-  Estescors$CoefName <- "efficiency"
-  
-  if(!is.null(technology_variable)){
-    EstescorsGAP <- Estescors[Estescors$Tech %in%   technology_legend$Tech,]
-    EstescorsGAP <- dplyr::inner_join(
-      EstescorsGAP[!EstescorsGAP$Tech %in% min(  technology_legend$Tech),c("sample","Survey","type","estType","restrict","Tech","stat","Estimate")],
-      doBy::summaryBy(list("Estimate",c("sample","Survey","type","estType","restrict","stat")),
-                      data=EstescorsGAP[EstescorsGAP$Tech %in% min(  technology_legend$Tech),],FUN=c(mean),na.rm=T),
-      by=c("sample","Survey","type","estType","restrict","stat"))
-    
-    EstescorsGAP$efficiencyGap_lvl <- EstescorsGAP$Estimate - EstescorsGAP$Estimate.mean
-    EstescorsGAP$efficiencyGap_pct <- ((EstescorsGAP$efficiencyGap_lvl/abs(EstescorsGAP$Estimate.mean)))*100
-    EstescorsGAP <- EstescorsGAP[c("sample","Survey","type","estType","restrict","Tech","stat","efficiencyGap_lvl","efficiencyGap_pct")]
-    EstescorsGAP <- EstescorsGAP |>  tidyr::gather(CoefName, Estimate, c("efficiencyGap_lvl","efficiencyGap_pct"))
-    Estescors <- rbind(Estescors,EstescorsGAP)
-  }
-  
-  # check <- unique(Estescors[c("sample","Tech","type","estType")]);table(check$type,check$sample)
-  
-  #---------------------------------------------------
   # Summary Estimates                              ####
   cat(crayon::green("Summary Estimates",Sys.time()),fill=T)
   Estimates <- sf_Naive$sf
@@ -762,7 +670,7 @@ msf_workhorse <- function(
           return(DONE)}), fill = TRUE))
     
     Estimates <- as.data.frame(data.table::rbindlist(Estimates, fill = TRUE))
-    
+    Estimates$Estimate <- as.numeric(as.character(Estimates$Estimate))
     lrtest <- Estimates[Estimates$CoefName %in% c("Nobs","nXvar","nuZUvar","nvZVvar","mlLoglik"),]
     lrtest$CoefName <- ifelse(lrtest$CoefName %in% c("nXvar","nuZUvar","nvZVvar"),"npar",lrtest$CoefName)
     lrtest <- doBy::summaryBy(Estimate~Tech+CoefName+sample+restrict,data=lrtest,FUN=sum,keep.names = T,na.rm=T)
@@ -783,8 +691,8 @@ msf_workhorse <- function(
     names(DF_Naive)[names(DF_Naive) %in% "Estimate"] <- "DF_Naive"
     names(LL_Group)[names(LL_Group) %in% "Estimate"] <- "LL_Group"
     names(DF_Group)[names(DF_Group) %in% "Estimate"] <- "DF_Group"
-    names(LL_Meta)[names(LL_Meta) %in% "Estimate"] <- "LL_Meta"
-    names(DF_Meta)[names(DF_Meta) %in% "Estimate"] <- "DF_Meta"
+    names(LL_Meta)[names(LL_Meta) %in% "Estimate"]   <- "LL_Meta"
+    names(DF_Meta)[names(DF_Meta) %in% "Estimate"]   <- "DF_Meta"
     
     lrtest <- dplyr::inner_join(LL_Meta,DF_Meta,by=c("sample","restrict"))
     lrtest <- dplyr::inner_join(LL_Group,lrtest,by=c("restrict"))
@@ -804,7 +712,7 @@ msf_workhorse <- function(
     lrtest$CoefName <- "LRT"
     lrtest$Tech <- 999
     
-    Estimates <- as.data.frame(data.table::rbindlist(list(Estimates,lrtest), fill = TRUE))
+    Estimates <- data.table::rbindlist(list(Estimates,lrtest), fill = TRUE)
     
   }
   
@@ -862,34 +770,49 @@ msf_workhorse <- function(
   
   Elasticity_sample <- Elasticity
   
-  Elasticity <- Elasticity |>
-    group_by(Survey, sample, Tech, input, restrict) |>
-    summarise(wmean  = weighted.mean(value, weights, na.rm = TRUE),
-              mean   = mean(value,na.rm = TRUE),
-              median = median(value,na.rm = TRUE),
-              mode   = mode(value, na.rm = TRUE)) |>
-    as.data.frame()
+  Elasticity <- as.data.table(Elasticity)
   
-  Elasticity <- Elasticity |> tidyr::gather(stat, Estimate, c("wmean","mean","median","mode"))
-  Elasticity$CoefName <- "elasticity"
-  
+  Elasticity <- sf_levels_and_gaps(
+    dt                  = Elasticity,
+    output_variable     = "value",
+    aggregation_points  = c("Survey", "sample", "input", "restrict"),
+    stub_name           = "elasticity",
+    weight_variable     = "weights",
+    technology_variable = technology_variable,
+    technology_legend   = technology_legend
+  )
+
+  #---------------------------------------------------
+  # Summary Scores                                 ####
+  cat(crayon::green("Summary Scores",Sys.time()),fill=T)
   if(!is.null(technology_variable)){
-    ElasticityGAP <- Elasticity[Elasticity$Tech %in%   technology_legend$Tech,]
-    ElasticityGAP <- dplyr::inner_join(
-      ElasticityGAP[!ElasticityGAP$Tech %in% min(  technology_legend$Tech),c("sample","Survey","input","restrict","Tech","stat","Estimate")],
-      doBy::summaryBy(list("Estimate",c("sample","Survey","input","restrict","stat")),
-                      data=ElasticityGAP[ElasticityGAP$Tech %in% min(  technology_legend$Tech),],FUN=c(mean),na.rm=T),
-      by=c("sample","Survey","input","restrict","stat"))
-    
-    ElasticityGAP$elasticityGap_lvl <- ElasticityGAP$Estimate - ElasticityGAP$Estimate.mean
-    ElasticityGAP$elasticityGap_pct <- ((ElasticityGAP$elasticityGap_lvl/abs(ElasticityGAP$Estimate.mean)))*100
-    ElasticityGAP <- ElasticityGAP[c("sample","Survey","input","Tech","restrict","stat","elasticityGap_lvl","elasticityGap_pct")]
-    ElasticityGAP <- ElasticityGAP |>  tidyr::gather(CoefName, Estimate, c("elasticityGap_lvl","elasticityGap_pct"))
-    Elasticity <- rbind(Elasticity,ElasticityGAP)
+    Estescors <- score |> tidyr::gather(type, value, c("TE0","TE","TGR","MTE"))
+    Estescors <- Estescors[!Estescors$value %in% c(NA,Inf,-Inf,NaN),]
+    Estescors00 <- Estescors
+    Estescors00$Tech <- -999
+    Estescors <- rbind(Estescors,Estescors00)
+  }else{
+    Estescors <- score |> tidyr::gather(type, value, c("TE"))
+    Estescors <- Estescors[!Estescors$value %in% c(NA,Inf,-Inf,NaN),]
   }
   
-  # check <- unique(Elasticity[Elasticity$Survey %in% 0,c("sample","Tech","input","stat","CoefName","Survey")]);table(check$input,check$sample)
+  Estescors00 <- Estescors
+  Estescors00$Survey <- "GLSS0"
+  Estescors <- rbind(Estescors,Estescors00)
+  rm(Estescors00)
   
+  Estescors <- as.data.table(Estescors)
+  
+  Estescors <- sf_levels_and_gaps(
+    dt                  = Estescors,
+    output_variable     = "value",
+    aggregation_points  = c("Survey", "sample", "type", "estType", "restrict"),
+    stub_name           = "efficiency",
+    weight_variable     = "weights",
+    technology_variable = technology_variable,
+    technology_legend   = technology_legend
+  )
+
   #---------------------------------------------------
   # Summary Risk                                   ####
   cat(crayon::green("Summary Risk",Sys.time()),fill=T)
@@ -930,83 +853,67 @@ msf_workhorse <- function(
   
   Risk_sample <- Risk
   
-  Risk <- Risk |>
-    group_by(Survey, sample, Tech, restrict) |>
-    summarise(wmean  = weighted.mean(risk, weights, na.rm = TRUE),
-              mean   = mean(risk,na.rm = TRUE),
-              median = median(risk,na.rm = TRUE),
-              mode   = mode(risk, na.rm = TRUE)) |>
-    as.data.frame()
+  Risk <- as.data.table(Risk)
   
-  Risk <- Risk |> tidyr::gather(stat, Estimate, c("wmean","mean","median","mode"))
-  Risk$CoefName <- "risk"
-  
+  Risk <- sf_levels_and_gaps(
+    dt                  = Risk,
+    output_variable     = "risk",
+    aggregation_points  = c("Survey", "sample", "restrict"),
+    stub_name           = "risk",
+    weight_variable     = "weights",
+    technology_variable = technology_variable,
+    technology_legend   = technology_legend
+  )
+
+  #---------------------------------------------------
+  # Distribution bars- Scores                      ####
+  cat(crayon::green("Distribution bars- Scores",Sys.time()),fill=T)
   if(!is.null(technology_variable)){
-    RiskGAP <- Risk[Risk$Tech %in%   technology_legend$Tech,]
-    RiskGAP <- dplyr::inner_join(
-      RiskGAP[!RiskGAP$Tech %in% min(  technology_legend$Tech),c("sample","Survey","restrict","Tech","stat","Estimate")],
-      doBy::summaryBy(list("Estimate",c("sample","Survey","restrict","stat")),
-                      data=RiskGAP[RiskGAP$Tech %in% min(  technology_legend$Tech),],FUN=c(mean),na.rm=T),
-      by=c("sample","Survey","restrict","stat"))
-    
-    RiskGAP$riskGap_lvl <- RiskGAP$Estimate - RiskGAP$Estimate.mean
-    RiskGAP$riskGap_pct <- ((RiskGAP$riskGap_lvl/abs(RiskGAP$Estimate.mean)))*100
-    RiskGAP <- RiskGAP[c("sample","Survey","restrict","Tech","stat","riskGap_lvl","riskGap_pct")]
-    RiskGAP <- RiskGAP |>  tidyr::gather(CoefName, Estimate, c("riskGap_lvl","riskGap_pct"))
-    Risk <- rbind(Risk,RiskGAP)
+    dataFrq <- score |> tidyr::gather(type, value, c("TE0","TE","TGR","MTE"))
+    dataFrq <- dataFrq[!dataFrq$value %in% c(NA,Inf,-Inf,NaN),]
+    dataFrq00 <- dataFrq
+    dataFrq00$Tech <- -999
+    dataFrq <- rbind(dataFrq,dataFrq00)
+  }else{
+    dataFrq <- score |> tidyr::gather(type, value, c("TE"))
+    dataFrq <- dataFrq[!dataFrq$value %in% c(NA,Inf,-Inf,NaN),]
   }
-  # check <- unique(Risk[Risk$Survey %in% 0,c("sample","Tech","input","stat","CoefName","Survey")]);table(check$input,check$sample)
-  
+  dataFrq <- as.data.table(dataFrq)
+  dataFrq <- rbind(dataFrq,copy(dataFrq)[,Survey := "GLSS0"])
+  ef_dist <- compute_jenks_binned_shares(
+    dt                 = dataFrq,
+    output_variable    = "value",
+    aggregation_points = c("Survey","sample","Tech","type","estType","restrict"),
+    jenks              = seq(0,1,0.05),
+    weight_variable    = "weights")
+  rm(dataFrq)
   #---------------------------------------------------
   # Distribution bars- Risk                        ####
   cat(crayon::green("Distribution bars- Risk",Sys.time()),fill=T)
   dataFrq <- Risk_sample[!Risk_sample$risk %in% c(NA,Inf,-Inf,NaN),]
-  
-  dataFrq$range <- cut(dataFrq$risk,seq(0,2,0.05))
-  dataFrq$count <- 1
-  
-  dataFrq00 <- dataFrq
-  dataFrq00$Survey <- "GLSS0"
-  dataFrq <- rbind(dataFrq,dataFrq00)
-  rm(dataFrq00)
-  
-  count <- dataFrq |> group_by(Survey,sample,Tech,restrict,range) |>
-    summarise(count = sum(count)) |> as.data.frame(.)
-  
-  count_sum <- dataFrq |> group_by(Survey,sample,Tech,restrict) |>
-    summarise(count_sum = sum(count)) |> as.data.frame(.)
-  
-  weights <- dataFrq |> group_by(Survey,sample,Tech,restrict,range) |>
-    summarise(weights = sum(weights)) |> as.data.frame(.)
-  
-  weights_sum <- dataFrq |> group_by(Survey,sample,Tech,restrict) |>
-    summarise(weights_sum = sum(weights)) |> as.data.frame(.)
-  
-  dataFrq <- dplyr::inner_join(dplyr::inner_join(count,count_sum,by=c("Survey","sample","Tech","restrict")),
-                               dplyr::inner_join(weights,weights_sum,by=c("Survey","sample","Tech","restrict")),
-                               by=c("Survey","sample","Tech","restrict","range"))
-  
-  dataFrq$est_weight <- dataFrq$weights/dataFrq$weights_sum
-  dataFrq$est_count  <- dataFrq$count/dataFrq$count_sum
-  dataFrq$Frqlevel   <- as.integer(dataFrq$range)
-  
-  rk_dist <- dataFrq[c("Survey","sample","Tech","restrict","range","Frqlevel","est_count","est_weight")]
-  rk_dist$type <- "risk"
-  
+  dataFrq <- as.data.table(dataFrq)
+  dataFrq <- rbind(dataFrq,copy(dataFrq)[,Survey := "GLSS0"])
+  rk_dist <- compute_jenks_binned_shares(
+    dt                 = dataFrq,
+    output_variable    = "risk",
+    aggregation_points = c("Survey","sample","Tech","restrict"),
+    jenks              = seq(0,2,0.05),
+    weight_variable    = "weights")
+  rk_dist[,type := "risk"]
   rm(dataFrq)
   #---------------------------------------------------
   # Summary and export                             ####
   cat(crayon::green("Summary and export",Sys.time()),fill=T)
   res <- list(
-    sf_estm = Estimates,
-    ef_mean = Estescors,
-    ef_dist = ef_dist,
-    rk_dist = rk_dist,
-    el_mean = Elasticity,
-    rk_mean = Risk,
-    el_samp = Elasticity_sample[!Elasticity_sample$Survey %in% "GLSS0",],
-    ef_samp = score,
-    rk_samp = Risk_sample[!Risk_sample$Survey %in% "GLSS0",])
+    sf_estm = as.data.frame(Estimates),
+    ef_mean = as.data.frame(Estescors),
+    ef_dist = as.data.frame(ef_dist),
+    rk_dist = as.data.frame(rk_dist),
+    el_mean = as.data.frame(Elasticity),
+    rk_mean = as.data.frame(Risk),
+    el_samp = as.data.frame(Elasticity_sample[!Elasticity_sample$Survey %in% "GLSS0",]),
+    ef_samp = as.data.frame(score),
+    rk_samp = as.data.frame(Risk_sample[!Risk_sample$Survey %in% "GLSS0",]))
   #---------------------------------------------------
   return(res)
   #---------------------------------------------------
@@ -1014,7 +921,7 @@ msf_workhorse <- function(
 
 
 
-#' Stochastic frontier workhorse (unrestricted and shape-constrained)
+#' Stochastic frontier workhorse 
 #'
 #' Fits a stochastic frontier model for a given production specification and,
 #' when monotonicity is sufficiently violated, re-estimates a
@@ -1555,7 +1462,8 @@ sf_workhorse <- function(
 #'
 #' @importFrom stats as.formula sd
 #' @family frontier analysis
-#' @export
+#' @keywords internal
+#' @noRd
 equation_editor <- function(
     data,
     FXN,
@@ -1756,7 +1664,8 @@ equation_editor <- function(
 #'     used to build \code{est_coef} and \code{est_vcov}).
 #' }
 #' @family frontier analysis
-#' @export
+#' @keywords internal
+#' @noRd
 fit_organizer <- function(fit, number_of_inputs, FXN) {
   
   # Check if the functional form is one of the specified types
@@ -1896,7 +1805,8 @@ fit_organizer <- function(fit, number_of_inputs, FXN) {
 #'     available (\code{NA} if not applicable).
 #' }
 #' @family frontier analysis
-#' @export
+#' @keywords internal
+#' @noRd
 sfaR_summary <- function(fit){
   
   # Extract the maximum likelihood results from the fit summary and convert to a dataframe
@@ -2033,7 +1943,8 @@ sfaR_summary <- function(fit){
 #' If no configuration converges, the object will contain whatever the last
 #' failed attempt returned (typically with `optStatus` not indicating
 #' convergence).
-#'
+#' @family frontier analysis
+#' @keywords internal
 #' @noRd
 .sf_try_convergence <- function(
     equations,
@@ -2061,7 +1972,7 @@ sfaR_summary <- function(fit){
   }
   
   # initialize a dummy sf object with optStatus field
-  sf <- list(optStatus = "")
+  sfx <- list(optStatus = "")
   
   # Loop over combinations of gradient tolerances, function tolerances, and optimization methods
   for (sf_gradtol in sf_gradtol_options) {
@@ -2071,13 +1982,13 @@ sfaR_summary <- function(fit){
       for (sf_method in sf_method_options) {
         
         # Stop trying if convergence already achieved
-        if (!grepl("SUCCESSFUL CONVERGENCE", sf$optStatus)) {
+        if (!grepl("SUCCESSFUL CONVERGENCE", toupper(sfx$optStatus))) {
           
           tryCatch({
             
             # CASE 1: no u-het & no v-het
             if (is.null(equations$uequ) && is.null(equations$vequ)) {
-              sf <- sfacross(
+              sfx <- sfacross(
                 formula   = equations$prodfxn,
                 udist     = udist,
                 scaling   = scaling,
@@ -2092,7 +2003,7 @@ sfaR_summary <- function(fit){
             
             # CASE 2: u-het only
             if (!is.null(equations$uequ) && is.null(equations$vequ)) {
-              sf <- sfacross(
+              sfx <- sfacross(
                 formula   = equations$prodfxn,
                 udist     = udist,
                 uhet      = equations$uequ,
@@ -2109,7 +2020,7 @@ sfaR_summary <- function(fit){
             
             # CASE 3: v-het only
             if (is.null(equations$uequ) && !is.null(equations$vequ)) {
-              sf <- sfacross(
+              sfx <- sfacross(
                 formula   = equations$prodfxn,
                 udist     = udist,
                 vhet      = equations$vequ,
@@ -2125,7 +2036,7 @@ sfaR_summary <- function(fit){
             
             # CASE 4: both u-het and v-het
             if (!is.null(equations$uequ) && !is.null(equations$vequ)) {
-              sf <- sfacross(
+              sfx <- sfacross(
                 formula   = equations$prodfxn,
                 uhet      = equations$uequ,
                 muhet     = equations$uequ,
@@ -2153,6 +2064,172 @@ sfaR_summary <- function(fit){
     
   } 
   
-  return(sf)
+  return(sfx)
+}
+
+
+
+#' Compute Outcome Levels and Technology Gaps
+#'
+#' @description
+#' Computes weighted and unweighted outcome levels (mean, median, mode) for a
+#' specified output variable across user-defined aggregation points, and—when
+#' technology information is supplied—computes level gaps and percent gaps
+#' between each technology group and a baseline technology (the minimum value
+#' of `Tech` in `technology_legend`).
+#'
+#' @details
+#' The function proceeds in two major stages:
+#'
+#' **(1) Outcome Levels**
+#' * Converts the input to a `data.table`.
+#' * If `technology_variable` is provided and `dt` does not already contain
+#'   a `Tech` column, it is created as `dt[ , Tech := get(technology_variable)]`.
+#' * Computes, for each grouping defined in `aggregation_points` (and `Tech`
+#'   when present), the following statistics for `output_variable`:
+#'   - Weighted mean (if a weight variable is provided)
+#'   - Unweighted mean
+#'   - Median
+#'   - Statistical mode (small helper function defined inside)
+#'
+#' The statistics are returned in long format with a common column
+#' `CoefName = stub_name`.
+#'
+#' **(2) Technology Gaps (optional)**
+#' If both `technology_variable` and `technology_legend` are provided (and
+#' `technology_legend` contains a column `Tech`):
+#'
+#' * Restricts calculations to technologies listed in `technology_legend$Tech`.
+#' * Identifies the minimum technology code (`min(technology_legend$Tech)`)
+#'   as the baseline.
+#' * Computes baseline means for each statistic across aggregation points.
+#' * For all non-baseline technologies, computes:
+#'   - **Level gap:** difference in estimate relative to the baseline.
+#'   - **Percent gap:** level gap divided by the absolute baseline level.
+#'
+#' Gap estimates are appended to the output in long format, where the gap
+#' variable names (`<stub_name>Gap_lvl`, `<stub_name>Gap_pct`) are stored
+#' in `CoefName`.
+#'
+#' When technology inputs are not supplied, the function returns only outcome
+#' level statistics (no gap variables).
+#'
+#' @param dt A `data.frame` or `data.table` containing the variables needed
+#'   for analysis.
+#' @param output_variable Character. Name of the numeric variable whose levels
+#'   and gaps will be computed.
+#' @param aggregation_points Character vector of variable names used to group
+#'   observations (e.g., district, year, gender).
+#' @param stub_name Character. Label assigned to `CoefName` for the level
+#'   estimates, and used to construct gap variable names
+#'   (`<stub_name>Gap_lvl`, `<stub_name>Gap_pct`).
+#' @param weight_variable Character or `NULL`. Optional weighting variable for
+#'   computing the weighted mean. If `NULL`, all units receive equal weight.
+#' @param technology_variable Character or `NULL`. Optional variable identifying
+#'   the technology group of each unit. When supplied, it is used to construct
+#'   or interpret the `Tech` column and is required for gap computations.
+#' @param technology_legend A `data.frame` or `data.table` mapping technology
+#'   codes. Must contain a column named `Tech`. Required for gap computations.
+#'
+#' @return A long `data.table` containing:
+#' * Outcome levels (`wmean`, `mean`, `median`, `mode`) for each group.
+#' * Gap levels (`<stub_name>Gap_lvl`) and gap percentages (`<stub_name>Gap_pct`)
+#'   when technology inputs are supplied.
+#'
+#' Columns always include:
+#' * Aggregation variables (`aggregation_points`)
+#' * `stat` — the statistic type
+#' * `CoefName` — variable name (levels or gaps)
+#' * `Estimate` — numeric value
+#'
+#' @family frontier analysis
+#' @keywords internal
+#' @noRd
+sf_levels_and_gaps <- function(
+    dt,
+    output_variable,
+    aggregation_points,
+    stub_name,
+    weight_variable     = NULL,
+    technology_variable = NULL,
+    technology_legend   = NULL
+    ) {
+      
+      dt <- data.table::as.data.table(dt)
+      
+      # Helper: statistical mode (not base::mode)
+      stat_mode <- function(x) {
+        x <- x[!is.na(x)]
+        if (!length(x)) return(NA_real_)
+        ux <- unique(x)
+        ux[which.max(tabulate(match(x, ux)))]
+      }
+      
+      # Compute level statistics
+      res <- dt[
+        ,
+        {
+          x <- get(output_variable)
+          w <- if (is.null(weight_variable)) rep(1, .N) else get(weight_variable)
+          
+          list(
+            wmean  = if (all(is.na(x))) NA_real_ else stats::weighted.mean(x, w, na.rm = TRUE),
+            mean   = mean(x, na.rm = TRUE),
+            median = stats::median(x, na.rm = TRUE),
+            mode   = stat_mode(x)
+          )
+        },
+        by = c(aggregation_points,"Tech")
+      ]
+      
+      # Wide -> long: wmean/mean/median/mode
+      res_long <- tidyr::gather(res, "stat", "Estimate", c("wmean", "mean", "median", "mode"))
+      res_long$CoefName <- stub_name
+      res_long <- data.table::as.data.table(res_long)
+      
+      # If no technology info, we are done (levels only)
+      if (is.null(technology_variable) || is.null(technology_legend) || !"Tech" %in% names(res_long)) {
+        return(res_long[])
+      }
+      
+      # ---- Gap computation block
+      # Technologies to consider (and baseline)
+      tech_levels <- unique(technology_legend$Tech)
+      base_tech   <- min(tech_levels)
+      
+      # Restrict to requested technologies
+      res_gap <- res_long[Tech %in% tech_levels]
+      
+      # Baseline mean by group + stat
+      res_base <- res_gap[Tech == base_tech,.(Estimate_mean = mean(Estimate, na.rm = TRUE)),by = c(aggregation_points, "stat")]
+      res_gap  <- res_gap[!Tech %in% base_tech, c(aggregation_points,"Tech","stat","Estimate"), with = FALSE]
+      res_gap  <- res_base[res_gap, on = c(aggregation_points, "stat")];rm(res_base)
+      
+      # Level and percent gaps
+      gap_lvl_name <- paste0(stub_name, "Gap_lvl")
+      gap_pct_name <- paste0(stub_name, "Gap_pct")
+      
+      res_gap[, (gap_lvl_name) := Estimate - Estimate_mean]
+      res_gap[!is.na(Estimate_mean) & abs(Estimate_mean) > 0, (gap_pct_name) := (get(gap_lvl_name) / abs(Estimate_mean)) * 100]
+      res_gap[abs(Estimate_mean) == 0 | is.na(Estimate_mean),(gap_pct_name) := NA_real_]
+      
+      res_gap <- res_gap[, c(aggregation_points,"Tech","stat",gap_lvl_name,gap_pct_name), with = FALSE]
+      # Long format for gaps; CoefName will be the gap variable name
+      res_gap_long <- tidyr::gather(
+        res_gap,
+        "CoefName",
+        "Estimate",
+        c(gap_lvl_name, gap_pct_name)
+      )
+      res_gap_long <- data.table::as.data.table(res_gap_long)
+      
+      # Stack levels and gaps
+      res_out <- data.table::rbindlist(
+        list(res_long, res_gap_long),
+        use.names = TRUE,
+        fill = TRUE
+      )
+      
+      res_out[]
 }
 

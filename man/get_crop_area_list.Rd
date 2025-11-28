@@ -29,3 +29,9 @@ Identifies and returns the column names in a dataset corresponding to crop area 
 for a specified set of crops. The function looks for column names that start with \code{"Area_"}
 and match any of the crops provided in \code{selected_crops}.
 }
+\seealso{
+Other helpers: 
+\code{\link{compute_jenks_binned_shares}()},
+\code{\link{harmonized_data_prep}()}
+}
+\concept{helpers}

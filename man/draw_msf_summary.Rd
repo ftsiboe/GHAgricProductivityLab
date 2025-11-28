@@ -18,7 +18,7 @@ TGR, MTE) by sample, technology, survey, and estimation type.
 technology, and survey.
 \item \code{rk_mean}: aggregated risk statistics, if available.
 \item \code{ef_dist}: histogram-style efficiency distributions
-(counts/weights) over value ranges (\code{range}, \code{Frqlevel}).
+(counts/weights) over value ranges (\code{binned_range_name}, \code{binned_range_level}).
 \item \code{rk_dist}: histogram-style risk distributions, if available.
 \item \code{disagscors}: optional disaggregated efficiency summaries
 by subgroup levels.
