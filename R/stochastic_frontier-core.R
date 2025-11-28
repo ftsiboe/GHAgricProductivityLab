@@ -1957,11 +1957,11 @@ sfaR_summary <- function(fit){
     sf_method_options  = NULL) {
   
   if (is.null(sf_gradtol_options)) {
-    sf_gradtol_options <- c(1e-6, 1e-3)
+    sf_gradtol_options <- c(1e-7, 1e-6, 1e-5, 1e-4, 1e-3)
   }
   
   if (is.null(sf_tol_options)) {
-    sf_tol_options <- c(1e-12, 1e-6)
+    sf_tol_options <- c(1e-12, 1e-11, 1e-10, 1e-9, 1e-8, 1e-7, 1e-6)
   }
 
   if (is.null(sf_method_options)) {
