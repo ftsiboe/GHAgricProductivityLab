@@ -38,6 +38,8 @@ rm(list = ls(all = TRUE)); gc()
 
 devtools::document()                         
 
+run_only_for(id = 5, allowed_jobnames = "run_all")
+
 project_name <- "land_tenure"
 
 study_environment <- readRDS(

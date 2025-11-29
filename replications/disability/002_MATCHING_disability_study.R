@@ -33,10 +33,15 @@
 #           (`output/match_specification_*.rds`)
 # =============================================================================
 
+if(!is.na(as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID"))) %in% 1) exit
+  
+  
 # --- Session hygiene
 rm(list = ls(all = TRUE)); gc()              
 
 devtools::document()                         
+
+run_only_for(id = 1, allowed_jobnames = "run_all")
 
 project_name <- "disability"
 

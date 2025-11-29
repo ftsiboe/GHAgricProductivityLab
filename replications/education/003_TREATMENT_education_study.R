@@ -25,6 +25,8 @@ rm(list = ls(all = TRUE)); gc()
 
 devtools::document()  
 
+run_only_for(id = 3, allowed_jobnames = "run_all")
+
 project_name = "education"
 
 # Detect operating system to determine runtime environment

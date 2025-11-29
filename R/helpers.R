@@ -93,3 +93,86 @@ get_crop_area_list <- function(
 }
 
 
+
+#' Restrict Execution of an R Script to Allowed SLURM Job Conditions
+#'
+#' @description
+#' `run_only_for()` controls when an R script is allowed to run based on:
+#' - the SLURM array index (`SLURM_ARRAY_TASK_ID`)
+#' - the SLURM job name (`SLURM_JOB_NAME`)
+#' - whether the script is being run locally on Windows
+#'
+#' The function is designed for workflows where multiple R scripts run in a
+#' single SLURM array job; each script decides independently whether it should
+#' run.
+#'
+#' @details
+#' Execution logic:
+#'
+#' 1. **Windows override**  
+#'    If running on Windows and `run_on_windows = TRUE`, return immediately.
+#'
+#' 2. **Allowed job names**  
+#'    If `allowed_jobnames` is set, the script runs only when SLURM job name is
+#'    in that vector.
+#'
+#' 3. **Array ID restriction**  
+#'    - If `id = NULL`, skip array-index filtering.  
+#'    - If numeric, match against `SLURM_ARRAY_TASK_ID`.
+#'
+#' Any violation → `quit(save = "no")`.
+#'
+#' @param id Integer or `NULL`. Expected SLURM array index, or `NULL` to skip
+#'   checking (useful for Windows/local runs).
+#' @param run_on_windows Logical. When `TRUE` (default), do not restrict when
+#'   running on Windows.
+#' @param allowed_jobnames Character vector of SLURM job names allowed to run
+#'   this script. If `NULL`, job-name filtering is skipped.
+#'
+#' @return Invisibly returns `NULL` when allowed; otherwise exits R.
+#'
+#' @export
+run_only_for <- function(id = NULL,
+                         run_on_windows = TRUE,
+                         allowed_jobnames = NULL) {
+  
+  # ---- Windows override ----
+  sysname <- Sys.info()[["sysname"]]
+  if (is.null(sysname)) sysname <- ""
+  sysname <- tolower(sysname)
+  
+  if (run_on_windows && identical(sysname, "windows")) {
+    return(invisible(NULL))
+  }
+  
+  # ---- Check allowed SLURM job names ----
+  current_jobname <- Sys.getenv("SLURM_JOB_NAME", unset = NA)
+  
+  if (!is.null(allowed_jobnames) &&
+      !is.na(current_jobname) &&
+      !(current_jobname %in% allowed_jobnames)) {
+    
+    cat(
+      "Skipping script. Job name =", current_jobname,
+      "\nAllowed job names:", paste(allowed_jobnames, collapse = ", "), "\n"
+    )
+    quit(save = "no")
+  }
+  
+  # ---- Check SLURM array index (only if id is NOT NULL) ----
+  if (!is.null(id)) {
+    task_id <- as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID", NA))
+    
+    if (!is.na(task_id) && task_id != id) {
+      cat(
+        "Skipping script. Task ID =", task_id,
+        "Expected =", id, "\n"
+      )
+      quit(save = "no")
+    }
+  }
+  
+  invisible(NULL)
+}
+
+

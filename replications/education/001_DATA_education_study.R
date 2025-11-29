@@ -20,6 +20,8 @@ rm(list = ls(all = TRUE)); gc()
 # This calls roxygen2 via devtools to regenerate .Rd docs and NAMESPACE.
 devtools::document()                         
 
+run_only_for(id = 3, allowed_jobnames = "run_all")
+
 # ---- Define study name and initialize study environment
 project_name <- "education"
 
