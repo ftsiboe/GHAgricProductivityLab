@@ -10,12 +10,7 @@ export(get_household_data)
 export(harmonized_data_prep)
 export(match_sample_specifications)
 export(msf_workhorse)
-<<<<<<< HEAD
 export(run_only_for)
-export(sf_functional_forms)
-export(sf_model_specifications)
-=======
->>>>>>> a0b6f7aab40fb39b0b049157826115b9ca402544
 export(sf_workhorse)
 export(study_setup)
 export(treatment_effect_calculation)

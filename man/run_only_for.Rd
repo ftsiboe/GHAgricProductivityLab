@@ -46,5 +46,5 @@ in that vector.
 }
 }
 
-Any violation → \code{quit(save = "no")}.
+Any violation -> \code{quit(save = "no")}.
 }

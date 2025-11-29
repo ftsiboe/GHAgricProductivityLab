@@ -34,10 +34,10 @@ If \code{NULL}, a weight of \code{1} is assumed for each row.}
 A \code{data.table} with:
 \itemize{
 \item grouping variables
-\item \code{binned_range_name} – character label of the Jenks bin
-\item \code{binned_range_level} – numeric factor level of the bin
-\item \code{estimate_count} – share of counts within the group
-\item \code{estimate_weight} – share of weights within the group
+\item \code{binned_range_name} - character label of the Jenks bin
+\item \code{binned_range_level} - numeric factor level of the bin
+\item \code{estimate_count} - share of counts within the group
+\item \code{estimate_weight} - share of weights within the group
 }
 }
 \description{
@@ -52,7 +52,7 @@ density, yield, acreage, distances) across spatial or categorical groups.
 Internally the function:
 \enumerate{
 \item Computes Jenks natural breaks (if not provided)
-\item Creates \code{count} and \code{weight} totals within each bin × group
+\item Creates \code{count} and \code{weight} totals within each bin by group
 \item Merges with total counts/weights per group
 \item Computes shares
 }

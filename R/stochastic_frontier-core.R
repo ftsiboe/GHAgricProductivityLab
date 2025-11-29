@@ -2053,7 +2053,7 @@ sfaR_summary <- function(fit){
             }
             
           }, error = function(e) {
-            # silently ignore — next combination will be tried
+            # silently ignore - next combination will be tried
           })
           
         } 
@@ -2073,8 +2073,8 @@ sfaR_summary <- function(fit){
 #'
 #' @description
 #' Computes weighted and unweighted outcome levels (mean, median, mode) for a
-#' specified output variable across user-defined aggregation points, and—when
-#' technology information is supplied—computes level gaps and percent gaps
+#' specified output variable across user-defined aggregation points, and-when
+#' technology information is supplied-computes level gaps and percent gaps
 #' between each technology group and a baseline technology (the minimum value
 #' of `Tech` in `technology_legend`).
 #'
@@ -2138,9 +2138,9 @@ sfaR_summary <- function(fit){
 #'
 #' Columns always include:
 #' * Aggregation variables (`aggregation_points`)
-#' * `stat` — the statistic type
-#' * `CoefName` — variable name (levels or gaps)
-#' * `Estimate` — numeric value
+#' * `stat` - the statistic type
+#' * `CoefName` - variable name (levels or gaps)
+#' * `Estimate` - numeric value
 #'
 #' @family frontier analysis
 #' @keywords internal

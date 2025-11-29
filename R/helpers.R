@@ -94,8 +94,6 @@ get_crop_area_list <- function(
 }
 
 
-
-<<<<<<< HEAD
 #' Restrict Execution of an R Script to Allowed SLURM Job Conditions
 #'
 #' @description
@@ -122,7 +120,7 @@ get_crop_area_list <- function(
 #'    - If `id = NULL`, skip array-index filtering.  
 #'    - If numeric, match against `SLURM_ARRAY_TASK_ID`.
 #'
-#' Any violation → `quit(save = "no")`.
+#' Any violation -> `quit(save = "no")`.
 #'
 #' @param id Integer or `NULL`. Expected SLURM array index, or `NULL` to skip
 #'   checking (useful for Windows/local runs).
@@ -178,8 +176,6 @@ run_only_for <- function(id = NULL,
 }
 
 
-=======
-
 #' Compute Jenks-Binned Shares by Aggregation Groups
 #'
 #' @description
@@ -204,17 +200,17 @@ run_only_for <- function(id = NULL,
 #' @return A `data.table` with:
 #' \itemize{
 #'   \item grouping variables
-#'   \item `binned_range_name` – character label of the Jenks bin
-#'   \item `binned_range_level` – numeric factor level of the bin
-#'   \item `estimate_count` – share of counts within the group
-#'   \item `estimate_weight` – share of weights within the group
+#'   \item `binned_range_name` - character label of the Jenks bin
+#'   \item `binned_range_level` - numeric factor level of the bin
+#'   \item `estimate_count` - share of counts within the group
+#'   \item `estimate_weight` - share of weights within the group
 #' }
 #'
 #' @details
 #' Internally the function:
 #' \enumerate{
 #'   \item Computes Jenks natural breaks (if not provided)
-#'   \item Creates `count` and `weight` totals within each bin × group
+#'   \item Creates `count` and `weight` totals within each bin by group
 #'   \item Merges with total counts/weights per group
 #'   \item Computes shares
 #' }
@@ -250,7 +246,7 @@ compute_jenks_binned_shares <- function(
   dt[, binned_range_name := cut(get(output_variable), jenks)]
   dt[, count := 1]
   
-  # 4. Counts/weights within each group × bin
+  # 4. Counts/weights within each group by bin
   cnt_dt <- dt[
     ,
     .(
@@ -293,21 +289,3 @@ compute_jenks_binned_shares <- function(
   
   return(res[])
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> a0b6f7aab40fb39b0b049157826115b9ca402544
