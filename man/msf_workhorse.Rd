@@ -219,11 +219,6 @@ output of \code{\link{sf_workhorse}}.
 }
 \seealso{
 Other frontier analysis: 
-\code{\link{equation_editor}()},
-\code{\link{fit_organizer}()},
-\code{\link{sf_functional_forms}()},
-\code{\link{sf_model_specifications}()},
-\code{\link{sf_workhorse}()},
-\code{\link{sfaR_summary}()}
+\code{\link{sf_workhorse}()}
 }
 \concept{frontier analysis}

@@ -170,6 +170,9 @@ draw_msf_estimations <- function(
       inefficiency_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
       adoption_covariates         = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd"))
       identifiers                 = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid")
+      match_specifications        = match_specifications
+      match_specification_optimal = study_environment$match_specification_optimal[c("ARRAY","method","distance","link")]
+      match_path                  = study_environment$wd$matching
     }
     #---------------------------------------------
     # Data Preparation                         ####
@@ -349,7 +352,7 @@ draw_msf_estimations <- function(
 #'       technology, and survey.
 #'     \item \code{rk_mean}: aggregated risk statistics, if available.
 #'     \item \code{ef_dist}: histogram-style efficiency distributions
-#'       (counts/weights) over value ranges (\code{range}, \code{Frqlevel}).
+#'       (counts/weights) over value ranges (\code{binned_range_name}, \code{binned_range_level}).
 #'     \item \code{rk_dist}: histogram-style risk distributions, if available.
 #'     \item \code{disagscors}: optional disaggregated efficiency summaries
 #'       by subgroup levels.
@@ -512,20 +515,20 @@ draw_msf_summary <- function(res, technology_legend) {
   # Distribution bars- Scores                      ####
   # Combine results from all draws for distribution bars of scores
   ef_dist <- as.data.frame(data.table::rbindlist(lapply(1:length(res), function(draw) { return(res[[draw]]$ef_dist) }), fill = TRUE)) |> 
-    tidyr::gather(stat, Estimate, c("est_count", "est_weight")) 
+    tidyr::gather(stat, Estimate, c("estimate_count", "estimate_weight")) 
   
   ef_dist <- ef_dist[!ef_dist$Estimate %in% c(NA, Inf, -Inf, NaN),]
   
-  ef_dist <- doBy::summaryBy(list(c("Estimate"), c("Survey", "sample", "Tech", "type", "estType", "range", "Frqlevel", "stat", "restrict", "draw")),
+  ef_dist <- doBy::summaryBy(list(c("Estimate"), c("Survey", "sample", "Tech", "type", "estType", "binned_range_name", "binned_range_level", "stat", "restrict", "draw")),
                              data=ef_dist, FUN=mean, keep.names = T)
   
   ef_dist <- dplyr::inner_join(
     doBy::summaryBy(list(c("Estimate"), 
-                         c("Survey", "sample", "Tech", "type", "estType", "range", "Frqlevel", "stat", "restrict")),
+                         c("Survey", "sample", "Tech", "type", "estType", "binned_range_name", "binned_range_level", "stat", "restrict")),
                     data=ef_dist[ef_dist$draw %in% 0,], FUN=mean, keep.names = T),
-    doBy::summaryBy(list(c("Estimate"), c("Surveyy", "Survey", "sample", "Tech", "type", "estType", "range", "Frqlevel", "stat", "restrict")),
+    doBy::summaryBy(list(c("Estimate"), c("Surveyy", "Survey", "sample", "Tech", "type", "estType", "binned_range_name", "binned_range_level", "stat", "restrict")),
                     data=ef_dist, FUN=c(mean, sd, length)),
-    by=c("Survey", "sample", "Tech", "type", "estType", "range", "Frqlevel", "stat", "restrict"))
+    by=c("Survey", "sample", "Tech", "type", "estType", "binned_range_name", "binned_range_level", "stat", "restrict"))
   
   ef_dist$jack_zv <- ef_dist$Estimate / ef_dist$Estimate.sd
   ef_dist$jack_pv <- round(2 * (1 - pt(abs(ef_dist$jack_zv), df=ef_dist$Estimate.length)), 5)
@@ -598,19 +601,19 @@ draw_msf_summary <- function(res, technology_legend) {
   rk_dist <- NULL
   if(!is.null(res[[1]]$rk_dist) & !nrow(res[[1]]$rk_dist) %in% 0) {
     rk_dist <- as.data.frame(data.table::rbindlist(lapply(1:length(res), function(draw) { return(res[[draw]]$rk_dist) }), fill = TRUE)) |> 
-      tidyr::gather(stat, Estimate, c("est_count", "est_weight")) 
+      tidyr::gather(stat, Estimate, c("estimate_count","estimate_weight")) 
     rk_dist <- rk_dist[!rk_dist$Estimate %in% c(NA, Inf, -Inf, NaN),]
     
-    rk_dist <- doBy::summaryBy(list(c("Estimate"), c("Survey", "sample", "Tech", "range", "Frqlevel", "stat", "restrict", "draw")),
+    rk_dist <- doBy::summaryBy(list(c("Estimate"), c("Survey", "sample", "Tech", "binned_range_name", "binned_range_level", "stat", "restrict", "draw")),
                                data=rk_dist, FUN=mean, keep.names = T)
 
     rk_dist <- dplyr::inner_join(
       doBy::summaryBy(list(c("Estimate"), 
-                           c("Survey", "sample", "Tech", "range", "Frqlevel", "stat", "restrict")),
+                           c("Survey", "sample", "Tech", "binned_range_name", "binned_range_level", "stat", "restrict")),
                       data=rk_dist[rk_dist$draw %in% 0,], FUN=mean, keep.names = T),
-      doBy::summaryBy(list(c("Estimate"), c("Survey", "sample", "Tech", "range", "Frqlevel", "stat", "restrict")),
+      doBy::summaryBy(list(c("Estimate"), c("Survey", "sample", "Tech", "binned_range_name", "binned_range_level", "stat", "restrict")),
                       data=rk_dist, FUN=c(mean, sd, length)),
-      by=c("Survey", "sample", "Tech", "range", "Frqlevel", "stat", "restrict"))
+      by=c("Survey", "sample", "Tech", "binned_range_name", "binned_range_level", "stat", "restrict"))
     
     rk_dist$jack_zv <- rk_dist$Estimate / rk_dist$Estimate.sd
     rk_dist$jack_pv <- round(2 * (1 - pt(abs(rk_dist$jack_zv), df=rk_dist$Estimate.length)), 5)

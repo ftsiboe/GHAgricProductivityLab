@@ -1,5 +1,5 @@
 # =============================================================================
-#  MULTI-STAGE FRONTIER ESTIMATION WORKFLOW – DISABILITY STUDY
+#  MULTI-STAGE FRONTIER ESTIMATION WORKFLOW – EDUCATION STUDY
 # =============================================================================
 #  General Description:
 # -----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ library(rgenoud);library(quadprog);library(car)
 
 devtools::document()  
 
-project_name = "disability"
+project_name = "education"
 
 # Detect operating system to determine runtime environment
 sysname <- toupper(as.character(Sys.info()[["sysname"]]))
@@ -75,11 +75,11 @@ model_specifications <- sf_model_specifications(
   distforms = distforms,
   fxnforms = fxnforms,
   data = study_environment$estimation_data,
-  technology_variables = c("disabled","disabled_self","disabled_spouse","disabled_child","disabled_close","disabled_member"))
+  technology_variables = c("educated","EduLevel","numeracy","any_formal","any_read","any_write","any_literacy",
+                           "local_literacy","fregn_literacy","any_train","apprentice","student","YerEduCat"))
 
 # Drop specifications that use disaggregation variables you do NOT want
-model_specifications <- model_specifications[!model_specifications$disasg %in% c( "Female","Region","Ecozon","EduCat","EduLevel","AgeCat"),]
-model_specifications <- model_specifications[model_specifications$level %in% c( "Pooled"),]
+model_specifications <- model_specifications[model_specifications$disasg %in% c("EduLevel","EduCat","Region","Ecozon"),]
 
 row.names(model_specifications) <- 1:nrow(model_specifications)
 
@@ -169,17 +169,21 @@ lapply(
         disagscors_list <- NULL
         
         # For one specific core scenario, compute disaggregated scores
-        if(technology_variable %in% "disabled" &  
+        if(technology_variable %in% "OwnLnd" &  
            matching_type %in% "optimal" & 
            disaggregate_level %in% "Pooled" & 
            disaggregate_variable %in% "CropID" & 
            f %in% 2 & d %in% 1){
-          disagscors_list <- c("Ecozon","Region","AgeCat","EduLevel","Female","disability",names(data)[grepl("CROP_",names(data))])
+          
+          disagscors_list <- c("Ecozon","Region","AgeCat","Female",
+                               names(data)[grepl("CROP_",names(data))],"LndAq","ShrCrpCat")
+          disagscors_list <- unique(disagscors_list[disagscors_list %in% names(data)])
+          
         }
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
-          unique(drawlist$ID)[1],
+          unique(drawlist$ID),
           draw_msf_estimations,
           data                    = data,
           surveyy                 = FALSE,
@@ -189,8 +193,8 @@ lapply(
           weight_variable         = "Weight",
           output_variable         = "HrvstKg",
           input_variables         = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
-          inefficiency_covariates = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
-          adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","EqipMech","OwnLnd")),
+          inefficiency_covariates = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","OwnLnd","EqipMech")),
+          adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","OwnLnd","EqipMech")),
           identifiers             = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
           disagscors_list         = disagscors_list,
           f                       = f,
@@ -200,7 +204,7 @@ lapply(
           match_specifications        = match_specifications,
           match_specification_optimal = study_environment$match_specification_optimal[c("ARRAY","method","distance","link")],
           match_path                  = study_environment$wd$matching
-          ) 
+        ) 
         # res <- list(res[[1]],res[[1]],res[[1]],res[[1]],res[[1]])
         # saveRDS(res,"data-raw/res.rds")
         # res <- readRDS("data-raw/res.rds")
@@ -215,9 +219,7 @@ lapply(
             res[[i]][,"disaggregate_variable"]  <- disaggregate_variable
             res[[i]][,"disaggregate_level"]     <- disaggregate_level
             res[[i]][,"technology_variable"]    <- technology_variable
-            res[[i]][,"TCHLvel"]                <- factor(
-              res[[i]][,"Tech"],levels = c(-999,technology_legend$Tech,999),
-              labels = c("National",technology_legend[,2],"Meta"))
+            res[[i]][,"TCHLvel"]                <- factor(res[[i]][,"Tech"],levels = c(-999,technology_legend$Tech,999),labels = c("National",technology_legend[,2],"Meta"))
           }, error=function(e){})
         }
         
@@ -230,9 +232,9 @@ lapply(
           Main <- Main[Main$CoefName %in% "efficiencyGap_lvl",]
           Main <- Main[Main$restrict %in% "Restricted",]
           Main <- Main[Main$estType %in% "teBC",]
-          Main[Main$type %in% "TGR", c("sample","type","Tech","Estimate")]
-          Main[Main$type %in% "TE" , c("sample","type","Tech","Estimate")]
-          Main[Main$type %in% "MTE", c("sample","type","Tech","Estimate")]
+          Main[Main$type %in% "TGR",c("Survey","sample","type","Tech","Estimate")]
+          Main[Main$type %in% "TE",c("Survey","sample","type","Tech","Estimate")]
+          Main[Main$type %in% "MTE",c("Survey","sample","type","Tech","Estimate")]
         }
         
         # Add the estimation name to the result list

@@ -2,7 +2,7 @@
 % Please edit documentation in R/stochastic_frontier-core.R
 \name{sf_workhorse}
 \alias{sf_workhorse}
-\title{Stochastic frontier workhorse (unrestricted and shape-constrained)}
+\title{Stochastic frontier workhorse}
 \usage{
 sf_workhorse(
   data,
@@ -171,11 +171,6 @@ downstream comparison.
 }
 \seealso{
 Other frontier analysis: 
-\code{\link{equation_editor}()},
-\code{\link{fit_organizer}()},
-\code{\link{msf_workhorse}()},
-\code{\link{sf_functional_forms}()},
-\code{\link{sf_model_specifications}()},
-\code{\link{sfaR_summary}()}
+\code{\link{msf_workhorse}()}
 }
 \concept{frontier analysis}
