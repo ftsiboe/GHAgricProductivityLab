@@ -1894,8 +1894,8 @@ sfaR_summary <- function(fit){
 #' @details
 #' The search pattern loops over:
 #'
-#' - **Gradient tolerances:** default `c(1e-6, 1e-3)`  
-#' - **Function tolerances:** default `c(1e-12, 1e-6)`  
+#' - **Gradient tolerances:** default `c(1e-7, 1e-6, 1e-5, 1e-4, 1e-3)`  
+#' - **Function tolerances:** default `c(1e-12, 1e-11, 1e-10, 1e-9, 1e-8, 1e-7, 1e-6)`  
 #' - **Optimization methods:** default  
 #'   `c("nr", "nm", "bfgs", "bhhh", "cg", "sann", "ucminf",
 #'      "mla", "sr1", "sparse", "nlminb")`

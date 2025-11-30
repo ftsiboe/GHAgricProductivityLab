@@ -1,11 +1,11 @@
 #!/bin/bash -l
 
 #SBATCH --job-name=msf_disa
-#SBATCH --time=0-01:00:00    
+#SBATCH --time=0-50:00:00    
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=3
-#SBATCH --mem=5G 
-#SBATCH --array=1-1
+#SBATCH --mem=28G 
+#SBATCH --array=1-18
 #SBATCH --mail-user=ftsiboe@hotmail.com
 #SBATCH --mail-type=ALL
 #SBATCH --output=/dev/null
