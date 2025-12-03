@@ -6,6 +6,9 @@
 replications/**/*.dta
 replications/**/*.rds
 replications/**/*.zip
+replications/**/*.csv
+replications/**/*.xlsx
+replications/**/*.png
 data/*.rds
 data/*.dta
 data-raw/*
@@ -13,3 +16,6 @@ data-raw/*
 tests/**/*.dta
 tests/**/*.rds
 tests/**/*.zip
+tests/**/*.csv
+tests/**/*.xlsx
+tests/**/*.png

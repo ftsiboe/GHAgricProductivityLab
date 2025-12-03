@@ -61,6 +61,9 @@ study_data <- study_data[
 
 # ---- Attach raw data to study environment (potential issue)
 study_environment$study_raw_data <- study_data
+# foreign::write.dta(
+#   study_data, file.path(study_environment$wd$output,paste0(project_name,"_study_study_data.dta")),
+#   convert.factors = c("labels"),convert.dates = T)
 
 # ---- Save study environment object
 # Save the entire study environment configuration (paths, metadata, etc.)
