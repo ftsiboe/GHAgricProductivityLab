@@ -38,7 +38,7 @@ rm(list = ls(all = TRUE)); gc()
 
 devtools::document()                         
 
-project_name <- "education"
+project_name <- "input_dealers"
 
 study_environment <- readRDS(
   file.path(paste0("replications/", project_name, "/output"),
@@ -48,7 +48,7 @@ study_environment <- readRDS(
 DATA <- harmonized_data_prep(study_environment$study_raw_data)           
 
 # Focus analysis sample: pooled crop only; define treatment indicator
-DATA$Treat <- as.integer(as.numeric(DATA$educated %in% 1)) # logical treated flag
+DATA$Treat <- as.integer(as.numeric(DATA$dealer005 >0)) # logical treated flag
 data <- DATA[as.character(DATA$CropID) %in% "Pooled", ]
 
 # --- Matching variable sets
@@ -60,7 +60,7 @@ match_variables_scaler <- c("AgeYr","HHSizeAE","FmleAERt","Depend","CrpMix", cro
 match_variables_factor <- c("Credit","OwnLnd","Ethnic","Marital","Religion","Head")
 
 # Exact-match strata (must match identically)
-match_variables_exact  <- c("Survey", "Region", "Ecozon", "Locality", "Female")
+match_variables_exact  <- c("Region", "Ecozon", "Locality", "Female")
 
 # --- Complete-case restriction (ensures no NAs in any matching fields)
 required_cols <- c("Surveyx", "EaId", "HhId", "Mid", "UID", "Weight", "Treat",
@@ -77,8 +77,8 @@ m.specs <- match_sample_specifications(data = data, myseed = study_environment$m
 #   m.specs$drawlist : index sets for resampling / bootstraps
 
 # Local convenience bindings
-match_specifications <- m.specs$m.specs #[1:8,]
-sample_draw_list     <- as.data.frame(m.specs$drawlist) #[1:3,]
+match_specifications <- m.specs$m.specs[1:8,]
+sample_draw_list     <- as.data.frame(m.specs$drawlist)[1:3,]
 
 # Persist key objects in the study_environment container
 study_environment[["match_specifications"]]   <- match_specifications

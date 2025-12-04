@@ -54,7 +54,7 @@ library(rgenoud);library(quadprog);library(car)
 
 devtools::document()  
 
-project_name = "education"
+project_name = "input_dealers"
 
 # Detect operating system to determine runtime environment
 sysname <- toupper(as.character(Sys.info()[["sysname"]]))
@@ -70,16 +70,17 @@ estimation_data$EduCat <- as.character(estimation_data$EduCat)
 distforms   <- sf_functional_forms()$distforms
 fxnforms    <- sf_functional_forms()$fxnforms
 
+
 # Build table of model specifications for multi–stage frontier estimation
 model_specifications <- sf_model_specifications(
   distforms = distforms,
   fxnforms = fxnforms,
   data = study_environment$estimation_data,
-  technology_variables = c("educated","EduLevel","numeracy","any_formal","any_read","any_write","any_literacy",
-                           "local_literacy","fregn_literacy","any_train","apprentice","student","YerEduCat"))
+  technology_variables = unique(c("dealer005",names(study_environment$estimation_data)[grepl("dealer",names(study_environment$estimation_data))]))
+)
 
 # Drop specifications that use disaggregation variables you do NOT want
-model_specifications <- model_specifications[model_specifications$disasg %in% c("EduLevel","EduCat","Region","Ecozon"),]
+#model_specifications <- model_specifications[model_specifications$disasg %in% c("EduLevel","EduCat","Region","Ecozon"),]
 
 row.names(model_specifications) <- 1:nrow(model_specifications)
 
@@ -183,19 +184,19 @@ lapply(
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
-          unique(drawlist$ID),
+          unique(drawlist$ID)[1],
           draw_msf_estimations,
           data                    = data,
           surveyy                 = FALSE,
-          intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
-          intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey","Ecozon")),
+          intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Ecozon")),
+          intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Ecozon")),
           drawlist                = drawlist,
           weight_variable         = "Weight",
           output_variable         = "HrvstKg",
           input_variables         = c("Area", "SeedKg", "HHLaborAE","HirdHr","FertKg","PestLt"),
-          inefficiency_covariates = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","OwnLnd","EqipMech")),
-          adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Survey","Ecozon","Extension","Credit","OwnLnd","EqipMech")),
-          identifiers             = c("unique_identifier", "Survey", "CropID", "HhId", "EaId", "Mid"),
+          inefficiency_covariates = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Ecozon","Extension","OwnLnd")),
+          adoption_covariates     = list(scalar_variables=c("lnAgeYr","lnYerEdu","CrpMix"),factor_variables=c("Female","Ecozon","Extension","OwnLnd")),
+          identifiers             = c("unique_identifier", "CropID", "HhId", "EaId", "Mid"),
           disagscors_list         = disagscors_list,
           f                       = f,
           d                       = d,

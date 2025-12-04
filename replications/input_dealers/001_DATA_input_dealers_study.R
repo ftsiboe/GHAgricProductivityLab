@@ -1,12 +1,12 @@
 # =============================================================================
-#  DATA and SETUP - EDUCATION STUDY 
+#  DATA and SETUP - INPUT DEALERS STUDY 
 # =============================================================================
 #  General Description:
 #  ---------------------------------------------------------------------------
-#  This script prepares analysis-ready data for the education study within the
+#  This script prepares analysis-ready data for the input dealers study within the
 #  GHAgricProductivityLab project. It:
 #    - Initializes a study-specific environment (folders, paths, metadata),
-#    - Loads harmonized farm/household and education modules,
+#    - Loads harmonized farm/household and input dealers modules,
 #    - Merges them at the household-farmer level,
 #    - Restricts the sample to relevant GLSS waves,
 #    - Saves both the processed study dataset and the study environment object
@@ -21,7 +21,7 @@ rm(list = ls(all = TRUE)); gc()
 devtools::document()                         
 
 # ---- Define study name and initialize study environment
-project_name <- "education"
+project_name <- "input_dealers"
 
 # study_setup() is assumed to:
 #   - create / verify directories,
@@ -35,9 +35,14 @@ study_environment <- study_setup(project_name = project_name)
 # the GHAgricProductivityLab GitHub repo, then reads them with haven.
 farmer_data <- get_household_data("harmonized_crop_farmer_data")
 
-# education_data <- get_household_data("harmonized_education_data")
-education_data  <- as.data.frame(haven::read_dta("data-raw/releases/harmonized_data/harmonized_education_data.dta"))
-education_data  <- education_data[names(education_data)[!grepl("YerEdu|EduLevel|EduWhyNo", names(education_data))]]
+# input_dealers <- get_household_data("ghana_agro_dealer_sale_points.rds")
+input_dealers <- readRDS("data-raw/releases/harmonized_data/ghana_agro_dealer_sale_points.rds")
+
+for(x in names(input_dealers)[grepl("dealer_density_",names(input_dealers))]){
+  input_dealers[,gsub("_density_","",x)] <- as.numeric(input_dealers[,x] > 0)
+}
+
+input_dealers <- input_dealers[names(input_dealers)[!grepl("dealer_density_",names(input_dealers))]]
 
 # ---- Merge farmer and education data at the household-member level
 # Merge keys:
@@ -47,13 +52,13 @@ education_data  <- education_data[names(education_data)[!grepl("YerEdu|EduLevel|
 #   - Mid     : member ID
 study_data <- dplyr::inner_join(
   farmer_data,
-  education_data,
-  by = c("Surveyx", "EaId", "HhId", "Mid")
+  input_dealers,
+  by = c("EaId")
 )
 
 # ---- Restrict to relevant survey rounds and drop certain variables
 study_data <- study_data[
-  study_data$Surveyx %in% c("GLSS6","GLSS7"),
+  study_data$Surveyx %in% c("GLSS7"),
 ]
 
 # ---- Attach raw data to study environment (potential issue)

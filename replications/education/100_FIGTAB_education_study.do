@@ -1,10 +1,11 @@
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_disability\data\tech_inefficiency_disability_data",clear
+use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\data\tech_inefficiency_education_data",clear
 decode CropID,gen(CropIDx)
 keep if CropIDx == "Pooled"
 qui levelsof CropIDx, local(levels)
-tab disabled
+tab educated
 
-qui foreach disab in disabled disabled_self disabled_spouse disabled_child disabled_close disabled_member{
+qui foreach edu in educated numeracy any_formal /*
+*/ any_read any_write any_literacy local_literacy fregn_literacy any_train apprentice student {
 	
 mat drop _all
 sca drop _all
@@ -12,17 +13,18 @@ sca drop _all
 loc ApID0 = 0
 tempfile Summaries DATA
 
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_disability\data\tech_inefficiency_disability_data",clear
+use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\data\tech_inefficiency_education_data",clear
 decode CropID,gen(CropIDx)
 qui levelsof CropIDx, local(levels)
 
 qui foreach crop in `levels'{
   
 *loc crop "Pooled"
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_disability\data\tech_inefficiency_disability_data",clear
+use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\data\tech_inefficiency_education_data",clear
 decode CropID,gen(CropIDx)
 keep if CropIDx == "`crop'"
-gen disagCat = `disab'
+gen disagCat = `edu'
+drop if disagCat == .
 cap{
 
 sum Season
@@ -206,27 +208,33 @@ loc ApID0=`ApID0'+1
 use `Summaries', clear
 
 export excel CropIDx Equ Coef Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_disability\results\tech_inefficiency_disability_results.xlsx", /*
-*/ sheet("Means_`disab'") sheetmodify firstrow(variables) 
+*/ using "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\results\tech_inefficiency_education_results_means.xlsx", /*
+*/ sheet("`edu'") sheetmodify firstrow(variables) 
 
 }
 
+
 mat drop _all
 sca drop _all
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_disability\data\tech_inefficiency_disability_data",clear
+use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\data\tech_inefficiency_education_data",clear
+keep if inlist(Surveyx,"GLSS6","GLSS7")
 decode CropID,gen(CropIDx)
-tabstat disabled disabCat* if CropIDx == "Cassava",by(Surveyx) save
 gen Trend=Season-r(min)
 egen Clust = group(Survey Ecozon EaId HhId)
 mat Means=J(1,8,.)
+tab EduLevel,gen(EduLvl)
+tab EduWhyNo,gen(EduNo) 
 
-qui foreach Var in disabled disabCat1 disabCat2 disabCat3 disabCat4 disabCat5 disabCat6 disabCat7{
+qui foreach Var in educated numeracy any_formal /*
+*/ any_read any_write any_literacy local_literacy fregn_literacy any_train apprentice student /*
+*/ EduLvl1 EduLvl2 EduLvl3 EduLvl4 EduLvl5 /*
+*/ EduNo1 EduNo2 EduNo3 EduNo4 EduNo5 EduNo6 EduNo7 EduNo8 EduNo9 EduNo10 EduNo11 EduNo12 EduNo13 EduNo14{
 	qui levelsof CropIDx, local(levels)
 	qui foreach crop in `levels'{
 		preserve
 		cap{
 			
-			*loc Var disabled
+			*loc Var EduLvl
 			*loc crop "Pooled"
 			keep if CropIDx == "`crop'"
 			
@@ -276,5 +284,7 @@ keep Variable crop mesure Beta SE Tv Pv Min Max SD N
 order Variable crop mesure Beta SE Tv Pv Min Max SD N
 
 export excel Variable crop mesure Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_disability\results\tech_inefficiency_disability_results.xlsx", /*
-*/ sheet("disability") sheetmodify firstrow(variables) 
+*/ using "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\results\tech_inefficiency_education_results_means.xlsx", /*
+*/ sheet("education_state") sheetmodify firstrow(variables) 
+
+

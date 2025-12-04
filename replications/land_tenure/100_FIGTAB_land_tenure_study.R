@@ -46,7 +46,7 @@ openxlsx::saveWorkbook(wb,file.path(study_environment$wd$output,paste0(project_n
 
 # Fig - Robustness              
 rm(list= ls()[!(ls() %in% c(Keep.List))])
-fig_robustness(y_title="\nPercentage point difference  [No ownership minus some ownership]",
+fig_robustness(y_title="\nLevel difference [No ownership minus some ownership]",
                res_list = c(file.path(study_environment$wd$output,"estimations","CropID_Pooled_OwnLnd_CD_hnormal_optimal.rds"),
                             list.files(file.path(study_environment$wd$output,"estimations"),
                                        pattern = "CropID_Pooled_OwnLnd_TL_",full.names = T)),
@@ -127,6 +127,7 @@ dataFrq$Tech <- factor(as.numeric(as.character(dataFrq$TCHLvel)),levels = 0:1,la
 fig_dsistribution(dataFrq,study_environment=study_environment)
 
 
+# Fig - Region and crop ranking text
 rm(list= ls()[!(ls() %in% c(Keep.List))])
 res <-readRDS(file.path(study_environment$wd$output,"estimations/CropID_Pooled_OwnLnd_TL_hnormal_optimal.rds"))$disagscors
 res$disasg <- res$disagscors_var
