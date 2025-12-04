@@ -162,20 +162,7 @@ lapply(
         drawlist = study_environment$sample_draw_list
         
         # By default, no disaggregated scores list
-        disagscors_list <- NULL
-        
-        # For one specific core scenario, compute disaggregated scores
-        if(technology_variable %in% "OwnLnd" &  
-           matching_type %in% "optimal" & 
-           disaggregate_level %in% "Pooled" & 
-           disaggregate_variable %in% "CropID" & 
-           f %in% 2 & d %in% 1){
-          
-          disagscors_list <- c("Ecozon","Region","AgeCat","EduLevel","Female",
-                               names(data)[grepl("CROP_",names(data))],"LndAq","ShrCrpCat")
-          disagscors_list <- unique(disagscors_list[disagscors_list %in% names(data)])
-
-        }
+        disagscors_list <- c("Ecozon","Region","AgeCat","EduLevel","Female",names(data)[grepl("CROP_",names(data))])
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
