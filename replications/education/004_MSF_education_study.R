@@ -79,7 +79,8 @@ model_specifications <- sf_model_specifications(
                            "local_literacy","fregn_literacy","any_train","apprentice","student","YerEduCat"))
 
 # Drop specifications that use disaggregation variables you do NOT want
-model_specifications <- model_specifications[model_specifications$disasg %in% c("EduLevel","EduCat","Region","Ecozon"),]
+model_specifications <- model_specifications[!model_specifications$disasg %in% c("EduLevel","EduCat","Region","Ecozon"),]
+model_specifications <- model_specifications[!(model_specifications$disasg %in% c("CropID") & ! model_specifications$level %in% "Pooled"),]
 
 row.names(model_specifications) <- 1:nrow(model_specifications)
 
