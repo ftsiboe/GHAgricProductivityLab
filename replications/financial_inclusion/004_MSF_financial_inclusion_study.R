@@ -78,8 +78,8 @@ model_specifications <- sf_model_specifications(
   technology_variables = c("credit_hh","credit_close","credit_member","credit_spouse","credit_self", "credit_child"))
 
 # Drop specifications that use disaggregation variables you do NOT want
-model_specifications <- model_specifications[model_specifications$disasg %in% c("Female","Region","Ecozon","EduCat","EduLevel","AgeCat"),]
-model_specifications <- model_specifications[!(model_specifications$disasg %in% c("CropID") & !model_specifications$level %in% "Pooled"),]
+# model_specifications <- model_specifications[model_specifications$disasg %in% c("Female","Region","Ecozon","EduCat","EduLevel","AgeCat"),]
+# model_specifications <- model_specifications[!(model_specifications$disasg %in% c("CropID") & !model_specifications$level %in% "Pooled"),]
 
 row.names(model_specifications) <- 1:nrow(model_specifications)
 
@@ -206,7 +206,7 @@ lapply(
           data                    = data,
           surveyy                 = FALSE,
           intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey", "Ecozon")),
-          intercept_shifters_meta = list(scalar_variables=NULL,factor_variables=c("Survey", "Ecozon")),
+          intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey", "Ecozon")),
           drawlist                = drawlist,
           weight_variable         = "Weight",
           output_variable         = "HrvstKg",
