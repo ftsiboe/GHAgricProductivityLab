@@ -206,7 +206,7 @@ lapply(
           data                    = data,
           surveyy                 = FALSE,
           intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey", "Ecozon")),
-          intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey", "Ecozon")),
+          intercept_shifters_meta = list(scalar_variables=NULL,factor_variables=c("Survey", "Ecozon")),
           drawlist                = drawlist,
           weight_variable         = "Weight",
           output_variable         = "HrvstKg",
