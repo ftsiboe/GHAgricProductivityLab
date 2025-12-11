@@ -21,27 +21,23 @@ wb <- openxlsx::loadWorkbook(file.path(study_environment$wd$output,paste0(projec
 openxlsx::writeData(wb, sheet = "msf",res[res$Survey %in% "GLSS0",] , colNames = T, startCol = "A", startRow = 1)
 openxlsx::saveWorkbook(wb,file.path(study_environment$wd$output,paste0(project_name,"_results.xlsx")),overwrite = T)
 
-
-
-
 # Fig - Heterogeneity          
 rm(list= ls()[!(ls() %in% c(Keep.List))])
-res <- readRDS("results/estimations/CropID_Pooled_credit_hh_TL_hnormal_optimal.rds")$disagscors
+res <- readRDS(file.path(study_environment$wd$estimations,"CropID_Pooled_credit_hh_TL_hnormal_optimal.rds"))$disagscors
 res$disasg <- as.character(res$disagscors_var)
-res$level <- as.character(res$disagscors_level)
+res$level  <- as.character(res$disagscors_level)
 res <- res[res$estType %in% "teBC",]
 res <- res[res$Survey %in% "GLSS0",]
 res <- res[res$restrict %in% "Restricted",]
 res <- res[res$stat %in% "mean",]
 res <- res[!res$sample %in% "unmatched",]
 res <- res[res$CoefName %in% "disag_efficiencyGap_lvl",]
-res <- res[c("disasg","level","FXN","DIS","Survey","input","TCH","Tech","CoefName","Estimate","Estimate.sd","jack_pv")]
+res <- res[c("disasg","level","fxnforms","distforms","Survey","input","technology_variable","Tech","CoefName","Estimate","Estimate.sd","jack_pv")]
 
-fig <- fig_heterogeneity00(res=res,y_title="Difference (no-credit less Credit)\n")
+fig <- fig_heterogeneity00(res=res,y_title="Difference (no-credit less Credit)\n",study_environment=study_environment)
 fig[["genderAge"]] <- fig[["genderAge"]] + theme(axis.text.x = element_text(size = 5.5))
-ggsave("results/figures/heterogeneity_crop_region.png", fig[["crop_region"]],dpi = 600,width = 8, height = 5)
-ggsave("results/figures/heterogeneity_genderAge.png", fig[["genderAge"]],dpi = 600,width = 8, height = 5)
-
+ggsave(file.path(study_environment$wd$output,"figure","heterogeneity_crop_region.png"), fig[["crop_region"]],dpi = 600,width = 8, height = 5)
+ggsave(file.path(study_environment$wd$output,"figure","heterogeneity_genderAge.png"), fig[["genderAge"]],dpi = 600,width = 8, height = 5)
 
 data <- res[(res$disasg %in% "FinIdxCat"),]
 data$x <- factor(as.numeric(as.character(data$level)),levels = 1:5,
@@ -69,7 +65,8 @@ fig <- ggplot(data = data, aes(x = x, y = Estimate, group = input, shape = input
         legend.title = element_text(size = 10),
         legend.text = element_text(size = 10),
         strip.background = element_rect(fill = "white", colour = "black", size = 1))
-ggsave("results/figures/heterogeneity_financial_inclusion.png", fig,dpi = 600,width = 6.8, height = 5)
+ggsave(file.path(study_environment$wd$output,"figure","heterogeneity_financial_inclusion.png"), 
+       fig,dpi = 600,width = 6.8, height = 5)
 
 
 res <- res[(res$disasg %in% c("Applied","Refused","Accept","Proces","Insured","Banked") | 
@@ -141,38 +138,45 @@ res$disasg <- ifelse(grepl("Refusal_",res$disasg),"Reson for refusal",res$disasg
 res$disasg <- ifelse(grepl("WhyNoLoan_",res$disasg),"Reason for not aplying a loan",res$disasg)
 
 res <- res[c("disasg","level","input","Estimate","Estimate.sd","jack_pv")]
-wb <- openxlsx::loadWorkbook("results/tech_inefficiency_financial_inclusion_results.xlsx")
+wb <- openxlsx::loadWorkbook(file.path(study_environment$wd$output,paste0(project_name,"_results.xlsx")))
 openxlsx::writeData(wb, sheet = "effects_by_inclusion",res , colNames = T, startCol = "A", startRow = 1)
-openxlsx::saveWorkbook(wb,"results/tech_inefficiency_financial_inclusion_results.xlsx",overwrite = T)
+openxlsx::saveWorkbook(wb,file.path(study_environment$wd$output,paste0(project_name,"_results.xlsx")),overwrite = T)
 
 
-# Fig - Robustness              
+# Fig - Robustness  
 rm(list= ls()[!(ls() %in% c(Keep.List))])
 fig_robustness(y_title="\nDifference [no-credit less Credit]",
-               res_list = c("results/estimations/CropID_Pooled_credit_hh_CD_hnormal_optimal.rds",
-                            list.files("results/estimations/",pattern = "CropID_Pooled_credit_hh_TL_",full.names = T)))
+               res_list = c(file.path(study_environment$wd$output,"estimations","CropID_Pooled_credit_hh_CD_hnormal_optimal.rds"),
+                            list.files(file.path(study_environment$wd$output,"estimations"),
+                                       pattern = "CropID_Pooled_credit_hh_TL_",full.names = T)),
+               study_environment=study_environment)
 
 # Fig - Matching TE      
 rm(list= ls()[!(ls() %in% c(Keep.List))])
-fig_input_te(y_title="\nGap associated with having credit (%)",tech_lable=c("Full sample", "No-credit sample", "Credit sample"))
+fig_input_te(
+  y_title="\nGap associated with having credit (%)",
+  tech_lable=c("Full sample", "No-credit sample", "Credit sample"),
+  study_environment=study_environment)
 
 # Fig - Covariate balance 
 rm(list= ls()[!(ls() %in% c(Keep.List))])
-fig_covariate_balance()
+fig_covariate_balance(study_environment=study_environment)
 
 # Fig - Distribution 
-dataFrq <- readRDS("results/estimations/CropID_Pooled_credit_hh_TL_hnormal_fullset.rds")
+rm(list= ls()[!(ls() %in% c(Keep.List))])
+dataFrq <- readRDS(file.path(study_environment$wd$output,"estimations/CropID_Pooled_credit_hh_TL_hnormal_fullset.rds"))
 dataFrq <- dataFrq$ef_dist
 dataFrq <- dataFrq[dataFrq$estType %in% "teBC",]
 dataFrq <- dataFrq[dataFrq$Survey %in% "GLSS0",]
-dataFrq <- dataFrq[dataFrq$stat %in% "weight",]
+dataFrq <- dataFrq[dataFrq$stat %in% "estimate_weight",]
 dataFrq <- dataFrq[dataFrq$restrict %in% "Restricted",]
 dataFrq$Tech <- factor(as.numeric(as.character(dataFrq$TCHLvel)),levels = 0:1,labels = c("No-Credit","Credit"))
-fig_dsistribution(dataFrq)
+fig_dsistribution(dataFrq,study_environment=study_environment)
 
 
+# Fig - Region and crop ranking text
 rm(list= ls()[!(ls() %in% c(Keep.List))])
-res <- readRDS("results/estimations/CropID_Pooled_credit_hh_TL_hnormal_optimal.rds")$disagscors
+res <-readRDS(file.path(study_environment$wd$output,"estimations/CropID_Pooled_credit_hh_TL_hnormal_optimal.rds"))$disagscors
 res$disasg <- res$disagscors_var
 res$level <- res$disagscors_level
 res <- res[res$estType %in% "teBC",]
