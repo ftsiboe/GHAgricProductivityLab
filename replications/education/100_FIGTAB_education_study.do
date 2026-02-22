@@ -1,4 +1,15 @@
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\data\tech_inefficiency_education_data",clear
+
+
+use "$GitHub\my_packages\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_education_data",clear
+merg 1:m Surveyx EaId HhId Mid using "$GitHub\my_packages\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_crop_farmer_data"
+keep if _merge==3
+keep if inlist(Surveyx,"GLSS6","GLSS7")
+compress
+saveold "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\education_study_data",replace ver(12)
+
+
+
+use "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\education_study_data",clear
 decode CropID,gen(CropIDx)
 keep if CropIDx == "Pooled"
 qui levelsof CropIDx, local(levels)
@@ -13,14 +24,14 @@ sca drop _all
 loc ApID0 = 0
 tempfile Summaries DATA
 
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\data\tech_inefficiency_education_data",clear
+use "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\education_study_data",clear
 decode CropID,gen(CropIDx)
 qui levelsof CropIDx, local(levels)
 
 qui foreach crop in `levels'{
   
 *loc crop "Pooled"
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\data\tech_inefficiency_education_data",clear
+use "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\education_study_data",clear
 decode CropID,gen(CropIDx)
 keep if CropIDx == "`crop'"
 gen disagCat = `edu'
@@ -208,7 +219,7 @@ loc ApID0=`ApID0'+1
 use `Summaries', clear
 
 export excel CropIDx Equ Coef Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\results\tech_inefficiency_education_results_means.xlsx", /*
+*/ using "$GitHub\my_packages\GHAgricProductivityLab\replications\education\output\education_results_means.xlsx", /*
 */ sheet("`edu'") sheetmodify firstrow(variables) 
 
 }
@@ -216,7 +227,7 @@ export excel CropIDx Equ Coef Beta SE Tv Pv Min Max SD N /*
 
 mat drop _all
 sca drop _all
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\data\tech_inefficiency_education_data",clear
+use "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\education_study_data",clear
 keep if inlist(Surveyx,"GLSS6","GLSS7")
 decode CropID,gen(CropIDx)
 gen Trend=Season-r(min)
@@ -284,7 +295,7 @@ keep Variable crop mesure Beta SE Tv Pv Min Max SD N
 order Variable crop mesure Beta SE Tv Pv Min Max SD N
 
 export excel Variable crop mesure Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_education\results\tech_inefficiency_education_results_means.xlsx", /*
+*/ using "$GitHub\my_packages\GHAgricProductivityLab\replications\education\output\education_results_means.xlsx", /*
 */ sheet("education_state") sheetmodify firstrow(variables) 
 
 
