@@ -20,7 +20,9 @@ rm(list = ls(all = TRUE)); gc()
 # This calls roxygen2 via devtools to regenerate .Rd docs and NAMESPACE.
 devtools::document()                         
 
-run_only_for(id = 4, allowed_jobnames = "run_all")
+if(! as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID", NA)) %in% NA){
+  run_only_for(id = 4, allowed_jobnames = "run_all")
+}
 
 # ---- Define study name and initialize study environment
 project_name <- "financial_inclusion"

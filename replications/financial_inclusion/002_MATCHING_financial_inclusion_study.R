@@ -38,7 +38,9 @@ rm(list = ls(all = TRUE)); gc()
 
 devtools::document()                         
 
-run_only_for(id = 4, allowed_jobnames = "run_all")
+if(! as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID", NA)) %in% NA){
+  run_only_for(id = 4, allowed_jobnames = "run_all")
+}
 
 project_name <- "financial_inclusion"
 
