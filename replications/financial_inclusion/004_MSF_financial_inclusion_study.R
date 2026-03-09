@@ -204,7 +204,7 @@ lapply(
           unique(drawlist$ID),
           draw_msf_estimations,
           data                    = data,
-          surveyy                 = FALSE,
+          surveyy                 = TRUE,
           intercept_shifters      = list(scalar_variables=crop_area_list,factor_variables=c("Survey", "Ecozon")),
           intercept_shifters_meta = list(scalar_variables=crop_area_list,factor_variables=c("Survey", "Ecozon")),
           drawlist                = drawlist,
