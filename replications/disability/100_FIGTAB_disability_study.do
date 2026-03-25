@@ -1,15 +1,15 @@
 
 
-use "$GitHub\my_packages\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_disability_data",clear
-merg 1:m Surveyx EaId HhId Mid using "$GitHub\my_packages\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_crop_farmer_data"
+use "$GitHub\labs\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_disability_data",clear
+merg 1:m Surveyx EaId HhId Mid using "$GitHub\labs\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_crop_farmer_data"
 keep if _merge==3
 drop _merge EduWhyNo 
 keep if inlist(Surveyx,"GLSS6","GLSS7")
 compress
-saveold "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\disability_study_data",replace ver(12)
+saveold "$GitHub\labs\GHAgricProductivityLab\replications\disability\output\disability_study_data",replace ver(12)
 
 
-use "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\disability_study_data",clear
+use "$GitHub\labs\GHAgricProductivityLab\replications\disability\output\disability_study_data",clear
 decode CropID,gen(CropIDx)
 keep if CropIDx == "Pooled"
 qui levelsof CropIDx, local(levels)
@@ -23,14 +23,14 @@ sca drop _all
 loc ApID0 = 0
 tempfile Summaries DATA
 
-use "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\disability_study_data",clear
+use "$GitHub\labs\GHAgricProductivityLab\replications\disability\output\disability_study_data",clear
 decode CropID,gen(CropIDx)
 qui levelsof CropIDx, local(levels)
 
 qui foreach crop in `levels'{
   
 *loc crop "Pooled"
-use "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\disability_study_data",clear
+use "$GitHub\labs\GHAgricProductivityLab\replications\disability\output\disability_study_data",clear
 decode CropID,gen(CropIDx)
 keep if CropIDx == "`crop'"
 gen disagCat = `disab'
@@ -217,14 +217,14 @@ loc ApID0=`ApID0'+1
 use `Summaries', clear
 
 export excel CropIDx Equ Coef Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\disability_results.xlsx", /*
+*/ using "$GitHub\labs\GHAgricProductivityLab\replications\disability\output\disability_results.xlsx", /*
 */ sheet("Means_`disab'") sheetmodify firstrow(variables) 
 
 }
 
 mat drop _all
 sca drop _all
-use "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\disability_study_data",clear
+use "$GitHub\labs\GHAgricProductivityLab\replications\disability\output\disability_study_data",clear
 decode CropID,gen(CropIDx)
 tabstat disabled disabCat* if CropIDx == "Cassava",by(Surveyx) save
 gen Trend=Season-r(min)
@@ -287,5 +287,5 @@ keep Variable crop mesure Beta SE Tv Pv Min Max SD N
 order Variable crop mesure Beta SE Tv Pv Min Max SD N
 
 export excel Variable crop mesure Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\my_packages\GHAgricProductivityLab\replications\disability\output\disability_results.xlsx", /*
+*/ using "$GitHub\labs\GHAgricProductivityLab\replications\disability\output\disability_results.xlsx", /*
 */ sheet("disability") sheetmodify firstrow(variables) 

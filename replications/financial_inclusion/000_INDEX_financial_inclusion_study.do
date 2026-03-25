@@ -17,13 +17,13 @@
  **************************************************************************/
 
 // Load the harmonized crop farmer data and clear the current dataset
-use "$GitHub\my_packages\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_crop_farmer_data", clear
+use "$GitHub\labs\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_crop_farmer_data", clear
 
 // Collapse the data to get the mean of specified variables by the grouping variables
 collapse (mean) YerEdu EduLevel AgeYr Female WeightHH, by(Surveyx EaId HhId Mid Locality Head)
 
 // Merge the current data with the harmonized financial inclusion data on specified keys
-merge 1:1 Surveyx EaId HhId Mid using "$GitHub\my_packages\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_financial_inclusion_data"
+merge 1:1 Surveyx EaId HhId Mid using "$GitHub\labs\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_financial_inclusion_data"
 keep if _merge==3 // Keep only the matched records
  
 // Decode the 'Locality' variable to create a new variable 'Localityx'
@@ -122,7 +122,7 @@ xtile FinIdxCat = FinIdx [pw=WeightHH] , nq(5)
 keep HhId EaId Mid Surveyx FinIdx FinIdxSi FinIdxCat
 
 // Save the final dataset in Stata version 12 format
-saveold "$GitHub\my_packages\GHAgricProductivityLab\data-raw\releases\harmonized_data\financial_inclusion_index", replace ver(12)
+saveold "$GitHub\labs\GHAgricProductivityLab\data-raw\releases\harmonized_data\financial_inclusion_index", replace ver(12)
 
 /*
 // Merge the current data with the harmonized financial inclusion data on specified keys

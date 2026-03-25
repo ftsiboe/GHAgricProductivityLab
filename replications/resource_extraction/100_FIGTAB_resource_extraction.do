@@ -1,5 +1,17 @@
 
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_resource_extract\data\tech_inefficiency_resource_extract_data",clear
+
+
+use "$GitHub\labs\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_resources_extraction_data",clear
+merg 1:m Surveyx EaId using "$GitHub\labs\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_crop_farmer_data"
+keep if _merge==3
+drop _merge EduWhyNo 
+keep if inlist(Surveyx,"GLSS3","GLSS4","GLSS5","GLSS6","GLSS7")
+compress
+saveold "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",replace ver(12)
+
+
+
+use "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",clear
 tab Surveyx
 decode CropID,gen(CropIDx)
 keep if CropIDx == "Pooled"
@@ -14,14 +26,14 @@ sca drop _all
 loc ApID0 = 0
 tempfile Summaries DATA
 
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_resource_extract\data\tech_inefficiency_resource_extract_data",clear
+use "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",clear
 decode CropID,gen(CropIDx)
 qui levelsof CropIDx, local(levels)
 
 qui foreach crop in `levels'{
   
 *loc crop "Pooled"
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_resource_extract\data\tech_inefficiency_resource_extract_data",clear
+use "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",clear
 decode CropID,gen(CropIDx)
 keep if CropIDx == "`crop'"
 gen disagCat = `disag'
@@ -208,7 +220,7 @@ loc ApID0=`ApID0'+1
 use `Summaries', clear
 
 export excel CropIDx Equ Coef Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_resource_extract\results\tech_inefficiency_resource_extract_results.xlsx", /*
+*/ using "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\resource_extraction_results.xlsx", /*
 */ sheet("Means_`disag'") sheetmodify firstrow(variables) 
 
 }
@@ -216,7 +228,7 @@ export excel CropIDx Equ Coef Beta SE Tv Pv Min Max SD N /*
 
 mat drop _all
 sca drop _all
-use "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_resource_extract\data\tech_inefficiency_resource_extract_data",clear
+use "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",clear
 decode CropID,gen(CropIDx)
 tabstat extraction_any mining_any mining_comm mining_gala quarrying sand salt if CropIDx == "Cassava",by(Surveyx) save
 sum Season
@@ -281,5 +293,5 @@ keep Variable crop mesure Beta SE Tv Pv Min Max SD N
 order Variable crop mesure Beta SE Tv Pv Min Max SD N
 
 export excel Variable crop mesure Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\GH-Agric-Productivity-Lab\replications\tech_inefficiency_resource_extract\results\tech_inefficiency_resource_extract_results.xlsx", /*
+*/ using "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\resource_extraction_results.xlsx", /*
 */ sheet("extraction") sheetmodify firstrow(variables) 
