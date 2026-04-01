@@ -25,6 +25,7 @@ asset_list <- asset_list[grepl(
   paste(c("farmer_data",
           "disability_data",
           "disability_data",
+          "time_poverty_data",
           "education_data",
           "financial_inclusion_data"),
          collapse = "|"),asset_list)]
