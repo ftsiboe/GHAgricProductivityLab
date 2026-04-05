@@ -8,7 +8,7 @@
 #' @return A list containing control parameters.
 #'
 #' @keywords internal
-GHAgricProductivityLab_control <- function(
+okwaayeli_control <- function(
     number_of_draws = 100,
     myseed = 11122025
 ){

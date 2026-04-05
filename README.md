@@ -1,4 +1,4 @@
-Agricultural Productivity Analaysis in Ghana
+okwaayeli : Agricultural Productivity Analaysis in Ghana
 ================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -10,8 +10,8 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/ftsiboe/GHAgricProductivityLab/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ftsiboe/USFarmSafetyNetLab/actions/workflows/R-CMD-check.yaml)
-[![codecov](https://codecov.io/gh/ftsiboe/GHAgricProductivityLab/graph/badge.svg?token=KIE05NKNU8)](https://codecov.io/gh/ftsiboe/GHAgricProductivityLab)
+[![R-CMD-check](https://github.com/ftsiboe/okwaayeli/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ftsiboe/USFarmSafetyNetLab/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/ftsiboe/okwaayeli/graph/badge.svg?token=KIE05NKNU8)](https://codecov.io/gh/ftsiboe/okwaayeli)
 ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![R \>= 4.0](https://img.shields.io/badge/R-%3E=4.0-blue) [![Contributor
 Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
@@ -20,7 +20,7 @@ Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](c
 *Collaborations with enthusiastic and committed graduate students are
 welcomed. For more details see the wiki on [Graduate Student Opportunity
 to Lead Research on Agricultural Productivity in
-Ghana](https://github.com/ftsiboe/GHAgricProductivityLab/wiki/Graduate-Student-Opportunity-to-Lead-Research-on-Agricultural-Productivity-in-Ghana)*
+Ghana](https://github.com/ftsiboe/okwaayeli/wiki/Graduate-Student-Opportunity-to-Lead-Research-on-Agricultural-Productivity-in-Ghana)*
 
 ## 📘 Overview
 
@@ -65,76 +65,76 @@ periodically, approximately every five years, in Ghana:
 
 - [Technology and managerial performance of farm operators by age in
   Ghana](https://doi.org/10.1007/s11123-023-00679-y) \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/releases/tag/legacy_studies)
 
 - [Taking stock of gender gaps in crop production technology adoption
   and technical efficiency in
   Ghana](https://doi.org/10.1080/03031853.2022.2150664) \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/releases/tag/legacy_studies)
 
 - [Starchy Staples Production Shortfall in Ghana is influenced by
   Technical Inefficiency than by Ecological Technology
   Gaps](https://doi.org/10.1371/journal.pone.0284780) \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/releases/tag/legacy_studies)
 
 - [Production Technology, Efficiency, and Productivity of Cereal
   Farms](https://doi.org/10.1017/age.2022.16) \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/releases/tag/legacy_studies)
 
 - [Chronic Sources of Low Cocoa Production in
   Ghana](https://doi.org/10.1017/age.2021.3) \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/releases/tag/legacy_studies)
 
 - [Effect of Fertilizer Subsidy on Household Level Cereal Production in
   Ghana](https://doi.org/10.1016/j.sciaf.2021.e00916) \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/releases/tag/legacy_studies)
 
 - [Spatiotemporal Evaluation of Dry Beans and Groundnut Production
   Technology and Inefficiency in
   Ghana](https://ageconsearch.umn.edu/record/310316/?ln=en&v=pdf) \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/releases/tag/legacy_studies)
 
 - [Vegetable Production Technical Efficiency and Technology Gaps in
   Ghana](https://ageconsearch.umn.edu/record/301046/?ln=en&v=pdf) \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/releases/tag/legacy_studies)
 
 - [Nationally Representative Farm/Household Level Dataset on Crop
   Production in Ghana from
   1987-2017](http://dx.doi.org/10.2139/ssrn.4134518) \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/releases/tag/legacy_studies)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/releases/tag/legacy_studies)
 
 ## 🛠 Work in Progress
 
 - [Technology Gaps Drive Inequality in Production for Farmers with
-  Disabilities](https://github.com/ftsiboe/GHAgricProductivityLab/blob/main/replications/disability/DisabilityAgricProdGapGhana_public_version.pdf)
+  Disabilities](https://github.com/ftsiboe/okwaayeli/blob/main/replications/disability/DisabilityAgricProdGapGhana_public_version.pdf)
   \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/disability)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/tree/main/replications/disability)
 - \[Heterogeneous Impacts of Farmer Education on Technology Access and
   Technical Efficiency in
-  Ghana\]<https://github.com/ftsiboe/GHAgricProductivityLab/blob/main/replications/tech_inefficiency_education#heterogeneous-impacts-of-farmer-education-on-technology-access-and-technical-efficiency-in-ghana>)
+  Ghana\]<https://github.com/ftsiboe/okwaayeli/blob/main/replications/tech_inefficiency_education#heterogeneous-impacts-of-farmer-education-on-technology-access-and-technical-efficiency-in-ghana>)
   \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/education)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/tree/main/replications/education)
 - \[Digging into the Linkages Between Resource Extraction and Farm
-  Performance\]<https://github.com/ftsiboe/GHAgricProductivityLab/blob/main/replications/tech_inefficiency_resource_extract#digging-into-the-linkages-between-resource-extraction-and-farm-performance>)
+  Performance\]<https://github.com/ftsiboe/okwaayeli/blob/main/replications/tech_inefficiency_resource_extract#digging-into-the-linkages-between-resource-extraction-and-farm-performance>)
   \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/resource_extract)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/tree/main/replications/resource_extract)
 - Societal Peace and Cohesion Improve Farm Technology and Technical
   Efficiency in Ghana \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/conflict)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/tree/main/replications/conflict)
 - Financial Inclusion and Credit Impacts on Crop Production in Ghana \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/financial_inclusion)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/tree/main/replications/financial_inclusion)
 - Land Ownership Appears Neither Necessary nor Sufficient for Superior
   Agricultural Performance in Ghana \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/land_tenure)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/tree/main/replications/land_tenure)
 - The Association Between Income Transfers and Crop Production in Ghana
   \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/income_transfer)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/tree/main/replications/income_transfer)
 
 ## 📅 Scheduled Studies
 
 - The link between extension services and Farm Technology Endowment and
   its Efficient Use \|
-  [🗂️⚙️](https://github.com/ftsiboe/GHAgricProductivityLab/tree/main/replications/extension)
+  [🗂️⚙️](https://github.com/ftsiboe/okwaayeli/tree/main/replications/extension)
 
 ## 🔓 Data and Code Availability
 

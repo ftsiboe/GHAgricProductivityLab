@@ -54,7 +54,7 @@ table(DATA$TimPov125)
 table(DATA$TimPov15)
 
 # Focus analysis sample: pooled crop only; define treatment indicator
-DATA$Treat <- as.integer(as.numeric(DATA$disabled %in% 1)) # logical treated flag
+DATA$Treat <- as.integer(as.numeric(DATA$TimPov125 %in% 1)) # logical treated flag
 data <- DATA[as.character(DATA$CropID) %in% "Pooled", ]
 
 # --- Matching variable sets
@@ -63,7 +63,7 @@ crop_area_list         <- get_crop_area_list(data)
 match_variables_scaler <- c("AgeYr", "YerEdu", "HHSizeAE", "FmleAERt", "Depend", "CrpMix", crop_area_list)
 
 # Categorical covariates used as factors in matching distance
-match_variables_factor <- c("Credit", "OwnLnd", "Ethnic", "Marital", "Religion", "Head")
+match_variables_factor <- c("Credit", "OwnLnd", "Ethnic", "Marital", "Religion")
 
 # Exact-match strata (must match identically)
 match_variables_exact  <- c("Survey", "Region", "Ecozon", "Locality", "Female")

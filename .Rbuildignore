@@ -19,7 +19,7 @@
 ^renv$                   # (if you’re using renv, ignore the project library)
 ^renv\\.lock$            # lockfile for renv
 ^coverage$               # test coverage output
-GHAgricProductivityLab.Rproj
+okwaayeli.Rproj
 ^LICENSE\.md$
 ^codemeta\.json$
 ^\.github$
@@ -33,7 +33,7 @@ code_of_conduct.md
 CONTRIBUTING
 \\.out$
 ^.*\\.pdf$
-^GHAgricProductivityLab_.*\.pdf$
+^okwaayeli_.*\.pdf$
 ^data/[^/]+\.rds$
 ^data/[^/]+/[^/]+\.rds$
 ^data/[^/]+/[^/]+/[^/]+\.rds$

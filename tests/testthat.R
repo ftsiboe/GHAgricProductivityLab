@@ -15,6 +15,6 @@ library(frontier)
 library(rgenoud)
 library(quadprog)
 library(car)
-library(GHAgricProductivityLab)
-#test_check("GHAgricProductivityLab")
+library(okwaayeli)
+#test_check("okwaayeli")
 

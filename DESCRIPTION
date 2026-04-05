@@ -1,4 +1,4 @@
-Package: GHAgricProductivityLab
+Package: okwaayeli
 Type: Package
 Title: Agricultural Productivity in Ghana
 Version: 0.0.0.9000
@@ -13,8 +13,8 @@ Description: Provides tools and datasets for investigating the drivers of agricu
  discussions and interventions aimed at improving agricultural productivity, 
  particularly in contexts with limited access to modern technologies.
 License: GPL-3 + file LICENSE
-URL: https://github.com/ftsiboe/GHAgricProductivityLab
-BugReports: https://github.com/ftsiboe/GHAgricProductivityLab/issues
+URL: https://github.com/ftsiboe/okwaayeli
+BugReports: https://github.com/ftsiboe/okwaayeli/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
@@ -24,7 +24,7 @@ Imports: MatchIt, data.table, haven, stats, sfaR, piggyback
 Remotes: github::dylan-turner25/rfcip
 Suggests: knitr, crayon, tidyr, withr, rmarkdown, lavaan, quadprog, emdbook, cobalt, cli,
  dplyr, doBy, stringr, MASS, Matrix, corpcor, testthat (>= 3.0.0), car, frontier, micEcon, rgenoud,
- purrr, randomForest, CBPS, dbarts, optmatch, Matching
+ purrr, randomForest, CBPS, dbarts, optmatch, Matching, classInt
 LazyData: true
 Cite-us: If you find it useful, please consider staring the repository and citing the following studies
   - Tsiboe F. (2021). Chronic sources of low cocoa production in Ghana, new insights from meta-analysis of old survey data. 

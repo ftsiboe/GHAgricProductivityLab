@@ -46,11 +46,11 @@ match_sample_specifications <- function(
     number_of_draws = NULL, data, myseed = NULL) {
   
   if(is.null(myseed)){
-    myseed <- GHAgricProductivityLab_control()$myseed
+    myseed <- okwaayeli_control()$myseed
   }
   
   if(is.null(number_of_draws)){
-    number_of_draws <- GHAgricProductivityLab_control()$number_of_draws
+    number_of_draws <- okwaayeli_control()$number_of_draws
   }
   
   # ---- basic validation ----
@@ -390,7 +390,6 @@ covariate_balance <- function(
   if (nrow(m.specs) == 0L) {
     return(list(rate = data.frame(), bal_tab = data.frame()))
   }
-  
   
   # Initialize the balance table by applying balance checks for each matching specification.
   bal_tab <- as.data.frame(

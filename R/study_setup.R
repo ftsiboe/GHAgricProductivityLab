@@ -26,7 +26,7 @@ study_setup <- function(
   
   # seed validation -> coerce to safe integer
   if(is.null(myseed)){
-    myseed <- GHAgricProductivityLab_control()$myseed
+    myseed <- okwaayeli_control()$myseed
   }
 
   # local_directories validation
