@@ -1,15 +1,15 @@
 #!/bin/bash -l
 
-#SBATCH --job-name=msf_res
+#SBATCH --job-name=msf_agSer
 #SBATCH --time=0-50:00:00    
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=3
 #SBATCH --mem=28G 
-#SBATCH --array=1-61
+#SBATCH --array=1-55
 #SBATCH --mail-user=ftsiboe@hotmail.com
 #SBATCH --mail-type=ALL
 #SBATCH --output=/dev/null
 
 module purge
 module load R/4.2.1-foss-2022a GDAL/3.5.0-foss-2022a PROJ/9.0.0-GCCcore-11.3.0
-R --no-save -q < replications/resource_extraction/004_MSF_resource_extraction_study.R
+R --no-save -q < replications/ag_services/004_MSF_ag_services_study.R

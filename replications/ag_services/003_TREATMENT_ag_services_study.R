@@ -1,5 +1,5 @@
 # =============================================================================
-#  TREATMENT EFFECT WORKFLOW - RESOURCE EXTRACTION STUDY 
+#  TREATMENT EFFECT WORKFLOW - AGRICULTURAL SERVICES STUDY 
 # =============================================================================
 #  General Description:
 # -----------------------------------------------------------------------------

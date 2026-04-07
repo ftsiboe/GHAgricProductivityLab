@@ -1,12 +1,12 @@
 # =============================================================================
-#  DATA and SETUP - ag_services STUDY 
+#  DATA and SETUP - AGRICULTURAL SERVICES STUDY 
 # =============================================================================
 #  General Description:
 #  ---------------------------------------------------------------------------
-#  This script prepares analysis-ready data for the resource extraction study within the
-#  GHAgricProductivityLab project. It:
+#  This script prepares analysis-ready data for the agricultural services study within the
+#  okwaayeli project. It:
 #    - Initializes a study-specific environment (folders, paths, metadata),
-#    - Loads harmonized farm/household and resource extraction modules,
+#    - Loads harmonized farm/household and agricultural services modules,
 #    - Merges them at the household-farmer level,
 #    - Restricts the sample to relevant GLSS waves,
 #    - Saves both the processed study dataset and the study environment object
@@ -34,18 +34,15 @@ study_environment <- study_setup(project_name = project_name)
 
 # ---- Load harmonized household / farmer-level data
 # Wrapper that downloads (via piggyback) and caches Stata .dta files from
-# the GHAgricProductivityLab GitHub repo, then reads them with haven.
+# the okwaayeli GitHub repo, then reads them with haven.
 farmer_data <- get_household_data("harmonized_crop_farmer_data",force = TRUE)
 
 ag_services_data <- get_household_data("harmonized_ag_services_data",force = TRUE)
-# ag_services_data  <- as.data.frame(haven::read_dta("data-raw/releases/harmonized_data/harmonized_ag_services_data.dta"))
 
-# ---- Merge farmer and resource extraction data at the household-member level
+# ---- Merge farmer and agricultural services data at the household-member level
 # Merge keys:
 #   - Surveyx : survey round 
 #   - EaId    : enumeration area
-#   - HhId    : household ID
-#   - Mid     : member ID
 study_data <- dplyr::inner_join(
   farmer_data,
   ag_services_data,
