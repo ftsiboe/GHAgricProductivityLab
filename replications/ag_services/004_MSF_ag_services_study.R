@@ -162,7 +162,7 @@ lapply(
         drawlist = study_environment$sample_draw_list
         
         # By default, no disaggregated scores list
-        disagscors_list <- c("Ecozon","Region","AgeCat","EduLevel","Female",names(data)[grepl("CROP_",names(data))])
+        disagscors_list <- NULL #c("Ecozon","Region","AgeCat","EduLevel","Female",names(data)[grepl("CROP_",names(data))])
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
@@ -218,6 +218,17 @@ lapply(
           Main[Main$type %in% "TGR",c("Survey","sample","type","Tech","Estimate")]
           Main[Main$type %in% "TE",c("Survey","sample","type","Tech","Estimate")]
           Main[Main$type %in% "MTE",c("Survey","sample","type","Tech","Estimate")]
+          
+          # Survey             sample       type   Estimate
+          # 1653  GLSS0 robust_mahalanobis  TGR   -0.0685271
+          # 1077  GLSS0 robust_mahalanobis   TE   0.03264703
+          # 789   GLSS0 robust_mahalanobis  MTE   0.00145247
+
+          # Survey             sample       type  Estimate
+          # 1653  GLSS0 robust_mahalanobis  TGR    -0.0434502
+          # 1077  GLSS0 robust_mahalanobis   TE    0.02069474
+          # 789   GLSS0 robust_mahalanobis  MTE    0.00343490
+          
         }
         
         # Add the estimation name to the result list

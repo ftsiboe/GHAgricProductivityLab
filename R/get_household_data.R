@@ -42,7 +42,7 @@
 get_household_data <- function(
     dataset = "harmonized_crop_farmer_data",
     github_token = NULL, 
-    force = FALSE){
+    force = TRUE){
   
   # Handle GitHub token: use supplied token, then env var, then default credentials
   if (is.null(github_token)) {

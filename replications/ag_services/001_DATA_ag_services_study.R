@@ -35,10 +35,10 @@ study_environment <- study_setup(project_name = project_name)
 # ---- Load harmonized household / farmer-level data
 # Wrapper that downloads (via piggyback) and caches Stata .dta files from
 # the GHAgricProductivityLab GitHub repo, then reads them with haven.
-farmer_data <- get_household_data("harmonized_crop_farmer_data")
+farmer_data <- get_household_data("harmonized_crop_farmer_data",force = TRUE)
 
-# ag_services_data <- get_household_data("harmonized_resources_extraction_data")
-ag_services_data  <- as.data.frame(haven::read_dta("data-raw/releases/harmonized_data/harmonized_ag_services_data.dta"))
+ag_services_data <- get_household_data("harmonized_ag_services_data",force = TRUE)
+# ag_services_data  <- as.data.frame(haven::read_dta("data-raw/releases/harmonized_data/harmonized_ag_services_data.dta"))
 
 # ---- Merge farmer and resource extraction data at the household-member level
 # Merge keys:

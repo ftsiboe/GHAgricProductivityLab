@@ -7,7 +7,7 @@
 get_household_data(
   dataset = "harmonized_crop_farmer_data",
   github_token = NULL,
-  force = FALSE
+  force = TRUE
 )
 }
 \arguments{
