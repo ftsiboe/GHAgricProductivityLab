@@ -1,24 +1,24 @@
 
-
-
-use "$GitHub\labs\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_resources_extraction_data",clear
-merg 1:m Surveyx EaId using "$GitHub\labs\GHAgricProductivityLab\data-raw\releases\harmonized_data\harmonized_crop_farmer_data"
+use "$GitHub\labs\okwaayeli\data-raw\releases\harmonized_data\harmonized_ag_services_data",clear
+merg 1:m Surveyx EaId using "$GitHub\labs\okwaayeli\data-raw\releases\harmonized_data\harmonized_crop_farmer_data"
 keep if _merge==3
 drop _merge EduWhyNo 
-keep if inlist(Surveyx,"GLSS3","GLSS4","GLSS5","GLSS6","GLSS7")
+keep if inlist(Surveyx,"GLSS5","GLSS6","GLSS7")
+tab ag_services, gen(ag_services)
+gen extension0 = extension  > 2
+tab extension_compliance,gen(compliance)
+tab extension,gen(extensionCat)
 compress
-saveold "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",replace ver(12)
+saveold "$GitHub\labs\okwaayeli\replications\ag_services\output\tech_inefficiency_ag_services_data",replace ver(12)
 
-
-
-use "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",clear
+use "$GitHub\labs\okwaayeli\replications\ag_services\output\tech_inefficiency_ag_services_data",clear
 tab Surveyx
 decode CropID,gen(CropIDx)
 keep if CropIDx == "Pooled"
 qui levelsof CropIDx, local(levels)
-tab extraction_any
+tab services0
 
-qui foreach disag in extraction_any mining_any mining_comm mining_gala quarrying sand salt{
+qui foreach disag in services0 farm_association community_cooperative extension0{
 	
 mat drop _all
 sca drop _all
@@ -26,14 +26,14 @@ sca drop _all
 loc ApID0 = 0
 tempfile Summaries DATA
 
-use "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",clear
+use "$GitHub\labs\okwaayeli\replications\ag_services\output\tech_inefficiency_ag_services_data",clear
 decode CropID,gen(CropIDx)
 qui levelsof CropIDx, local(levels)
 
 qui foreach crop in `levels'{
   
 *loc crop "Pooled"
-use "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",clear
+use "$GitHub\labs\okwaayeli\replications\ag_services\output\tech_inefficiency_ag_services_data",clear
 decode CropID,gen(CropIDx)
 keep if CropIDx == "`crop'"
 gen disagCat = `disag'
@@ -44,7 +44,7 @@ gen Trend=Season-r(min)
 egen Clust = group(Survey Ecozon EaId HhId)
 
 mat Means=J(1,8,.)
-qui foreach Var of var Yield Area SeedKg HHLaborAE HirdHr FertKg PestLt AgeYr YerEdu HHSizeAE Depend CrpMix {
+qui foreach Var of var Yield Area SeedKg HHLaborAE HirdHr FertKg PestLt AgeYr YerEdu HHSizeAE Depend CrpMix extension_distance community_tractors{
 preserve
 cap{
 *loc Var Yield
@@ -220,23 +220,33 @@ loc ApID0=`ApID0'+1
 use `Summaries', clear
 
 export excel CropIDx Equ Coef Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\resource_extraction_results.xlsx", /*
+*/ using "$GitHub\labs\okwaayeli\replications\ag_services\output\ag_services_results-summary-statistics.xlsx", /*
 */ sheet("Means_`disag'") sheetmodify firstrow(variables) 
 
 }
 
-
 mat drop _all
 sca drop _all
-use "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\tech_inefficiency_resource_extract_data",clear
+use "$GitHub\labs\okwaayeli\replications\ag_services\output\tech_inefficiency_ag_services_data",clear
 decode CropID,gen(CropIDx)
-tabstat extraction_any mining_any mining_comm mining_gala quarrying sand salt if CropIDx == "Cassava",by(Surveyx) save
+
+loc xlist services0 farm_association community_cooperative extension0 /*
+*/ ag_services1 ag_services2 ag_services3 ag_services4 ag_services5 ag_services6 ag_services7 ag_services8 /*
+*/ extension_agency_mofa extension_agency_ngo extension_agency_coop  /*
+*/ services_ext_planting services_ext_mechanization services_ext_credit  /*
+*/ services_ext_irrigation services_ext_husbandry services_ext_agchemicals services_ext_post_harvest  /*
+*/ services_asso_employment services_asso_credit services_asso_equipment services_asso_inputs  /*
+*/ services_asso_marketing services_asso_records services_asso_labour /*
+*/ compliance1 compliance2 compliance3 compliance4 /*
+*/ extensionCat1 extensionCat2 extensionCat3 extensionCat4 extensionCat5 extensionCat6 extensionCat7
+
+tabstat `xlist' if CropIDx == "Cassava",by(Surveyx) save
 sum Season
 gen Trend=Season-r(min)
 egen Clust = group(Survey Ecozon EaId HhId)
 mat Means=J(1,8,.)
 
-qui foreach Var in extraction_any mining_any mining_comm mining_gala quarrying sand salt{
+qui foreach Var in `xlist'{
 	qui levelsof CropIDx, local(levels)
 	qui foreach crop in `levels'{
 		preserve
@@ -293,5 +303,5 @@ keep Variable crop mesure Beta SE Tv Pv Min Max SD N
 order Variable crop mesure Beta SE Tv Pv Min Max SD N
 
 export excel Variable crop mesure Beta SE Tv Pv Min Max SD N /*
-*/ using "$GitHub\labs\GHAgricProductivityLab\replications\resource_extraction\output\resource_extraction_results.xlsx", /*
-*/ sheet("extraction") sheetmodify firstrow(variables) 
+*/ using "$GitHub\labs\okwaayeli\replications\ag_services\output\ag_services_results.xlsx", /*
+*/ sheet("services") sheetmodify firstrow(variables) 

@@ -26,7 +26,7 @@ openxlsx::saveWorkbook(wb,file.path(study_environment$wd$output,paste0(project_n
 
 # Fig - Heterogeneity          
 rm(list= ls()[!(ls() %in% c(Keep.List))])
-res <- readRDS(file.path(study_environment$wd$estimations,"CropID_Pooled_extraction_any_TL_hnormal_optimal.rds"))$disagscors
+res <- readRDS(file.path(study_environment$wd$estimations,"CropID_Pooled_ag_services_TL_hnormal_optimal.rds"))$disagscors
 res$disasg <- as.character(res$disagscors_var)
 res$level  <- as.character(res$disagscors_level)
 res <- res[res$estType %in% "teBC",]
@@ -44,7 +44,7 @@ ggsave(file.path(study_environment$wd$output,"figure","heterogeneity_genderAge.p
 
 # Fig - TREND 
 rm(list= ls()[!(ls() %in% c(Keep.List))])
-ef_mean <- readRDS(file.path(study_environment$wd$output,"estimations/CropID_Pooled_extraction_any_TL_hnormal_optimal.rds"))$ef_mean
+ef_mean <- readRDS(file.path(study_environment$wd$output,"estimations/CropID_Pooled_ag_services_TL_hnormal_optimal.rds"))$ef_mean
 ef_mean <- ef_mean[ef_mean$stat %in% "wmean", ]
 ef_mean <- ef_mean[ef_mean$estType %in% "teBC", ]
 ef_mean$estm_type <- "ef_mean"
