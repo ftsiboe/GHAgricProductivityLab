@@ -50,7 +50,7 @@ study_environment <- readRDS(
 DATA <- harmonized_data_prep(study_environment$study_raw_data)           
 
 # Focus analysis sample: pooled crop only; define treatment indicator
-DATA$Treat <- as.integer(as.numeric(DATA$ag_services >0)) # logical treated flag
+DATA$Treat <- as.integer(as.numeric(DATA$services0 >0)) # logical treated flag
 data <- DATA[as.character(DATA$CropID) %in% "Pooled", ]
 
 # --- Matching variable sets

@@ -67,37 +67,18 @@ study_environment <- readRDS(
 # Data ingest & basic harmonization
 estimation_data <- study_environment[["estimation_data"]]
 estimation_data$EduCat <- as.character(estimation_data$EduCat)
+estimation_data <- fastDummies::dummy_cols(estimation_data,c("extension_compliance","ag_services","extension"),ignore_na = TRUE)
+
 distforms <- sf_functional_forms()$distforms
 fxnforms <- sf_functional_forms()$fxnforms
 
-# study_environment$estimation_data$extension <- ifelse(
-#   study_environment$estimation_data$extension %in% 1:2,NA,
-#   study_environment$estimation_data$extension)
-# 
-# study_environment$estimation_data$extension <- ifelse(
-#   study_environment$estimation_data$cooperative > 1 & study_environment$estimation_data$extension <2,NA,
-#   study_environment$estimation_data$extension)
-# 
-# table(study_environment$estimation_data$ag_services,
-#       study_environment$estimation_data$extension )
-# 
-# study_environment$estimation_data$cooperative <- ifelse(
-#   study_environment$estimation_data$cooperative %in% 1,NA,
-#   study_environment$estimation_data$cooperative)
-# 
-# study_environment$estimation_data$cooperative <- ifelse(
-#   study_environment$estimation_data$extension > 2 & study_environment$estimation_data$cooperative <1,NA,
-#   study_environment$estimation_data$cooperative)
-# 
-# table(study_environment$estimation_data$ag_services,
-#       study_environment$estimation_data$cooperative )
 
 # Build table of model specifications for multi–stage frontier estimation
 model_specifications <- sf_model_specifications(
   distforms = distforms,
   fxnforms = fxnforms,
   data = study_environment$estimation_data,
-  technology_variables = c("ag_services"))
+  technology_variables = c("services0", "services1", "services2", "services3"))
 
 # model_specifications <- model_specifications[!model_specifications$disasg %in% c("EduLevel","EduCat","Region","Ecozon","AgeCat"),]
 # model_specifications <- model_specifications[!(model_specifications$disasg %in% c("CropID") & ! model_specifications$level %in% "Pooled"),]
@@ -192,18 +173,21 @@ lapply(
         disagscors_list <- NULL
         
         # For one specific core scenario, compute disaggregated scores
-        if(technology_variable %in% "ag_services" &  
+        if(technology_variable %in% "services0" &  
            matching_type %in% "optimal" & 
            disaggregate_level %in% "Pooled" & 
            disaggregate_variable %in% "CropID" & 
            f %in% 2 & d %in% 1){
           
-          disagscors_list <- c("extension_compliance",names(data)[grepl("CROP_",names(data))],"extension","cooperative")
+          disagscors_list <- c(names(data)[grepl("CROP_",names(data))])
 
           for(ddx in c(
             names(data)[grepl("extension_agency_",names(data))],
-            names(data)[grepl("services_ext_",names(data))],
-            names(data)[grepl("services_coop_",names(data))])){
+            names(data)[grepl("extension_",names(data))],
+            names(data)[grepl("ag_services_",names(data))],
+            names(data)[grepl("extension_compliance_",names(data))],
+            names(data)[grepl("extensionCat_",names(data))],
+            names(data)[grepl("services_",names(data))])){
             if(round(mean(data[,ddx],na.rm=T),2) >= 0.03){ 
               disagscors_list <- c(disagscors_list,ddx)
             }
@@ -211,7 +195,6 @@ lapply(
           
           disagscors_list <- unique(disagscors_list[disagscors_list %in% names(data)])
         }
-        
         
         # Multi-stage frontier estimation over sample draws
         res <- lapply(
